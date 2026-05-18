@@ -2,7 +2,7 @@ import { useState } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { LanguageProvider } from "./context/LanguageContext";
-import HamburgerMenu from "./components/HamburgerMenu";
+import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import SplashScreen from "./components/SplashScreen";
 import Home from "./pages/Home";
@@ -13,12 +13,15 @@ import Signup from "./pages/Signup";
 import { AuthProvider } from "./context/AuthContext";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
+import Placeholder from "./pages/Placeholder";
+import Donate from "./pages/Donate";
+import BecomeMember from "./pages/BecomeMember";
 
 function Layout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
   return (
     <div className="min-h-screen flex flex-col">
-      <HamburgerMenu isOpen={menuOpen} setIsOpen={setMenuOpen} />
+      <Navbar isOpen={menuOpen} setIsOpen={setMenuOpen} />
       <main className="flex-1">{children}</main>
       <Footer />
     </div>
@@ -29,7 +32,7 @@ function AuthLayout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
   return (
     <div className="min-h-screen flex flex-col">
-      <HamburgerMenu isOpen={menuOpen} setIsOpen={setMenuOpen} />
+      <Navbar isOpen={menuOpen} setIsOpen={setMenuOpen} />
       <main className="flex-1">{children}</main>
       {/* No Footer on auth pages */}
     </div>
@@ -57,6 +60,17 @@ export default function App() {
               <Route path="/" element={<Layout><Home /></Layout>} />
               <Route path="/sangathan" element={<Layout><Sangathan /></Layout>} />
               <Route path="/uddeshya" element={<Layout><Uddeshya /></Layout>} />
+              <Route path="/about" element={<Layout><Placeholder title="About Us" /></Layout>} />
+              <Route path="/events" element={<Layout><Placeholder title="Events" /></Layout>} />
+              <Route path="/forums" element={<Layout><Placeholder title="Forums" /></Layout>} />
+              <Route path="/become-member" element={<Layout><BecomeMember /></Layout>} />
+              <Route path="/donate" element={<Layout><Donate /></Layout>} />
+              <Route path="/leadership/founding-presidents" element={<Layout><Placeholder title="Founding Presidents" /></Layout>} />
+              <Route path="/margdarshak-mandal" element={<Layout><Placeholder title="Margdarshak Mandal" /></Layout>} />
+              <Route path="/initiatives" element={<Layout><Placeholder title="Our Initiatives" /></Layout>} />
+              <Route path="/media" element={<Layout><Placeholder title="Media & Gallery" /></Layout>} />
+              <Route path="/volunteer" element={<Layout><Placeholder title="Volunteer" /></Layout>} />
+              <Route path="/contact" element={<Layout><Placeholder title="Contact Us" /></Layout>} />
 
               {/* Auth pages — no Footer */}
               <Route path="/login" element={<AuthLayout><Login /></AuthLayout>} />

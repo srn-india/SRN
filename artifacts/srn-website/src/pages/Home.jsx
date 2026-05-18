@@ -180,12 +180,12 @@ export default function Home() {
               {h.ctaKnowMoreHindi} / {h.ctaKnowMore}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <a
-              href="mailto:srnindia@yahoo.com"
+            <Link
+              to="/become-member"
               className="inline-flex items-center gap-2 px-7 py-3 rounded-full border-2 border-white/40 text-white font-semibold backdrop-blur-sm hover:bg-white/10 hover:border-[#F47A3A] hover:-translate-y-0.5 transition-all duration-300 text-sm"
             >
               {h.ctaJoinHindi} / {h.ctaJoin}
-            </a>
+            </Link>
           </motion.div>
         </motion.div>
 

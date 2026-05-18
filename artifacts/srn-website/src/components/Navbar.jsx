@@ -1,19 +1,47 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, Mail, Languages, ArrowUpRight } from "lucide-react";
+import { Phone, Mail, Languages, ArrowUpRight, User, Calendar, MessageSquare, ChevronDown } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
+import { useAuth } from "../context/AuthContext";
 
-const navLinks = [
+const mainLinks = [
   { path: "/",          hindiName: "मुखपृष्ठ", englishName: "Home",       number: "01" },
-  { path: "/sangathan", hindiName: "संगठन",    englishName: "Sangathan",  number: "02" },
-  { path: "/uddeshya",  hindiName: "उद्देश्य", englishName: "Objectives", number: "03" },
+  { path: "/about",     hindiName: "हमारे बारे में", englishName: "About Us", number: "02" },
+  { path: "/sangathan", hindiName: "संगठन",    englishName: "Sangathan",  number: "03" },
+  { path: "/uddeshya",  hindiName: "उद्देश्य", englishName: "Objectives", number: "04" },
+  { path: "/initiatives", hindiName: "हमारी पहल", englishName: "Our Initiatives", number: "05" },
+  { path: "/media",     hindiName: "मीडिया और गैलरी", englishName: "Media & Gallery", number: "06" },
+  { path: "/margdarshak-mandal", hindiName: "मार्गदर्शक मंडल", englishName: "Margdarshak Mandal", number: "07" },
+  { path: "/volunteer", hindiName: "स्वयंसेवक", englishName: "Volunteer", number: "08" },
+  { path: "/contact",   hindiName: "संपर्क करें", englishName: "Contact Us", number: "09" },
 ];
 
-export default function HamburgerMenu({ isOpen, setIsOpen }) {
+const actionLinks = [
+  { path: "/become-member", hindiName: "सदस्य बनें", englishName: "Become a Member" },
+  { path: "/donate",    hindiName: "दान करें", englishName: "Make a Donation" },
+];
+
+const leadershipLinks = [
+  { path: "/leadership/founding-presidents", hindiName: "संस्थापक अध्यक्ष", englishName: "Founding Presidents" },
+];
+
+export default function Navbar({ isOpen, setIsOpen }) {
   const location = useLocation();
   const { lang, toggleLang } = useLanguage();
+  const { user } = useAuth();
   const en = lang === "en";
+  
+  const [leadershipOpen, setLeadershipOpen] = useState(false);
+
+  const isDashboard = location.pathname === "/dashboard";
+
+  const navLinksToRender = isDashboard ? [
+    ...mainLinks.slice(0, 4),
+    { path: "/events", hindiName: "कार्यक्रम", englishName: "Events", number: "EV" },
+    { path: "/forums", hindiName: "मंच", englishName: "Forums", number: "FR" },
+    ...mainLinks.slice(4)
+  ] : mainLinks;
 
   useEffect(() => {
     const handleKey = (e) => { if (e.key === "Escape") setIsOpen(false); };
@@ -47,16 +75,50 @@ export default function HamburgerMenu({ isOpen, setIsOpen }) {
 
   return (
     <>
-      {/* ── Hamburger button ─────────────────────────────────────── */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-5 right-6 z-50 w-12 h-12 flex flex-col items-center justify-center gap-1.5 rounded-[10px] bg-gradient-to-br from-[#E8622A] to-[#C04A18] shadow-lg shadow-orange-900/40 border border-[#F47A3A]/30 hover:shadow-orange-700/50 transition-shadow duration-300"
-        aria-label="Toggle menu"
-      >
-        <span className={`block w-5 h-0.5 bg-white rounded-full transition-all duration-300 origin-center ${isOpen ? "rotate-45 translate-y-[6px]" : ""}`} />
-        <span className={`block w-5 h-0.5 bg-white rounded-full transition-all duration-300 ${isOpen ? "opacity-0 scale-x-0" : ""}`} />
-        <span className={`block w-5 h-0.5 bg-white rounded-full transition-all duration-300 origin-center ${isOpen ? "-rotate-45 -translate-y-[6px]" : ""}`} />
-      </button>
+      {/* ── Top Navbar (Fixed Right) ─────────────────────────────────────── */}
+      <div className="fixed top-5 right-6 z-50 flex items-center gap-3">
+        {/* Events Button */}
+        {!isDashboard && (
+          <Link to="/events" className="hidden sm:flex items-center gap-2 px-4 py-3 rounded-[10px] bg-black/25 hover:bg-black/50 backdrop-blur-md border border-white/10 text-white transition-all shadow-lg hover:-translate-y-0.5">
+            <Calendar className="w-4 h-4 text-[#F47A3A]" />
+            <span className="text-sm font-medium">{en ? "Events" : "कार्यक्रम"}</span>
+          </Link>
+        )}
+        
+        {/* Forums Button */}
+        {!isDashboard && (
+          <Link to="/forums" className="hidden sm:flex items-center gap-2 px-4 py-3 rounded-[10px] bg-black/25 hover:bg-black/50 backdrop-blur-md border border-white/10 text-white transition-all shadow-lg hover:-translate-y-0.5">
+            <MessageSquare className="w-4 h-4 text-[#F47A3A]" />
+            <span className="text-sm font-medium">{en ? "Forums" : "मंच"}</span>
+          </Link>
+        )}
+
+        {/* User / Login Button */}
+        {user ? (
+          !isDashboard && (
+            <Link to="/dashboard" className="flex items-center gap-2 px-4 py-3 rounded-[10px] bg-[#E8622A]/90 hover:bg-[#C04A18] backdrop-blur-md border border-[#F47A3A]/30 text-white transition-all shadow-lg hover:-translate-y-0.5">
+              <User className="w-4 h-4" />
+              <span className="text-sm font-medium hidden sm:block">{en ? "Dashboard" : "डैशबोर्ड"}</span>
+            </Link>
+          )
+        ) : (
+          <Link to="/login" className="flex items-center gap-2 px-4 py-3 rounded-[10px] bg-[#E8622A]/90 hover:bg-[#C04A18] backdrop-blur-md border border-[#F47A3A]/30 text-white transition-all shadow-lg hover:-translate-y-0.5">
+            <User className="w-4 h-4" />
+            <span className="text-sm font-medium">{en ? "Login" : "लॉगिन"}</span>
+          </Link>
+        )}
+
+        {/* Hamburger button */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-12 h-12 shrink-0 flex flex-col items-center justify-center gap-1.5 rounded-[10px] bg-gradient-to-br from-[#E8622A] to-[#C04A18] shadow-lg shadow-orange-900/40 border border-[#F47A3A]/30 hover:shadow-orange-700/50 transition-all duration-300 hover:-translate-y-0.5"
+          aria-label="Toggle menu"
+        >
+          <span className={`block w-5 h-0.5 bg-white rounded-full transition-all duration-300 origin-center ${isOpen ? "rotate-45 translate-y-[6px]" : ""}`} />
+          <span className={`block w-5 h-0.5 bg-white rounded-full transition-all duration-300 ${isOpen ? "opacity-0 scale-x-0" : ""}`} />
+          <span className={`block w-5 h-0.5 bg-white rounded-full transition-all duration-300 origin-center ${isOpen ? "-rotate-45 -translate-y-[6px]" : ""}`} />
+        </button>
+      </div>
 
       {/* ── Full-screen overlay ───────────────────────────────────── */}
       <AnimatePresence>
@@ -97,17 +159,13 @@ export default function HamburgerMenu({ isOpen, setIsOpen }) {
             >
               {/* ─── LEFT — Logo panel (desktop) ─────────────────── */}
               <div className="hidden md:flex w-5/12 flex-col items-center justify-center px-12 relative">
-                {/* Vertical glass divider */}
                 <div className="absolute right-0 top-16 bottom-16 w-px"
                   style={{ background: "linear-gradient(to bottom, transparent, rgba(232,98,42,0.3) 30%, rgba(232,98,42,0.3) 70%, transparent)" }}
                 />
-
-                {/* Glow */}
                 <div className="absolute w-80 h-80 rounded-full pointer-events-none"
                   style={{ background: "radial-gradient(circle, rgba(232,98,42,0.12) 0%, transparent 70%)" }}
                 />
 
-                {/* Logo inside a glass card */}
                 <motion.div
                   className="relative z-10 flex flex-col items-center"
                   initial={{ opacity: 0, y: 30, scale: 0.8 }}
@@ -149,7 +207,7 @@ export default function HamburgerMenu({ isOpen, setIsOpen }) {
               </div>
 
               {/* ─── RIGHT — Nav & Controls ──────────────────────── */}
-              <div className="w-full md:w-7/12 flex flex-col justify-center px-8 md:px-14 py-16">
+              <div className="w-full md:w-7/12 flex flex-col justify-start px-8 md:px-14 pt-28 pb-12 overflow-y-auto no-scrollbar">
 
                 {/* Mobile logo */}
                 <div className="flex md:hidden items-center gap-3 mb-10">
@@ -158,8 +216,8 @@ export default function HamburgerMenu({ isOpen, setIsOpen }) {
                 </div>
 
                 {/* ── Nav links ── */}
-                <nav className="space-y-3 mb-10">
-                  {navLinks.map((link, i) => {
+                <nav className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6 mt-12 md:mt-0">
+                  {navLinksToRender.map((link, i) => {
                     const isActive = location.pathname === link.path;
                     const primary  = en ? link.englishName : link.hindiName;
                     const secondary = en ? link.hindiName : link.englishName;
@@ -175,7 +233,7 @@ export default function HamburgerMenu({ isOpen, setIsOpen }) {
                         <Link
                           to={link.path}
                           onClick={handleLinkClick}
-                          className="group flex items-center gap-5 px-5 py-4 rounded-2xl transition-all duration-300"
+                          className="group flex items-center gap-4 px-4 py-2.5 rounded-2xl transition-all duration-300"
                           style={{
                             background: isActive
                               ? "rgba(232,98,42,0.15)"
@@ -197,31 +255,126 @@ export default function HamburgerMenu({ isOpen, setIsOpen }) {
                           </span>
 
                           {/* Divider line */}
-                          <div className={`w-px h-8 shrink-0 transition-colors duration-200 ${
+                          <div className={`w-px h-6 shrink-0 transition-colors duration-200 ${
                             isActive ? "bg-[#E8622A]/50" : "bg-white/10 group-hover:bg-[#E8622A]/30"
                           }`} />
 
                           {/* Labels */}
                           <div className="flex-1 min-w-0">
-                            <p className={`text-xl font-serif font-semibold leading-tight transition-colors duration-200 ${
+                            <p className={`text-[15px] font-serif font-semibold leading-tight transition-colors duration-200 ${
                               isActive ? "text-[#F47A3A]" : "text-white/90 group-hover:text-[#F47A3A]"
                             }`}>
                               {primary}
                             </p>
-                            <p className="text-xs text-white/30 group-hover:text-[#F47A3A]/50 transition-colors duration-200 mt-0.5">
+                            <p className="text-[10px] text-white/30 group-hover:text-[#F47A3A]/50 transition-colors duration-200 mt-0.5">
                               {secondary}
                             </p>
                           </div>
 
                           {/* Arrow */}
-                          <ArrowUpRight className={`w-4 h-4 shrink-0 transition-all duration-200 ${
+                          <ArrowUpRight className={`w-3.5 h-3.5 shrink-0 transition-all duration-200 ${
                             isActive ? "text-[#E8622A] opacity-100" : "text-white/20 opacity-0 group-hover:opacity-60 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                           }`} />
                         </Link>
                       </motion.div>
                     );
                   })}
+
+                  {/* Leadership Section (Nested) */}
+                  <motion.div
+                    custom={navLinksToRender.length}
+                    variants={linkVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className="rounded-2xl overflow-hidden transition-all duration-300"
+                    style={{
+                      background: "rgba(255,255,255,0.04)",
+                      border: "1px solid rgba(255,255,255,0.07)",
+                      boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
+                    }}
+                  >
+                    <button
+                      onClick={() => setLeadershipOpen(!leadershipOpen)}
+                      className="w-full group flex items-center justify-between gap-4 px-4 py-2.5 transition-all duration-300 hover:bg-white/5"
+                    >
+                      <div className="flex items-center gap-4">
+                        <span className="text-xs font-mono font-bold text-white/20 group-hover:text-[#E8622A]/60">10</span>
+                        <div className="w-px h-6 shrink-0 bg-white/10 group-hover:bg-[#E8622A]/30" />
+                        <div className="flex-1 min-w-0 text-left">
+                          <p className="text-[15px] font-serif font-semibold leading-tight text-white/90 group-hover:text-[#F47A3A]">
+                            {en ? "Leadership" : "नेतृत्व"}
+                          </p>
+                          <p className="text-[10px] text-white/30 group-hover:text-[#F47A3A]/50 mt-0.5">
+                            {en ? "नेतृत्व" : "Leadership"}
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronDown className={`w-5 h-5 text-white/30 transition-transform duration-300 ${leadershipOpen ? "rotate-180" : ""}`} />
+                    </button>
+                    
+                    <AnimatePresence>
+                      {leadershipOpen && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="border-t border-white/5 bg-black/20"
+                        >
+                          <div className="py-2 flex flex-col">
+                            {leadershipLinks.map((link) => {
+                              const isActive = location.pathname === link.path;
+                              return (
+                                <Link
+                                  key={link.path}
+                                  to={link.path}
+                                  onClick={handleLinkClick}
+                                  className={`px-16 py-3 text-sm font-medium transition-colors ${
+                                    isActive ? "text-[#F47A3A] bg-white/5" : "text-white/60 hover:text-white hover:bg-white/5"
+                                  }`}
+                                >
+                                  {en ? link.englishName : link.hindiName}
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
                 </nav>
+
+                {/* ── Action Buttons ── */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                  {actionLinks.map((link, i) => (
+                    <motion.div
+                      key={link.path}
+                      custom={navLinksToRender.length + 1 + i}
+                      variants={linkVariants}
+                      initial="hidden"
+                      animate="visible"
+                    >
+                      <Link
+                        to={link.path}
+                        onClick={handleLinkClick}
+                        className="group relative flex items-center justify-center px-6 py-3 rounded-xl overflow-hidden shadow-lg hover:shadow-orange-900/40 transition-all duration-300 hover:-translate-y-0.5"
+                        style={{
+                          background: "linear-gradient(135deg, #E8622A, #C04A18)",
+                          border: "1px solid rgba(232,98,42,0.5)",
+                        }}
+                      >
+                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="relative z-10 flex flex-col items-center">
+                          <span className="text-white font-serif font-bold text-[15px] tracking-wide">
+                            {en ? link.englishName : link.hindiName}
+                          </span>
+                          <span className="text-orange-200/60 text-[10px] mt-0.5">
+                            {en ? link.hindiName : link.englishName}
+                          </span>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  ))}
+                </div>
 
                 {/* Shimmer divider */}
                 <div className="h-px mb-6"
