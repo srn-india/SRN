@@ -1,7 +1,9 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, AlertCircle } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
+import { useAuth } from "../context/AuthContext";
 
 // ── Indian states and Union Territories ──────────────────────────────────────
 
@@ -105,11 +107,52 @@ function DecorativePanel() {
 export default function Signup() {
   const { t } = useLanguage();
   const sc = t.signup;
+  const { register } = useAuth();
+  const navigate = useNavigate();
 
-  function handleSubmit(e) {
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    state: "",
+    district: "",
+    gender: "",
+    password: "",
+    confirm: ""
+  });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  async function handleSubmit(e) {
     e.preventDefault();
-    // Placeholder — wire to backend API here
-    console.log("Signup form submitted");
+    setError("");
+    if (formData.password !== formData.confirm) {
+      setError("Passwords do not match");
+      return;
+    }
+    setLoading(true);
+    try {
+      await register({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        state: formData.state,
+        district: formData.district,
+        gender: formData.gender,
+        password: formData.password
+      });
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   const inputClass =
@@ -164,6 +207,13 @@ export default function Signup() {
               Join us in building a stronger nation.
             </motion.p>
 
+              {error && (
+                <div className="mb-4 flex items-center gap-2 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  {error}
+                </div>
+              )}
+
             {/* Form */}
             <form onSubmit={handleSubmit} noValidate>
               <motion.div
@@ -172,19 +222,35 @@ export default function Signup() {
                 animate="visible"
                 className="space-y-5"
               >
-                {/* Full Name */}
-                <motion.div variants={itemVariants}>
-                  <label htmlFor="signup-name" className={labelClass}>
-                    {sc.nameLabel}
-                  </label>
-                  <input
-                    id="signup-name"
-                    type="text"
-                    placeholder={sc.namePlaceholder}
-                    autoComplete="name"
-                    className={inputClass}
-                  />
-                </motion.div>
+                {/* First & Last Name */}
+                <div className="flex gap-4">
+                  <motion.div variants={itemVariants} className="flex-1">
+                    <label htmlFor="firstName" className={labelClass}>First Name</label>
+                    <input
+                      id="firstName"
+                      name="firstName"
+                      type="text"
+                      placeholder="First Name"
+                      className={inputClass}
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      required
+                    />
+                  </motion.div>
+                  <motion.div variants={itemVariants} className="flex-1">
+                    <label htmlFor="lastName" className={labelClass}>Last Name</label>
+                    <input
+                      id="lastName"
+                      name="lastName"
+                      type="text"
+                      placeholder="Last Name"
+                      className={inputClass}
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      required
+                    />
+                  </motion.div>
+                </div>
 
                 {/* Email */}
                 <motion.div variants={itemVariants}>
@@ -193,10 +259,14 @@ export default function Signup() {
                   </label>
                   <input
                     id="signup-email"
+                    name="email"
                     type="email"
                     placeholder={sc.emailPlaceholder}
                     autoComplete="email"
                     className={inputClass}
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
                   />
                 </motion.div>
 
@@ -207,10 +277,14 @@ export default function Signup() {
                   </label>
                   <input
                     id="signup-phone"
+                    name="phone"
                     type="tel"
                     placeholder={sc.phonePlaceholder}
                     autoComplete="tel"
                     className={inputClass}
+                    value={formData.phone}
+                    onChange={handleChange}
+                    required
                   />
                 </motion.div>
 
@@ -221,7 +295,9 @@ export default function Signup() {
                   </label>
                   <select
                     id="signup-state"
-                    defaultValue=""
+                    name="state"
+                    value={formData.state}
+                    onChange={handleChange}
                     className={inputClass + " cursor-pointer appearance-none"}
                     style={{
                       backgroundImage:
@@ -230,6 +306,7 @@ export default function Signup() {
                       backgroundPosition: "right 1rem center",
                       paddingRight: "2.5rem",
                     }}
+                    required
                   >
                     <option value="" disabled>
                       {sc.stateDefault}
@@ -242,6 +319,46 @@ export default function Signup() {
                   </select>
                 </motion.div>
 
+                {/* District & Gender */}
+                <div className="flex gap-4">
+                  <motion.div variants={itemVariants} className="flex-1">
+                    <label htmlFor="district" className={labelClass}>District</label>
+                    <input
+                      id="district"
+                      name="district"
+                      type="text"
+                      placeholder="District"
+                      className={inputClass}
+                      value={formData.district}
+                      onChange={handleChange}
+                      required
+                    />
+                  </motion.div>
+                  <motion.div variants={itemVariants} className="flex-1">
+                    <label htmlFor="gender" className={labelClass}>Gender</label>
+                    <select
+                      id="gender"
+                      name="gender"
+                      className={inputClass + " cursor-pointer appearance-none"}
+                      value={formData.gender}
+                      onChange={handleChange}
+                      required
+                      style={{
+                        backgroundImage:
+                          "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23B89070' d='M6 8L1 3h10z'/%3E%3C/svg%3E\")",
+                        backgroundRepeat: "no-repeat",
+                        backgroundPosition: "right 1rem center",
+                        paddingRight: "2.5rem",
+                      }}
+                    >
+                      <option value="" disabled>Select Gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </motion.div>
+                </div>
+
                 {/* Password */}
                 <motion.div variants={itemVariants}>
                   <label htmlFor="signup-password" className={labelClass}>
@@ -249,10 +366,14 @@ export default function Signup() {
                   </label>
                   <input
                     id="signup-password"
+                    name="password"
                     type="password"
                     placeholder={sc.passwordPlaceholder}
                     autoComplete="new-password"
                     className={inputClass}
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
                   />
                 </motion.div>
 
@@ -263,10 +384,14 @@ export default function Signup() {
                   </label>
                   <input
                     id="signup-confirm"
+                    name="confirm"
                     type="password"
                     placeholder={sc.confirmPlaceholder}
                     autoComplete="new-password"
                     className={inputClass}
+                    value={formData.confirm}
+                    onChange={handleChange}
+                    required
                   />
                 </motion.div>
 
@@ -274,14 +399,15 @@ export default function Signup() {
                 <motion.div variants={itemVariants} className="pt-2">
                   <button
                     type="submit"
+                    disabled={loading}
                     className="w-full py-3.5 px-6 rounded-xl font-semibold text-white text-sm
                                bg-gradient-to-r from-[#E8622A] to-[#C04A18]
                                shadow-md shadow-orange-900/25
                                hover:-translate-y-0.5 hover:shadow-lg hover:shadow-orange-900/30
                                active:translate-y-0
-                               transition-all duration-200"
+                               transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    {sc.submitBtn}
+                    {loading ? "Signing up..." : sc.submitBtn}
                   </button>
                 </motion.div>
               </motion.div>

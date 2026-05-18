@@ -71,9 +71,25 @@ function FadeSection({ children, className = "", delay = 0 }) {
 }
 
 /* ─── Main page ───────────────────────────────────────────────────────── */
+const HERO_IMAGES = [
+  "/hero-bg.jpg",
+  "/hero-bg-1.png",
+  "/hero-bg-2.png",
+  "/hero-bg-3.png"
+];
+
 export default function Home() {
   const { t, lang } = useLanguage();
   const h = t.home;
+  
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % HERO_IMAGES.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -85,11 +101,16 @@ export default function Home() {
 
       {/* ── Hero ─────────────────────────────────────────────────────── */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background image */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('/hero-bg.jpg')" }}
-        />
+        {/* Background image carousel */}
+        {HERO_IMAGES.map((img, index) => (
+          <div
+            key={img}
+            className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-[1500ms] ease-in-out ${
+              index === currentImageIndex ? "opacity-100" : "opacity-0"
+            }`}
+            style={{ backgroundImage: `url('${img}')` }}
+          />
+        ))}
         {/* Overlay: subtle dark tint to keep text readable */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/30 to-black/50" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#E8622A]/8 via-transparent to-[#C04A18]/8" />

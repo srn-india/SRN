@@ -10,6 +10,9 @@ import Sangathan from "./pages/Sangathan";
 import Uddeshya from "./pages/Uddeshya";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import { AuthProvider } from "./context/AuthContext";
+import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
 
 function Layout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -47,18 +50,21 @@ export default function App() {
 
       {/* Main app */}
       <LanguageProvider>
-        <BrowserRouter basename={import.meta.env.BASE_URL}>
-          <Routes>
-            {/* Standard pages — with Footer */}
-            <Route path="/" element={<Layout><Home /></Layout>} />
-            <Route path="/sangathan" element={<Layout><Sangathan /></Layout>} />
-            <Route path="/uddeshya" element={<Layout><Uddeshya /></Layout>} />
+        <AuthProvider>
+          <BrowserRouter basename={import.meta.env.BASE_URL}>
+            <Routes>
+              {/* Standard pages — with Footer */}
+              <Route path="/" element={<Layout><Home /></Layout>} />
+              <Route path="/sangathan" element={<Layout><Sangathan /></Layout>} />
+              <Route path="/uddeshya" element={<Layout><Uddeshya /></Layout>} />
 
-            {/* Auth pages — no Footer */}
-            <Route path="/login" element={<AuthLayout><Login /></AuthLayout>} />
-            <Route path="/signup" element={<AuthLayout><Signup /></AuthLayout>} />
+              {/* Auth pages — no Footer */}
+              <Route path="/login" element={<AuthLayout><Login /></AuthLayout>} />
+              <Route path="/signup" element={<AuthLayout><Signup /></AuthLayout>} />
+              <Route path="/dashboard" element={<AuthLayout><Dashboard /></AuthLayout>} />
+              <Route path="/profile" element={<AuthLayout><Profile /></AuthLayout>} />
 
-            {/* 404 */}
+              {/* 404 */}
             <Route path="*" element={
               <Layout>
                 <div className="flex-1 flex flex-col items-center justify-center py-20">
@@ -70,6 +76,7 @@ export default function App() {
             } />
           </Routes>
         </BrowserRouter>
+        </AuthProvider>
       </LanguageProvider>
     </>
   );
