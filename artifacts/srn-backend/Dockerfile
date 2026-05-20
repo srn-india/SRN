@@ -8,7 +8,9 @@ COPY prisma ./prisma
 RUN npm install
 RUN npx prisma generate --schema=./prisma/schema.prisma
 
-COPY . .
+# Copy source files and configuration required for build
+COPY src ./src
+COPY tsconfig.json ./
 RUN npm run build
 
 # Production stage

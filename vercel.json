@@ -1,0 +1,7 @@
+{
+  "name": "srn",
+  "buildCommand": "pnpm --filter @workspace/srn-website run build",
+  "outputDirectory": "artifacts/srn-website/dist/public",
+  "framework": "vite",
+  "installCommand": "pnpm install"
+}
