@@ -14,6 +14,11 @@ import { AuthProvider } from "./context/AuthContext";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Placeholder from "./pages/Placeholder";
+import Events from "./pages/Events";
+import Forums from "./pages/Forums";
+import MargdarshakMandal from "./pages/MargdarshakMandal";
+import Initiatives from "./pages/Initiatives";
+import Media from "./pages/Media";
 import Donate from "./pages/Donate";
 import BecomeMember from "./pages/BecomeMember";
 
@@ -61,14 +66,14 @@ export default function App() {
               <Route path="/sangathan" element={<Layout><Sangathan /></Layout>} />
               <Route path="/uddeshya" element={<Layout><Uddeshya /></Layout>} />
               <Route path="/about" element={<Layout><Placeholder title="About Us" /></Layout>} />
-              <Route path="/events" element={<Layout><Placeholder title="Events" /></Layout>} />
-              <Route path="/forums" element={<Layout><Placeholder title="Forums" /></Layout>} />
+              <Route path="/events" element={<Layout><Events /></Layout>} />
+              <Route path="/forums" element={<Layout><Forums /></Layout>} />
               <Route path="/become-member" element={<Layout><BecomeMember /></Layout>} />
               <Route path="/donate" element={<Layout><Donate /></Layout>} />
               <Route path="/leadership/founding-presidents" element={<Layout><Placeholder title="Founding Presidents" /></Layout>} />
-              <Route path="/margdarshak-mandal" element={<Layout><Placeholder title="Margdarshak Mandal" /></Layout>} />
-              <Route path="/initiatives" element={<Layout><Placeholder title="Our Initiatives" /></Layout>} />
-              <Route path="/media" element={<Layout><Placeholder title="Media & Gallery" /></Layout>} />
+              <Route path="/margdarshak-mandal" element={<Layout><MargdarshakMandal /></Layout>} />
+              <Route path="/initiatives" element={<Layout><Initiatives /></Layout>} />
+              <Route path="/media" element={<Layout><Media /></Layout>} />
               <Route path="/volunteer" element={<Layout><Placeholder title="Volunteer" /></Layout>} />
               <Route path="/contact" element={<Layout><Placeholder title="Contact Us" /></Layout>} />
 

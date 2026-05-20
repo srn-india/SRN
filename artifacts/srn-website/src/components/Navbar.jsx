@@ -1,29 +1,48 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, Mail, Languages, ArrowUpRight, User, Calendar, MessageSquare, ChevronDown } from "lucide-react";
+import { Phone, Mail, Languages, User, Calendar, MessageSquare, X } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 import { useAuth } from "../context/AuthContext";
 
-const mainLinks = [
-  { path: "/",          hindiName: "मुखपृष्ठ", englishName: "Home",       number: "01" },
-  { path: "/about",     hindiName: "हमारे बारे में", englishName: "About Us", number: "02" },
-  { path: "/sangathan", hindiName: "संगठन",    englishName: "Sangathan",  number: "03" },
-  { path: "/uddeshya",  hindiName: "उद्देश्य", englishName: "Objectives", number: "04" },
-  { path: "/initiatives", hindiName: "हमारी पहल", englishName: "Our Initiatives", number: "05" },
-  { path: "/media",     hindiName: "मीडिया और गैलरी", englishName: "Media & Gallery", number: "06" },
-  { path: "/margdarshak-mandal", hindiName: "मार्गदर्शक मंडल", englishName: "Margdarshak Mandal", number: "07" },
-  { path: "/volunteer", hindiName: "स्वयंसेवक", englishName: "Volunteer", number: "08" },
-  { path: "/contact",   hindiName: "संपर्क करें", englishName: "Contact Us", number: "09" },
-];
-
-const actionLinks = [
-  { path: "/become-member", hindiName: "सदस्य बनें", englishName: "Become a Member" },
-  { path: "/donate",    hindiName: "दान करें", englishName: "Make a Donation" },
-];
-
-const leadershipLinks = [
-  { path: "/leadership/founding-presidents", hindiName: "संस्थापक अध्यक्ष", englishName: "Founding Presidents" },
+const menuCategories = [
+  {
+    titleEn: "The Party",
+    titleHi: "पार्टी",
+    links: [
+      { path: "/", hindiName: "मुखपृष्ठ", englishName: "Home" },
+      { path: "/about", hindiName: "हमारे बारे में", englishName: "About Us" },
+      { path: "/uddeshya", hindiName: "उद्देश्य", englishName: "Objectives" },
+      { path: "/initiatives", hindiName: "हमारी पहल", englishName: "Our Initiatives" },
+    ],
+  },
+  {
+    titleEn: "Organisation",
+    titleHi: "संगठन",
+    links: [
+      { path: "/sangathan", hindiName: "संगठन", englishName: "Sangathan" },
+      { path: "/margdarshak-mandal", hindiName: "मार्गदर्शक मंडल", englishName: "Margdarshak Mandal" },
+      { path: "/volunteer", hindiName: "स्वयंसेवक", englishName: "Volunteer" },
+    ],
+  },
+  {
+    titleEn: "Media & Resources",
+    titleHi: "मीडिया और संसाधन",
+    links: [
+      { path: "/media", hindiName: "मीडिया और गैलरी", englishName: "Media & Gallery" },
+      { path: "/events", hindiName: "कार्यक्रम", englishName: "Events" },
+      { path: "/forums", hindiName: "मंच", englishName: "Forums" },
+    ],
+  },
+  {
+    titleEn: "Action & Contact",
+    titleHi: "कार्रवाई और संपर्क",
+    links: [
+      { path: "/become-member", hindiName: "सदस्य बनें", englishName: "Become a Member", isButton: true },
+      { path: "/donate", hindiName: "दान करें", englishName: "Make a Donation", isButton: true },
+      { path: "/contact", hindiName: "संपर्क करें", englishName: "Contact Us" },
+    ],
+  },
 ];
 
 export default function Navbar({ isOpen, setIsOpen }) {
@@ -32,16 +51,7 @@ export default function Navbar({ isOpen, setIsOpen }) {
   const { user } = useAuth();
   const en = lang === "en";
   
-  const [leadershipOpen, setLeadershipOpen] = useState(false);
-
   const isDashboard = location.pathname === "/dashboard";
-
-  const navLinksToRender = isDashboard ? [
-    ...mainLinks.slice(0, 4),
-    { path: "/events", hindiName: "कार्यक्रम", englishName: "Events", number: "EV" },
-    { path: "/forums", hindiName: "मंच", englishName: "Forums", number: "FR" },
-    ...mainLinks.slice(4)
-  ] : mainLinks;
 
   useEffect(() => {
     const handleKey = (e) => { if (e.key === "Escape") setIsOpen(false); };
@@ -70,57 +80,59 @@ export default function Navbar({ isOpen, setIsOpen }) {
 
   const linkVariants = {
     hidden:  { opacity: 0, x: -20 },
-    visible: (i) => ({ opacity: 1, x: 0, transition: { duration: 0.35, ease: "easeOut", delay: 0.15 + i * 0.08 } }),
+    visible: (i) => ({ opacity: 1, x: 0, transition: { duration: 0.35, ease: "easeOut", delay: 0.15 + i * 0.05 } }),
   };
 
   return (
     <>
-      {/* ── Top Navbar (Fixed Right) ─────────────────────────────────────── */}
-      <div className="fixed top-5 right-6 z-50 flex items-center gap-3">
-        {/* Events Button */}
-        {!isDashboard && (
-          <Link to="/events" className="hidden sm:flex items-center gap-2 px-4 py-3 rounded-[10px] bg-black/25 hover:bg-black/50 backdrop-blur-md border border-white/10 text-white transition-all shadow-lg hover:-translate-y-0.5">
-            <Calendar className="w-4 h-4 text-[#F47A3A]" />
-            <span className="text-sm font-medium">{en ? "Events" : "कार्यक्रम"}</span>
-          </Link>
-        )}
+      {/* ── Global Header ─────────────────────────────────────── */}
+      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-5 pointer-events-none">
         
-        {/* Forums Button */}
-        {!isDashboard && (
-          <Link to="/forums" className="hidden sm:flex items-center gap-2 px-4 py-3 rounded-[10px] bg-black/25 hover:bg-black/50 backdrop-blur-md border border-white/10 text-white transition-all shadow-lg hover:-translate-y-0.5">
-            <MessageSquare className="w-4 h-4 text-[#F47A3A]" />
-            <span className="text-sm font-medium">{en ? "Forums" : "मंच"}</span>
-          </Link>
-        )}
+        {/* Top Left: Logo & Name */}
+        <Link to="/" className="flex items-center gap-3 pointer-events-auto group">
+          <img src="/logo.PNG" alt="SRN Logo" className="w-12 h-12 object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md" />
+          <div className="hidden sm:block">
+            <h1 className="text-white font-bold text-lg font-serif leading-tight drop-shadow-md">
+              {en ? "Sashakt Rashtra Nirman" : "सशक्त राष्ट्र निर्माण"}
+            </h1>
+            <p className="text-[#F47A3A] text-xs font-serif tracking-wide drop-shadow-md">
+              {en ? "सशक्त राष्ट्र निर्माण" : "Sashakt Rashtra Nirman"}
+            </p>
+          </div>
+        </Link>
 
-        {/* User / Login Button */}
-        {user ? (
-          !isDashboard && (
-            <Link to="/dashboard" className="flex items-center gap-2 px-4 py-3 rounded-[10px] bg-[#E8622A]/90 hover:bg-[#C04A18] backdrop-blur-md border border-[#F47A3A]/30 text-white transition-all shadow-lg hover:-translate-y-0.5">
+        {/* Top Right: Buttons & Hamburger */}
+        <div className="flex items-center gap-3 pointer-events-auto">
+
+
+          {user ? (
+            !isDashboard && (
+              <Link to="/dashboard" className="flex items-center gap-2 px-3 py-2 rounded-[10px] bg-white/5 hover:bg-white/15 backdrop-blur-md border border-white/10 text-white/80 hover:text-white transition-all shadow-sm hover:-translate-y-0.5">
+                <User className="w-4 h-4" />
+                <span className="text-sm font-medium hidden sm:block">{en ? "Dashboard" : "डैशबोर्ड"}</span>
+              </Link>
+            )
+          ) : (
+            <Link to="/login" className="flex items-center gap-2 px-3 py-2 rounded-[10px] bg-white/5 hover:bg-white/15 backdrop-blur-md border border-white/10 text-white/80 hover:text-white transition-all shadow-sm hover:-translate-y-0.5">
               <User className="w-4 h-4" />
-              <span className="text-sm font-medium hidden sm:block">{en ? "Dashboard" : "डैशबोर्ड"}</span>
+              <span className="text-sm font-medium">{en ? "Login" : "लॉगिन"}</span>
             </Link>
-          )
-        ) : (
-          <Link to="/login" className="flex items-center gap-2 px-4 py-3 rounded-[10px] bg-[#E8622A]/90 hover:bg-[#C04A18] backdrop-blur-md border border-[#F47A3A]/30 text-white transition-all shadow-lg hover:-translate-y-0.5">
-            <User className="w-4 h-4" />
-            <span className="text-sm font-medium">{en ? "Login" : "लॉगिन"}</span>
-          </Link>
-        )}
+          )}
 
-        {/* Hamburger button */}
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-12 h-12 shrink-0 flex flex-col items-center justify-center gap-1.5 rounded-[10px] bg-gradient-to-br from-[#E8622A] to-[#C04A18] shadow-lg shadow-orange-900/40 border border-[#F47A3A]/30 hover:shadow-orange-700/50 transition-all duration-300 hover:-translate-y-0.5"
-          aria-label="Toggle menu"
-        >
-          <span className={`block w-5 h-0.5 bg-white rounded-full transition-all duration-300 origin-center ${isOpen ? "rotate-45 translate-y-[6px]" : ""}`} />
-          <span className={`block w-5 h-0.5 bg-white rounded-full transition-all duration-300 ${isOpen ? "opacity-0 scale-x-0" : ""}`} />
-          <span className={`block w-5 h-0.5 bg-white rounded-full transition-all duration-300 origin-center ${isOpen ? "-rotate-45 -translate-y-[6px]" : ""}`} />
-        </button>
+          {/* Hamburger button (Changes to X when open inside overlay) */}
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="w-12 h-12 shrink-0 relative rounded-[10px] bg-black/20 hover:bg-black/40 backdrop-blur-md border border-white/10 text-white transition-all duration-300 shadow-sm hover:-translate-y-0.5 z-50"
+            aria-label="Toggle menu"
+          >
+            <span className={`absolute left-1/2 -translate-x-1/2 w-5 h-0.5 bg-white rounded-full transition-all duration-300 origin-center ${isOpen ? "top-1/2 -translate-y-1/2 rotate-45" : "top-[14px]"}`} />
+            <span className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-5 h-0.5 bg-white rounded-full transition-all duration-300 ${isOpen ? "opacity-0 scale-x-0" : ""}`} />
+            <span className={`absolute left-1/2 -translate-x-1/2 w-5 h-0.5 bg-white rounded-full transition-all duration-300 origin-center ${isOpen ? "top-1/2 -translate-y-1/2 -rotate-45" : "bottom-[14px]"}`} />
+          </button>
+        </div>
       </div>
 
-      {/* ── Full-screen overlay ───────────────────────────────────── */}
+      {/* ── Full-screen Mega Menu Overlay ───────────────────────────── */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -128,329 +140,129 @@ export default function Navbar({ isOpen, setIsOpen }) {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed inset-0 z-40"
-            style={{ background: "rgba(10, 4, 2, 0.55)" }}
+            className="fixed inset-0 z-40 bg-white dark:bg-[#0A0402]"
+            style={{ background: "rgba(10, 4, 2, 0.95)" }}
           >
             {/* Blurred bg layer */}
-            <div className="absolute inset-0 backdrop-blur-2xl" />
+            <div className="absolute inset-0 backdrop-blur-3xl" />
 
             {/* Subtle noise texture */}
             <div
-              className="absolute inset-0 opacity-[0.03] pointer-events-none"
+              className="absolute inset-0 opacity-[0.04] pointer-events-none"
               style={{
                 backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
                 backgroundSize: "128px 128px",
               }}
             />
 
-            {/* Radial orange glow at top */}
-            <div
-              className="absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full pointer-events-none"
-              style={{ background: "radial-gradient(ellipse at center, rgba(232,98,42,0.18) 0%, transparent 70%)" }}
-            />
-
-            {/* ── Content container ───────────────────────────────── */}
             <motion.div
               variants={panelVariants}
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="relative z-10 w-full h-full flex"
+              className="relative z-10 w-full h-full flex flex-col pt-28 pb-10 px-6 md:px-16 overflow-y-auto"
             >
-              {/* ─── LEFT — Logo panel (desktop) ─────────────────── */}
-              <div className="hidden md:flex w-5/12 flex-col items-center justify-center px-12 relative">
-                <div className="absolute right-0 top-16 bottom-16 w-px"
-                  style={{ background: "linear-gradient(to bottom, transparent, rgba(232,98,42,0.3) 30%, rgba(232,98,42,0.3) 70%, transparent)" }}
-                />
-                <div className="absolute w-80 h-80 rounded-full pointer-events-none"
-                  style={{ background: "radial-gradient(circle, rgba(232,98,42,0.12) 0%, transparent 70%)" }}
-                />
-
-                <motion.div
-                  className="relative z-10 flex flex-col items-center"
-                  initial={{ opacity: 0, y: 30, scale: 0.8 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ delay: 0.18, duration: 0.65, ease: [0.32, 0.72, 0, 1] }}
-                >
-                  <motion.img
-                    src="/logo.PNG"
-                    alt="SRN Logo"
-                    className="w-52 h-52 object-contain drop-shadow-2xl"
-                    animate={{ y: [0, -8, 0] }}
-                    transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-                  />
-
-                  <motion.h1
-                    className="text-white font-bold text-2xl font-serif leading-snug text-center mt-5"
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.38, duration: 0.5 }}
-                  >
-                    {en ? "Sashakt Rashtra Nirman" : "सशक्त राष्ट्र निर्माण"}
-                  </motion.h1>
-                  <motion.div
-                    className="mt-3 w-12 h-0.5 rounded-full mx-auto"
-                    style={{ background: "linear-gradient(to right, #E8622A, #D4880C)" }}
-                    initial={{ scaleX: 0 }}
-                    animate={{ scaleX: 1 }}
-                    transition={{ delay: 0.52, duration: 0.45 }}
-                  />
-                  <motion.p
-                    className="text-[#F47A3A]/60 text-sm mt-3 font-serif tracking-wide"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.6, duration: 0.4 }}
-                  >
-                    {en ? "सशक्त राष्ट्र निर्माण" : "Sashakt Rashtra Nirman"}
-                  </motion.p>
-                </motion.div>
-              </div>
-
-              {/* ─── RIGHT — Nav & Controls ──────────────────────── */}
-              <div className="w-full md:w-7/12 flex flex-col justify-start px-8 md:px-14 pt-28 pb-12 overflow-y-auto no-scrollbar">
-
-                {/* Mobile logo */}
-                <div className="flex md:hidden items-center gap-3 mb-10">
-                  <img src="/logo.PNG" alt="logo" className="w-10 h-10 object-contain" />
-                  <p className="text-white font-bold font-serif">{en ? "Sashakt Rashtra Nirman" : "सशक्त राष्ट्र निर्माण"}</p>
-                </div>
-
-                {/* ── Nav links ── */}
-                <nav className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6 mt-12 md:mt-0">
-                  {navLinksToRender.map((link, i) => {
-                    const isActive = location.pathname === link.path;
-                    const primary  = en ? link.englishName : link.hindiName;
-                    const secondary = en ? link.hindiName : link.englishName;
-
-                    return (
-                      <motion.div
-                        key={link.path}
-                        custom={i}
+              
+              {/* Menu Grid Container */}
+              <div className="max-w-7xl mx-auto w-full flex-1">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-10">
+                  
+                  {menuCategories.map((category, colIdx) => (
+                    <div key={category.titleEn} className="flex flex-col">
+                      <motion.h2 
+                        custom={colIdx}
                         variants={linkVariants}
-                        initial="hidden"
-                        animate="visible"
+                        className="text-[#E8622A] font-bold text-xl font-serif mb-6 pb-2 border-b border-white/10"
                       >
-                        <Link
-                          to={link.path}
-                          onClick={handleLinkClick}
-                          className="group flex items-center gap-4 px-4 py-2.5 rounded-2xl transition-all duration-300"
-                          style={{
-                            background: isActive
-                              ? "rgba(232,98,42,0.15)"
-                              : "rgba(255,255,255,0.04)",
-                            border: isActive
-                              ? "1px solid rgba(232,98,42,0.45)"
-                              : "1px solid rgba(255,255,255,0.07)",
-                            boxShadow: isActive
-                              ? "0 4px 24px rgba(232,98,42,0.12), inset 0 1px 0 rgba(255,255,255,0.06)"
-                              : "inset 0 1px 0 rgba(255,255,255,0.04)",
-                            backdropFilter: "blur(8px)",
-                          }}
-                        >
-                          {/* Number */}
-                          <span className={`text-xs font-mono font-bold transition-colors duration-200 shrink-0 ${
-                            isActive ? "text-[#E8622A]" : "text-white/20 group-hover:text-[#E8622A]/60"
-                          }`}>
-                            {link.number}
-                          </span>
-
-                          {/* Divider line */}
-                          <div className={`w-px h-6 shrink-0 transition-colors duration-200 ${
-                            isActive ? "bg-[#E8622A]/50" : "bg-white/10 group-hover:bg-[#E8622A]/30"
-                          }`} />
-
-                          {/* Labels */}
-                          <div className="flex-1 min-w-0">
-                            <p className={`text-[15px] font-serif font-semibold leading-tight transition-colors duration-200 ${
-                              isActive ? "text-[#F47A3A]" : "text-white/90 group-hover:text-[#F47A3A]"
-                            }`}>
-                              {primary}
-                            </p>
-                            <p className="text-[10px] text-white/30 group-hover:text-[#F47A3A]/50 transition-colors duration-200 mt-0.5">
-                              {secondary}
-                            </p>
-                          </div>
-
-                          {/* Arrow */}
-                          <ArrowUpRight className={`w-3.5 h-3.5 shrink-0 transition-all duration-200 ${
-                            isActive ? "text-[#E8622A] opacity-100" : "text-white/20 opacity-0 group-hover:opacity-60 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                          }`} />
-                        </Link>
-                      </motion.div>
-                    );
-                  })}
-
-                  {/* Leadership Section (Nested) */}
-                  <motion.div
-                    custom={navLinksToRender.length}
-                    variants={linkVariants}
-                    initial="hidden"
-                    animate="visible"
-                    className="rounded-2xl overflow-hidden transition-all duration-300"
-                    style={{
-                      background: "rgba(255,255,255,0.04)",
-                      border: "1px solid rgba(255,255,255,0.07)",
-                      boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
-                    }}
-                  >
-                    <button
-                      onClick={() => setLeadershipOpen(!leadershipOpen)}
-                      className="w-full group flex items-center justify-between gap-4 px-4 py-2.5 transition-all duration-300 hover:bg-white/5"
-                    >
-                      <div className="flex items-center gap-4">
-                        <span className="text-xs font-mono font-bold text-white/20 group-hover:text-[#E8622A]/60">10</span>
-                        <div className="w-px h-6 shrink-0 bg-white/10 group-hover:bg-[#E8622A]/30" />
-                        <div className="flex-1 min-w-0 text-left">
-                          <p className="text-[15px] font-serif font-semibold leading-tight text-white/90 group-hover:text-[#F47A3A]">
-                            {en ? "Leadership" : "नेतृत्व"}
-                          </p>
-                          <p className="text-[10px] text-white/30 group-hover:text-[#F47A3A]/50 mt-0.5">
-                            {en ? "नेतृत्व" : "Leadership"}
-                          </p>
-                        </div>
-                      </div>
-                      <ChevronDown className={`w-5 h-5 text-white/30 transition-transform duration-300 ${leadershipOpen ? "rotate-180" : ""}`} />
-                    </button>
-                    
-                    <AnimatePresence>
-                      {leadershipOpen && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="border-t border-white/5 bg-black/20"
-                        >
-                          <div className="py-2 flex flex-col">
-                            {leadershipLinks.map((link) => {
-                              const isActive = location.pathname === link.path;
-                              return (
+                        {en ? category.titleEn : category.titleHi}
+                      </motion.h2>
+                      
+                      <ul className="space-y-4">
+                        {category.links.map((link, linkIdx) => {
+                          const isActive = location.pathname === link.path;
+                          
+                          if (link.isButton) {
+                            return (
+                              <motion.li key={link.path} custom={colIdx + linkIdx} variants={linkVariants}>
                                 <Link
-                                  key={link.path}
                                   to={link.path}
                                   onClick={handleLinkClick}
-                                  className={`px-16 py-3 text-sm font-medium transition-colors ${
-                                    isActive ? "text-[#F47A3A] bg-white/5" : "text-white/60 hover:text-white hover:bg-white/5"
-                                  }`}
+                                  className="inline-block mt-2 w-full text-center px-6 py-2.5 rounded-lg bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white font-semibold shadow-lg hover:shadow-orange-900/50 hover:-translate-y-0.5 transition-all duration-300"
                                 >
                                   {en ? link.englishName : link.hindiName}
                                 </Link>
-                              );
-                            })}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
-                </nav>
+                              </motion.li>
+                            );
+                          }
 
-                {/* ── Action Buttons ── */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
-                  {actionLinks.map((link, i) => (
-                    <motion.div
-                      key={link.path}
-                      custom={navLinksToRender.length + 1 + i}
-                      variants={linkVariants}
-                      initial="hidden"
-                      animate="visible"
-                    >
-                      <Link
-                        to={link.path}
-                        onClick={handleLinkClick}
-                        className="group relative flex items-center justify-center px-6 py-3 rounded-xl overflow-hidden shadow-lg hover:shadow-orange-900/40 transition-all duration-300 hover:-translate-y-0.5"
-                        style={{
-                          background: "linear-gradient(135deg, #E8622A, #C04A18)",
-                          border: "1px solid rgba(232,98,42,0.5)",
-                        }}
-                      >
-                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        <div className="relative z-10 flex flex-col items-center">
-                          <span className="text-white font-serif font-bold text-[15px] tracking-wide">
-                            {en ? link.englishName : link.hindiName}
-                          </span>
-                          <span className="text-orange-200/60 text-[10px] mt-0.5">
-                            {en ? link.hindiName : link.englishName}
-                          </span>
-                        </div>
-                      </Link>
-                    </motion.div>
+                          return (
+                            <motion.li key={link.path} custom={colIdx + linkIdx} variants={linkVariants}>
+                              <Link
+                                to={link.path}
+                                onClick={handleLinkClick}
+                                className={`block group transition-colors duration-200 ${
+                                  isActive ? "text-[#F47A3A]" : "text-white/70 hover:text-white"
+                                }`}
+                              >
+                                <span className="text-[15px] font-medium block">
+                                  {en ? link.englishName : link.hindiName}
+                                </span>
+                                <span className="text-[11px] text-white/30 group-hover:text-[#F47A3A]/50 transition-colors block mt-0.5">
+                                  {en ? link.hindiName : link.englishName}
+                                </span>
+                              </Link>
+                            </motion.li>
+                          );
+                        })}
+                      </ul>
+                    </div>
                   ))}
+
+                </div>
+              </div>
+
+              {/* Bottom Footer Area within Menu */}
+              <motion.div 
+                custom={10} 
+                variants={linkVariants}
+                className="mt-16 max-w-7xl mx-auto w-full border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-6"
+              >
+                {/* Language Toggle */}
+                <div className="flex items-center gap-4 bg-white/5 p-1.5 rounded-xl border border-white/10">
+                  <Languages className="w-4 h-4 text-[#E8622A] ml-2" />
+                  <div className="flex bg-black/40 rounded-lg p-0.5">
+                    <button
+                      onClick={() => !en && toggleLang()}
+                      className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                        en ? "bg-[#E8622A] text-white shadow-md" : "text-white/50 hover:text-white"
+                      }`}
+                    >
+                      EN
+                    </button>
+                    <button
+                      onClick={() => en && toggleLang()}
+                      className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                        !en ? "bg-[#E8622A] text-white shadow-md" : "text-white/50 hover:text-white"
+                      }`}
+                    >
+                      HI
+                    </button>
+                  </div>
                 </div>
 
-                {/* Shimmer divider */}
-                <div className="h-px mb-6"
-                  style={{ background: "linear-gradient(to right, transparent, rgba(232,98,42,0.25), transparent)" }}
-                />
+                {/* Contact Info */}
+                <div className="flex items-center gap-6">
+                  <a href="tel:+917652012487" className="flex items-center gap-2 text-white/60 hover:text-[#F47A3A] transition-colors text-sm">
+                    <Phone className="w-4 h-4 text-[#E8622A]" />
+                    +91 76520 12487
+                  </a>
+                  <a href="mailto:srnindia@yahoo.com" className="flex items-center gap-2 text-white/60 hover:text-[#F47A3A] transition-colors text-sm">
+                    <Mail className="w-4 h-4 text-[#E8622A]" />
+                    srnindia@yahoo.com
+                  </a>
+                </div>
+              </motion.div>
 
-                {/* ── Language toggle ── */}
-                <motion.div
-                  className="mb-6"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.45, duration: 0.4 }}
-                >
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <Languages className="w-3 h-3 text-[#E8622A]/60" />
-                    <p className="text-white/35 text-[10px] uppercase tracking-[0.2em] font-medium">
-                      {en ? "Language / भाषा" : "भाषा / Language"}
-                    </p>
-                  </div>
-                  <button
-                    onClick={toggleLang}
-                    className="flex items-center w-full rounded-xl overflow-hidden"
-                    style={{
-                      background: "rgba(255,255,255,0.04)",
-                      border: "1px solid rgba(232,98,42,0.2)",
-                      boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)",
-                    }}
-                  >
-                    {["en", "hi"].map((l) => (
-                      <span
-                        key={l}
-                        className="flex-1 py-2.5 text-sm font-semibold text-center transition-all duration-300"
-                        style={lang === l ? {
-                          background: "linear-gradient(135deg, #E8622A, #C04A18)",
-                          color: "white",
-                          boxShadow: "0 2px 12px rgba(232,98,42,0.35)",
-                        } : { color: "rgba(255,255,255,0.35)" }}
-                      >
-                        {l === "en" ? "English" : "हिंदी"}
-                      </span>
-                    ))}
-                  </button>
-                </motion.div>
-
-                {/* ── Contact ── */}
-                <motion.div
-                  className="flex flex-col gap-2.5"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.55, duration: 0.4 }}
-                >
-                  {[
-                    { href: "tel:+917652012487", Icon: Phone, label: "+91 76520 12487" },
-                    { href: "mailto:srnindia@yahoo.com", Icon: Mail, label: "srnindia@yahoo.com" },
-                  ].map(({ href, Icon, label }) => (
-                    <a
-                      key={href}
-                      href={href}
-                      className="group flex items-center gap-2.5 px-4 py-2.5 rounded-xl transition-all duration-200"
-                      style={{
-                        background: "rgba(255,255,255,0.03)",
-                        border: "1px solid rgba(255,255,255,0.06)",
-                      }}
-                    >
-                      <span className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-                        style={{ background: "rgba(232,98,42,0.12)", border: "1px solid rgba(232,98,42,0.2)" }}
-                      >
-                        <Icon className="w-3.5 h-3.5 text-[#E8622A]" />
-                      </span>
-                      <span className="text-white/50 group-hover:text-[#F47A3A] text-sm transition-colors duration-200">
-                        {label}
-                      </span>
-                    </a>
-                  ))}
-                </motion.div>
-              </div>
             </motion.div>
           </motion.div>
         )}
