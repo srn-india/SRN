@@ -7,9 +7,27 @@ export default function Footer() {
   const f = t.footer;
 
   return (
-    <footer className="bg-[#1E0F05] text-white pt-12 pb-8">
-      {/* Top orange bar */}
-      <div className="h-1 bg-gradient-to-r from-[#E8622A] to-[#D4880C] mb-12" />
+    <footer className="bg-[#1E0F05] text-white pb-8">
+      {/* Integrated Contact Strip at the top of Footer */}
+      <div className="bg-gradient-to-r from-[#E8622A] to-[#C04A18] py-8 px-6 mb-12">
+        <div className="max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-6">
+          <a
+            href="tel:+917652012487"
+            className="flex items-center gap-2 text-white hover:text-white/80 font-medium transition-colors duration-200"
+          >
+            <Phone className="w-5 h-5 shrink-0" />
+            +91 76520 12487
+          </a>
+          <div className="hidden sm:block h-5 w-px bg-white/30" />
+          <a
+            href="mailto:srnindia@yahoo.com"
+            className="flex items-center gap-2 text-white hover:text-white/80 font-medium transition-colors duration-200"
+          >
+            <Mail className="w-5 h-5 shrink-0" />
+            srnindia@yahoo.com
+          </a>
+        </div>
+      </div>
 
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">

@@ -56,8 +56,8 @@ export const content = {
       impactCounters: [
         { value: 10000, suffix: "+", label: "Beneficiaries", labelHindi: "लाभार्थी" },
         { value: 25, suffix: "+", label: "Projects", labelHindi: "परियोजनाएं" },
-        { value: 500, suffix: "+", label: "Volunteers", labelHindi: "स्वयंसेवक" },
-        { value: 15, suffix: "+", label: "Districts", labelHindi: "जिले" },
+        { value: 800, suffix: "+", label: "Volunteers", labelHindi: "स्वयंसेवक" },
+        { value: 750, suffix: "+", label: "Districts", labelHindi: "जिले" },
       ],
       impactQuote: "Together, we can build a strong, aware, and developed India.",
       impactQuoteHindi: "साथ मिलकर हम एक सशक्त, जागरूक और विकसित भारत का निर्माण कर सकते हैं।",
@@ -378,8 +378,8 @@ export const content = {
       impactCounters: [
         { value: 10000, suffix: "+", label: "Beneficiaries", labelHindi: "लाभार्थी" },
         { value: 25, suffix: "+", label: "Projects", labelHindi: "परियोजनाएं" },
-        { value: 500, suffix: "+", label: "Volunteers", labelHindi: "स्वयंसेवक" },
-        { value: 15, suffix: "+", label: "Districts", labelHindi: "जिले" },
+        { value: 800, suffix: "+", label: "Volunteers", labelHindi: "स्वयंसेवक" },
+        { value: 750, suffix: "+", label: "Districts", labelHindi: "जिले" },
       ],
       impactQuote: "Together, we can build a strong, aware, and developed India.",
       impactQuoteHindi: "साथ मिलकर हम एक सशक्त, जागरूक और विकसित भारत का निर्माण कर सकते हैं।",

@@ -703,24 +703,24 @@ export default function NationalPresident() {
       </section>
 
       {/* ── Dynamic Antyodaya Footer Callout ─────────────────────────── */}
-      <section className="px-6 py-12">
+      <section className="px-6 py-12 bg-[#FFF9F2]">
         <div className="max-w-4xl mx-auto">
           <FadeSection>
-            <div className="relative rounded-3xl bg-gradient-to-br from-[#1E0F05] to-[#3A1A0A] p-8 md:p-12 text-center overflow-hidden shadow-xl">
+            <div className="relative rounded-3xl bg-white border border-[#F0D5B8] p-8 md:p-12 text-center overflow-hidden shadow-lg">
               {/* Subtle glows */}
               <div className="absolute -left-12 -bottom-12 w-48 h-48 rounded-full bg-[#E8622A]/10 blur-3xl" />
               <div className="absolute -right-12 -top-12 w-48 h-48 rounded-full bg-[#D4880C]/10 blur-3xl" />
-              <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `repeating-linear-gradient(-45deg, white, white 1px, transparent 1px, transparent 28px)` }} />
+              <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: `repeating-linear-gradient(-45deg, #E8622A, #E8622A 1px, transparent 1px, transparent 28px)` }} />
 
-              <span className="inline-block bg-[#E8622A]/20 border border-[#E8622A]/30 text-[#F47A3A] text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">
+              <span className="inline-block bg-[#E8622A]/10 border border-[#E8622A]/30 text-[#E8622A] text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">
                 {en ? "Core Philosophy" : "मूल दर्शन"}
               </span>
 
-              <h4 className="text-2xl md:text-3xl font-serif font-bold text-white leading-tight">
+              <h4 className="text-2xl md:text-3xl font-serif font-bold text-[#5C1010] leading-tight">
                 {en ? "Antyodaya & Grassroots Service" : "अंत्योदय और जमीनी जन-सेवा"}
               </h4>
 
-              <p className="text-orange-100/70 text-sm md:text-base mt-4 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-[#7A5C45] text-sm md:text-base mt-4 max-w-2xl mx-auto leading-relaxed">
                 {en
                   ? "Dr. Manoj Kumar Shukla is a strong advocate for ensuring that the benefits of every government welfare scheme reach the person at the very end of the line with absolute integrity, aligning completely with our vision of nation-building."
                   : "डॉ. शुक्ला इस विचार के प्रबल पक्षधर हैं कि देश के विकास और सुशासन की हर कल्याणकारी योजना का लाभ समाज की अंतिम पंक्ति में खड़े व्यक्ति तक पूरी ईमानदारी से पहुँचना चाहिए।"}

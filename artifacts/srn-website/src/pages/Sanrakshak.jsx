@@ -79,7 +79,7 @@ function GalleryImageFrame({ src, alt, caption, fileName }) {
 const bioData = {
   en: {
     name: "Mahamandaleshwar Swami Yatindranand Giri Maharaj",
-    titleBadge: "Sansrakshak / Patron",
+    titleBadge: "Sanrakshak / Patron",
     degrees: "Bachelor of Science (B.Sc) | Senior Spiritual Leader of Juna Akhara",
     subtitles: [
       "Revered Senior Spiritual Leader",
@@ -204,7 +204,7 @@ const bioData = {
   },
   hi: {
     name: "महामंडलेश्वर स्वामी यतीन्द्रानन्द गिरि महाराज",
-    titleBadge: "संरक्षक / Sansrakshak",
+    titleBadge: "संरक्षक / Sanrakshak",
     degrees: "विज्ञान स्नातक (B.Sc) | श्री पंचदशनाम जूना अखाड़ा के वरिष्ठ आध्यात्मिक संत",
     subtitles: [
       "परम आदरणीय वरिष्ठ आध्यात्मिक संत",
@@ -350,8 +350,8 @@ export default function Sansrakshak() {
   useEffect(() => {
     window.scrollTo(0, 0);
     document.title = en 
-      ? "Sashakt Rashtra Nirman – Patron (Sansrakshak)" 
-      : "सशक्त राष्ट्र निर्माण – संरक्षक (Sansrakshak)";
+      ? "Sashakt Rashtra Nirman – Patron (Sanrakshak)" 
+      : "सशक्त राष्ट्र निर्माण – संरक्षक (Sanrakshak)";
   }, [en]);
 
   const activeSectionData = data.sections.find(s => s.id === activeTab);
@@ -398,7 +398,7 @@ export default function Sansrakshak() {
           </span>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
-            {en ? "Sansrakshak (Patron)" : "संरक्षक (Sansrakshak)"}
+            {en ? "Sanrakshak (Patron)" : "संरक्षक (Sanrakshak)"}
           </h1>
           
           <motion.div
@@ -439,7 +439,7 @@ export default function Sansrakshak() {
                       Upload Portrait
                     </span>
                     <span className="text-[9px] text-[#7A5C45] font-mono leading-none bg-white border border-[#F0D5B8] px-1 py-0.5 rounded">
-                      sansrakshak_portrait.png
+                      sanrakshak_portrait.png
                     </span>
                   </div>
                 )}
@@ -662,23 +662,23 @@ export default function Sansrakshak() {
       </section>
 
       {/* ── Dynamic Antyodaya Footer Callout ─────────────────────────── */}
-      <section className="px-6 py-12">
+      <section className="px-6 py-12 bg-[#FFF9F2]">
         <div className="max-w-4xl mx-auto">
           <FadeSection>
-            <div className="relative rounded-3xl bg-gradient-to-br from-[#1E0F05] to-[#3A1A0A] p-8 md:p-12 text-center overflow-hidden shadow-xl">
+            <div className="relative rounded-3xl bg-white border border-[#F0D5B8] p-8 md:p-12 text-center overflow-hidden shadow-lg">
               <div className="absolute -left-12 -bottom-12 w-48 h-48 rounded-full bg-[#E8622A]/10 blur-3xl" />
               <div className="absolute -right-12 -top-12 w-48 h-48 rounded-full bg-[#D4880C]/10 blur-3xl" />
-              <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `repeating-linear-gradient(-45deg, white, white 1px, transparent 1px, transparent 28px)` }} />
+              <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: `repeating-linear-gradient(-45deg, #E8622A, #E8622A 1px, transparent 1px, transparent 28px)` }} />
               
-              <span className="inline-block bg-[#E8622A]/20 border border-[#E8622A]/30 text-[#F47A3A] text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">
+              <span className="inline-block bg-[#E8622A]/10 border border-[#E8622A]/30 text-[#E8622A] text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">
                 {en ? "Legacy of Devotion" : "सनातन संस्कृति एवं अखंड सेवा"}
               </span>
 
-              <h4 className="text-2xl md:text-3xl font-serif font-bold text-white leading-tight">
+              <h4 className="text-2xl md:text-3xl font-serif font-bold text-[#5C1010] leading-tight">
                 {en ? "Preserving Sanatana & Serving Humanity" : "सनातन का संरक्षण और मानवता की निस्वार्थ सेवा"}
               </h4>
               
-              <p className="text-orange-100/70 text-sm md:text-base mt-4 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-[#7A5C45] text-sm md:text-base mt-4 max-w-2xl mx-auto leading-relaxed">
                 {en 
                   ? "Mahamandaleshwar Swami Yatindranand Giri Maharaj stands as a beacon of light and inspiration, guiding countless souls on their spiritual journeys and igniting the flame of divine love and national duty."
                   : "महामंडलेश्वर स्वामी यतीन्द्रानन्द गिरि महाराज का संपूर्ण जीवन साधना, राष्ट्र-भक्ति और लोक-कल्याण का एक अनुपम संगम है। वे निरंतर समाज में निस्वार्थ सेवा का प्रचार कर हर हृदय में दिव्य प्रेम एवं राष्ट्रधर्म की ज्योति प्रज्वलित कर रहे हैं।"}
