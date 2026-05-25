@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, Mail, Languages, User, Calendar, MessageSquare, X } from "lucide-react";
+import { Phone, Mail, Languages, User, Calendar, MessageSquare, X, Lock } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 import { useAuth } from "../context/AuthContext";
 
@@ -21,8 +21,14 @@ const menuCategories = [
     titleHi: "संगठन",
     links: [
       { path: "/sangathan", hindiName: "संगठन", englishName: "Sangathan" },
-      { path: "/margdarshak-mandal", hindiName: "मार्गदर्शक मंडल", englishName: "Margdarshak Mandal" },
-      { path: "/volunteer", hindiName: "स्वयंसेवक", englishName: "Volunteer" },
+      { path: "/organisation/sansrakshak", hindiName: "संरक्षक", englishName: "Sansrakshak" },
+      { path: "/organisation/national-president", hindiName: "राष्ट्रीय अध्यक्ष", englishName: "National President" },
+      { path: "/organisation/advisory-board", hindiName: "सलाहकार मंडल", englishName: "Salahkar Mandal/Advisory board", isLocked: true },
+      { path: "/organisation/national-office-bearers", hindiName: "राष्ट्रीय पदाधिकारी", englishName: "National office bearers", isLocked: true },
+      { path: "/organisation/morcha", hindiName: "मोर्चा", englishName: "Morcha", isLocked: true },
+      { path: "/organisation/department", hindiName: "विभाग/प्रभारी", englishName: "Department/Prabhari", isLocked: true },
+      { path: "/organisation/state-bearers", hindiName: "राज्य पदाधिकारी", englishName: "State bearers", isLocked: true },
+
     ],
   },
   {
@@ -59,6 +65,34 @@ export default function Navbar({ isOpen, setIsOpen }) {
     return () => window.removeEventListener("keydown", handleKey);
   }, [setIsOpen]);
 
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+    
+    const handleScroll = () => {
+      // Don't hide navbar if the menu is open
+      if (isOpen) {
+        setIsVisible(true);
+        lastScrollY = window.scrollY;
+        return;
+      }
+
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > lastScrollY && currentScrollY > 50) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
+      }
+      
+      lastScrollY = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isOpen]);
+
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
@@ -86,11 +120,11 @@ export default function Navbar({ isOpen, setIsOpen }) {
   return (
     <>
       {/* ── Global Header ─────────────────────────────────────── */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-5 pointer-events-none">
+      <div className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-3 bg-[#1E0F05]/65 backdrop-blur-md border-b border-white/10 pointer-events-auto shadow-md transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
         
         {/* Top Left: Logo & Name */}
-        <Link to="/" className="flex items-center gap-3 pointer-events-auto group">
-          <img src="/logo.PNG" alt="SRN Logo" className="w-12 h-12 object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md" />
+        <Link to="/" className="flex items-center gap-3 group">
+          <img src="/logo.PNG" alt="SRN Logo" className="w-[52px] h-[52px] object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md" />
           <div className="hidden sm:block">
             <h1 className="text-white font-bold text-lg font-serif leading-tight drop-shadow-md">
               {en ? "Sashakt Rashtra Nirman" : "सशक्त राष्ट्र निर्माण"}
@@ -102,18 +136,17 @@ export default function Navbar({ isOpen, setIsOpen }) {
         </Link>
 
         {/* Top Right: Buttons & Hamburger */}
-        <div className="flex items-center gap-3 pointer-events-auto">
-
+        <div className="flex items-center gap-2">
 
           {user ? (
             !isDashboard && (
-              <Link to="/dashboard" className="flex items-center gap-2 px-3 py-2 rounded-[10px] bg-white/5 hover:bg-white/15 backdrop-blur-md border border-white/10 text-white/80 hover:text-white transition-all shadow-sm hover:-translate-y-0.5">
+              <Link to="/dashboard" className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-all">
                 <User className="w-4 h-4" />
                 <span className="text-sm font-medium hidden sm:block">{en ? "Dashboard" : "डैशबोर्ड"}</span>
               </Link>
             )
           ) : (
-            <Link to="/login" className="flex items-center gap-2 px-3 py-2 rounded-[10px] bg-white/5 hover:bg-white/15 backdrop-blur-md border border-white/10 text-white/80 hover:text-white transition-all shadow-sm hover:-translate-y-0.5">
+            <Link to="/login" className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-all">
               <User className="w-4 h-4" />
               <span className="text-sm font-medium">{en ? "Login" : "लॉगिन"}</span>
             </Link>
@@ -122,7 +155,7 @@ export default function Navbar({ isOpen, setIsOpen }) {
           {/* Hamburger button (Changes to X when open inside overlay) */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="w-12 h-12 shrink-0 relative rounded-[10px] bg-black/20 hover:bg-black/40 backdrop-blur-md border border-white/10 text-white transition-all duration-300 shadow-sm hover:-translate-y-0.5 z-50"
+            className="w-10 h-10 shrink-0 relative rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/5 text-white transition-all duration-300 z-50 flex items-center justify-center"
             aria-label="Toggle menu"
           >
             <span className={`absolute left-1/2 -translate-x-1/2 w-5 h-0.5 bg-white rounded-full transition-all duration-300 origin-center ${isOpen ? "top-1/2 -translate-y-1/2 rotate-45" : "top-[14px]"}`} />
@@ -140,11 +173,10 @@ export default function Navbar({ isOpen, setIsOpen }) {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed inset-0 z-40 bg-white dark:bg-[#0A0402]"
-            style={{ background: "rgba(10, 4, 2, 0.95)" }}
+            className="fixed inset-0 z-40 bg-[#1E0F05]/75"
           >
             {/* Blurred bg layer */}
-            <div className="absolute inset-0 backdrop-blur-3xl" />
+            <div className="absolute inset-0 backdrop-blur-md" />
 
             {/* Subtle noise texture */}
             <div
@@ -160,24 +192,24 @@ export default function Navbar({ isOpen, setIsOpen }) {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="relative z-10 w-full h-full flex flex-col pt-28 pb-10 px-6 md:px-16 overflow-y-auto"
+              className="relative z-10 w-full h-full flex flex-col pt-28 pb-8 px-6 md:px-12 overflow-y-auto"
             >
               
               {/* Menu Grid Container */}
-              <div className="max-w-7xl mx-auto w-full flex-1">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-10">
+              <div className="max-w-7xl mx-auto w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-6">
                   
                   {menuCategories.map((category, colIdx) => (
                     <div key={category.titleEn} className="flex flex-col">
                       <motion.h2 
                         custom={colIdx}
                         variants={linkVariants}
-                        className="text-[#E8622A] font-bold text-xl font-serif mb-6 pb-2 border-b border-white/10"
+                        className="text-[#E8622A] font-bold text-lg font-serif mb-3 pb-1.5 border-b border-white/10"
                       >
                         {en ? category.titleEn : category.titleHi}
                       </motion.h2>
                       
-                      <ul className="space-y-4">
+                      <ul className="flex flex-col gap-1.5">
                         {category.links.map((link, linkIdx) => {
                           const isActive = location.pathname === link.path;
                           
@@ -187,10 +219,32 @@ export default function Navbar({ isOpen, setIsOpen }) {
                                 <Link
                                   to={link.path}
                                   onClick={handleLinkClick}
-                                  className="inline-block mt-2 w-full text-center px-6 py-2.5 rounded-lg bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white font-semibold shadow-lg hover:shadow-orange-900/50 hover:-translate-y-0.5 transition-all duration-300"
+                                  className="flex items-center justify-center w-full px-3 py-2 mt-1 rounded-xl bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white font-semibold shadow-lg hover:shadow-orange-900/50 hover:scale-[1.02] transition-all duration-300 border border-[#F47A3A]/30 text-[13px]"
                                 >
                                   {en ? link.englishName : link.hindiName}
                                 </Link>
+                              </motion.li>
+                            );
+                          }
+
+                          if (link.isLocked) {
+                            return (
+                              <motion.li key={link.path} custom={colIdx + linkIdx} variants={linkVariants}>
+                                <div
+                                  className="block w-full px-3 py-1.5 rounded-xl border border-white/5 bg-white/5 backdrop-blur-md text-white/40 cursor-not-allowed select-none relative group"
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex flex-col">
+                                      <span className="text-[13px] font-medium leading-snug">
+                                        {en ? link.englishName : link.hindiName}
+                                      </span>
+                                      <span className="text-[10px] text-white/20">
+                                        {en ? link.hindiName : link.englishName}
+                                      </span>
+                                    </div>
+                                    <Lock className="w-3.5 h-3.5 text-[#E8622A]/70" />
+                                  </div>
+                                </div>
                               </motion.li>
                             );
                           }
@@ -200,16 +254,20 @@ export default function Navbar({ isOpen, setIsOpen }) {
                               <Link
                                 to={link.path}
                                 onClick={handleLinkClick}
-                                className={`block group transition-colors duration-200 ${
-                                  isActive ? "text-[#F47A3A]" : "text-white/70 hover:text-white"
+                                className={`block w-full px-3 py-1.5 rounded-xl border backdrop-blur-md transition-all duration-300 group ${
+                                  isActive 
+                                    ? "bg-[#E8622A]/20 border-[#E8622A]/50 shadow-[0_0_15px_rgba(232,98,42,0.15)] text-white" 
+                                    : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 hover:-translate-y-px text-white/70 hover:text-white"
                                 }`}
                               >
-                                <span className="text-[15px] font-medium block">
-                                  {en ? link.englishName : link.hindiName}
-                                </span>
-                                <span className="text-[11px] text-white/30 group-hover:text-[#F47A3A]/50 transition-colors block mt-0.5">
-                                  {en ? link.hindiName : link.englishName}
-                                </span>
+                                <div className="flex flex-col">
+                                  <span className="text-[13px] font-medium leading-snug">
+                                    {en ? link.englishName : link.hindiName}
+                                  </span>
+                                  <span className={`text-[10px] transition-colors ${isActive ? "text-[#F47A3A]" : "text-white/30 group-hover:text-white/50"}`}>
+                                    {en ? link.hindiName : link.englishName}
+                                  </span>
+                                </div>
                               </Link>
                             </motion.li>
                           );
@@ -225,7 +283,7 @@ export default function Navbar({ isOpen, setIsOpen }) {
               <motion.div 
                 custom={10} 
                 variants={linkVariants}
-                className="mt-16 max-w-7xl mx-auto w-full border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-6"
+                className="mt-10 max-w-7xl mx-auto w-full border-t border-white/10 pt-6 flex flex-col md:flex-row items-center justify-between gap-6"
               >
                 {/* Language Toggle */}
                 <div className="flex items-center gap-4 bg-white/5 p-1.5 rounded-xl border border-white/10">
@@ -245,7 +303,7 @@ export default function Navbar({ isOpen, setIsOpen }) {
                         !en ? "bg-[#E8622A] text-white shadow-md" : "text-white/50 hover:text-white"
                       }`}
                     >
-                      HI
+                      हिं
                     </button>
                   </div>
                 </div>

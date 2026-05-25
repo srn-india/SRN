@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Calendar, MapPin, ArrowRight, Users, Clock } from "lucide-react";
 import SectionHeader from "../components/SectionHeader";
 import { useFadeIn } from "../hooks/useFadeIn";
+import { useLanguage } from "../context/LanguageContext";
 
 function FadeSection({ children, delay = 0, className = "" }) {
   const ref = useFadeIn(0.1);
@@ -50,6 +51,9 @@ const eventsList = [
 ];
 
 export default function Events() {
+  const { lang } = useLanguage();
+  const en = lang === "en";
+
   useEffect(() => {
     window.scrollTo(0, 0);
     document.title = "Events | Sashakt Rashtra Nirman";
@@ -78,16 +82,19 @@ export default function Events() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md mb-6">
             <Calendar className="w-4 h-4 text-[#E8622A]" />
-            <span className="text-white/80 text-sm font-medium tracking-wide uppercase">Upcoming Events</span>
+            <span className="text-white/80 text-sm font-medium tracking-wide uppercase">
+              {en ? "Upcoming Events" : "आगामी कार्यक्रम"}
+            </span>
           </div>
           <h1 className="text-4xl md:text-6xl font-bold text-white font-serif leading-tight drop-shadow-lg">
-            Connect, Engage & <span className="text-[#E8622A]">Inspire</span>
+            {en ? (
+              <>Connect, Engage & <span className="text-[#E8622A]">Inspire</span></>
+            ) : (
+              <>जुड़ें, भाग लें और <span className="text-[#E8622A]">प्रेरित करें</span></>
+            )}
           </h1>
-          <p className="text-xl text-[#F47A3A] mt-3 font-medium tracking-wide drop-shadow">
-            कार्यक्रम और आयोजन
-          </p>
           <p className="text-white/70 mt-6 text-lg max-w-2xl mx-auto font-light leading-relaxed">
-            Join our nationwide movement. Participate in rallies, summits, and community discussions to shape the future of our nation.
+            {en ? "Join our nationwide movement. Participate in rallies, summits, and community discussions to shape the future of our nation." : "हमारे राष्ट्रव्यापी आंदोलन से जुड़ें। हमारे राष्ट्र के भविष्य को आकार देने के लिए रैलियों, शिखर सम्मेलनों और सामुदायिक चर्चाओं में भाग लें।"}
           </p>
         </motion.div>
       </section>
@@ -124,8 +131,9 @@ export default function Events() {
                       <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-[#E8622A]" /> {event.time}</span>
                     </div>
 
-                    <h3 className="text-xl font-bold text-[#1E0F05] font-serif mb-1 group-hover:text-[#E8622A] transition-colors">{event.title}</h3>
-                    <p className="text-sm text-[#F47A3A] mb-3 font-medium">{event.titleHi}</p>
+                    <h3 className="text-xl font-bold text-[#1E0F05] font-serif mb-1 group-hover:text-[#E8622A] transition-colors">
+                      {en ? event.title : event.titleHi}
+                    </h3>
                     
                     <p className="text-[#7A5C45] text-sm leading-relaxed mb-6 flex-1">
                       {event.description}
@@ -134,10 +142,10 @@ export default function Events() {
                     <div className="mt-auto pt-4 border-t border-[#F0D5B8] flex items-center justify-between">
                       <div className="flex items-center gap-1.5 text-sm font-medium text-[#5C1010]">
                         <Users className="w-4 h-4 text-[#E8622A]" />
-                        {event.attendees} Expected
+                        {event.attendees} {en ? "Expected" : "अपेक्षित"}
                       </div>
                       <button className="flex items-center gap-1 text-[#E8622A] font-semibold text-sm hover:text-[#C04A18] transition-colors">
-                        Register <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        {en ? "Register" : "पंजीकरण करें"} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </button>
                     </div>
                   </div>
@@ -152,12 +160,14 @@ export default function Events() {
       <section className="py-20 px-6 bg-[#FFF9F2] border-t border-[#E8622A]/20">
         <div className="max-w-4xl mx-auto text-center">
           <FadeSection>
-            <h2 className="text-3xl font-bold text-[#5C1010] font-serif mb-4">Want to Host a Local Event?</h2>
+            <h2 className="text-3xl font-bold text-[#5C1010] font-serif mb-4">
+              {en ? "Want to Host a Local Event?" : "क्या आप स्थानीय कार्यक्रम आयोजित करना चाहते हैं?"}
+            </h2>
             <p className="text-[#7A5C45] mb-8 max-w-2xl mx-auto">
-              Empower your local community by organizing a town hall, rally, or discussion group under the Sashakt Rashtra Nirman banner. We provide the resources, you provide the passion.
+              {en ? "Empower your local community by organizing a town hall, rally, or discussion group under the Sashakt Rashtra Nirman banner. We provide the resources, you provide the passion." : "सशक्त राष्ट्र निर्माण के बैनर तले टाउन हॉल, रैली या चर्चा समूह का आयोजन करके अपने स्थानीय समुदाय को सशक्त बनाएं। हम संसाधन प्रदान करते हैं, आप जुनून प्रदान करें।"}
             </p>
             <button className="px-8 py-3 rounded-full bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white font-semibold shadow-lg shadow-orange-900/20 hover:-translate-y-1 transition-transform">
-              Become an Organizer
+              {en ? "Become an Organizer" : "आयोजक बनें"}
             </button>
           </FadeSection>
         </div>

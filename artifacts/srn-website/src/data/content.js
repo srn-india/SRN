@@ -292,6 +292,7 @@ export const content = {
       submitBtn:           "Login",
       noAccount:           "Don't have an account? Sign up",
       backToHome:          "Back to Home",
+      googleBtn:           "Sign in with Google",
     },
     signup: {
       title:                "Create Account",
@@ -310,6 +311,7 @@ export const content = {
       submitBtn:            "Create Account",
       haveAccount:          "Already have an account? Log in",
       backToHome:           "Back to Home",
+      googleBtn:           "Sign in with Google",
     },
     footer: {
       tagline: "Service, Strength and Determination",
@@ -612,6 +614,7 @@ export const content = {
       submitBtn:           "लॉगिन",
       noAccount:           "खाता नहीं है? साइन अप करें",
       backToHome:          "होम पर वापस जाएं",
+      googleBtn:           "गूगल के साथ साइन इन करें",
     },
     signup: {
       title:                "खाता बनाएं",
@@ -630,6 +633,7 @@ export const content = {
       submitBtn:            "खाता बनाएं",
       haveAccount:          "पहले से खाता है? लॉगिन करें",
       backToHome:           "होम पर वापस जाएं",
+      googleBtn:           "गूगल के साथ साइन इन करें",
     },
     footer: {
       tagline: "सेवा, शक्ति और संकल्प",

@@ -74,11 +74,8 @@ export default function Uddeshya() {
           </motion.span>
 
           <h1 className="text-4xl md:text-6xl font-bold text-white font-serif tracking-tight leading-tight">
-            {en ? "Objectives of the Trust" : u.bannerTitleHindi}
+            {en ? u.bannerTitle : u.bannerTitleHindi}
           </h1>
-          <p className="text-[#F47A3A] text-lg mt-2 font-medium">
-            {en ? u.bannerTitleHindi : "Objectives of the Trust"}
-          </p>
           <p className="text-orange-200/60 text-sm mt-4 max-w-xl mx-auto leading-relaxed">
             {u.bannerSubtitle}
           </p>
@@ -98,8 +95,7 @@ export default function Uddeshya() {
           <FadeSection>
             <SectionHeader
               hindi={u.objectivesTitleHindi}
-              english={en ? "Core Objectives" : null}
-              lang={lang}
+              english={u.objectivesTitle}
             />
             <p className="text-center text-[#7A5C45] text-sm -mt-6 mb-10 max-w-xl mx-auto">
               {en
@@ -133,9 +129,8 @@ export default function Uddeshya() {
         <div className="max-w-4xl mx-auto relative">
           <FadeSection>
             <SectionHeader
-              hindi="हमारा मिशन"
-              english="Our Mission"
-              lang={lang}
+              hindi={u.missionTitleHindi}
+              english={u.missionTitle}
             />
           </FadeSection>
           <div className="mt-8 grid grid-cols-1 gap-4">
@@ -157,11 +152,8 @@ export default function Uddeshya() {
               {en ? "Registered & Recognized" : "पंजीकृत एवं मान्यता प्राप्त"}
             </span>
             <h2 className="text-3xl md:text-4xl font-bold text-white font-serif">
-              {en ? "Legal Framework" : "कानूनी मान्यता"}
+              {en ? u.legalTitle : u.legalTitleHindi}
             </h2>
-            <p className="text-[#F47A3A] text-lg mt-1">
-              {en ? "कानूनी मान्यता" : "Legal Framework"}
-            </p>
             <div className="mx-auto mt-4 h-1 w-20 rounded-full bg-gradient-to-r from-[#E8622A] to-[#D4880C]" />
             <p className="text-white/50 text-sm mt-4 max-w-lg mx-auto">
               {en

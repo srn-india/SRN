@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { MessageSquare, TrendingUp, Users, Search, ChevronRight, Hash } from "lucide-react";
 import SectionHeader from "../components/SectionHeader";
 import { useFadeIn } from "../hooks/useFadeIn";
+import { useLanguage } from "../context/LanguageContext";
 
 function FadeSection({ children, delay = 0, className = "" }) {
   const ref = useFadeIn(0.1);
@@ -40,6 +41,9 @@ const trendingThreads = [
 ];
 
 export default function Forums() {
+  const { lang } = useLanguage();
+  const en = lang === "en";
+
   useEffect(() => {
     window.scrollTo(0, 0);
     document.title = "Forums | Sashakt Rashtra Nirman";
@@ -68,20 +72,23 @@ export default function Forums() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md mb-6 shadow-[0_0_15px_rgba(232,98,42,0.3)]">
             <MessageSquare className="w-4 h-4 text-[#E8622A]" />
-            <span className="text-white/90 text-sm font-medium tracking-wide uppercase">Community Forums</span>
+            <span className="text-white/90 text-sm font-medium tracking-wide uppercase">
+              {en ? "Community Forums" : "सामुदायिक मंच"}
+            </span>
           </div>
           <h1 className="text-4xl md:text-6xl font-bold text-white font-serif leading-tight drop-shadow-lg">
-            Raise Your <span className="text-[#E8622A]">Voice</span>
+            {en ? (
+              <>Raise Your <span className="text-[#E8622A]">Voice</span></>
+            ) : (
+              <>अपनी आवाज़ <span className="text-[#E8622A]">उठाएं</span></>
+            )}
           </h1>
-          <p className="text-xl text-[#F47A3A] mt-3 font-medium tracking-wide drop-shadow">
-            सामुदायिक मंच
-          </p>
           
           {/* Search Bar */}
           <div className="mt-10 max-w-2xl mx-auto relative group">
             <input 
               type="text" 
-              placeholder="Search discussions, topics, or members..."
+              placeholder={en ? "Search discussions, topics, or members..." : "चर्चाएँ, विषय या सदस्यों को खोजें..."}
               className="w-full bg-white/10 backdrop-blur-xl border border-white/20 text-white placeholder-white/50 px-6 py-4 rounded-2xl focus:outline-none focus:border-[#E8622A] focus:ring-1 focus:ring-[#E8622A] transition-all shadow-lg"
             />
             <button className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-[#E8622A] rounded-xl hover:bg-[#C04A18] transition-colors">
@@ -106,15 +113,14 @@ export default function Forums() {
                     <img src={cat.image} alt={cat.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                     <div className="absolute bottom-4 left-4 right-4">
-                      <h3 className="text-white font-serif text-xl font-bold">{cat.title}</h3>
-                      <p className="text-[#F47A3A] text-sm font-medium">{cat.titleHi}</p>
+                      <h3 className="text-white font-serif text-xl font-bold">{en ? cat.title : cat.titleHi}</h3>
                     </div>
                   </div>
                   <div className="p-5 flex flex-col justify-between h-[120px]">
                     <p className="text-[#7A5C45] text-sm line-clamp-2">{cat.description}</p>
                     <div className="flex items-center justify-between mt-4 text-xs font-semibold text-[#E8622A]">
-                      <span className="flex items-center gap-1.5"><MessageSquare className="w-4 h-4" /> {cat.topics} Topics</span>
-                      <span className="flex items-center gap-1 group-hover:translate-x-1 transition-transform">Explore <ChevronRight className="w-4 h-4" /></span>
+                      <span className="flex items-center gap-1.5"><MessageSquare className="w-4 h-4" /> {cat.topics} {en ? "Topics" : "विषय"}</span>
+                      <span className="flex items-center gap-1 group-hover:translate-x-1 transition-transform">{en ? "Explore" : "देखें"} <ChevronRight className="w-4 h-4" /></span>
                     </div>
                   </div>
                 </div>
@@ -126,9 +132,9 @@ export default function Forums() {
             <div className="bg-white rounded-2xl border border-[#F0D5B8] shadow-sm overflow-hidden">
               <div className="px-6 py-5 border-b border-[#F0D5B8] bg-gradient-to-r from-[#FFF9F2] to-white flex items-center justify-between">
                 <h3 className="font-serif font-bold text-xl text-[#5C1010] flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-[#E8622A]" /> Trending Discussions
+                  <TrendingUp className="w-5 h-5 text-[#E8622A]" /> {en ? "Trending Discussions" : "ट्रेंडिंग चर्चाएँ"}
                 </h3>
-                <button className="text-sm font-semibold text-[#E8622A] hover:text-[#C04A18]">View All</button>
+                <button className="text-sm font-semibold text-[#E8622A] hover:text-[#C04A18]">{en ? "View All" : "सभी देखें"}</button>
               </div>
               <div className="divide-y divide-[#F0D5B8]/50">
                 {trendingThreads.map((thread) => (
@@ -150,7 +156,7 @@ export default function Forums() {
                       </div>
                       <div className="hidden sm:flex flex-col items-center justify-center bg-[#FDF5EC] border border-[#F0D5B8] rounded-xl px-4 py-2 group-hover:bg-[#E8622A]/10 group-hover:border-[#E8622A]/30 transition-colors">
                         <span className="font-bold text-[#5C1010] text-lg">{thread.replies}</span>
-                        <span className="text-[10px] uppercase text-[#7A5C45] font-semibold">Replies</span>
+                        <span className="text-[10px] uppercase text-[#7A5C45] font-semibold">{en ? "Replies" : "जवाब"}</span>
                       </div>
                     </div>
                   </div>
@@ -166,12 +172,12 @@ export default function Forums() {
             <div className="bg-gradient-to-br from-[#E8622A] to-[#C04A18] rounded-2xl p-6 text-white shadow-lg shadow-orange-900/20 relative overflow-hidden">
               <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `repeating-linear-gradient(45deg, white, white 1px, transparent 1px, transparent 10px)`}}/>
               <div className="relative z-10">
-                <h3 className="font-serif font-bold text-xl mb-2">Join the Conversation</h3>
+                <h3 className="font-serif font-bold text-xl mb-2">{en ? "Join the Conversation" : "चर्चा में शामिल हों"}</h3>
                 <p className="text-white/80 text-sm mb-6 leading-relaxed">
-                  Sign in to create new topics, reply to discussions, and connect directly with other members.
+                  {en ? "Sign in to create new topics, reply to discussions, and connect directly with other members." : "नए विषय बनाने, चर्चाओं का जवाब देने और अन्य सदस्यों से सीधे जुड़ने के लिए साइन इन करें।"}
                 </p>
                 <button className="w-full bg-white text-[#C04A18] font-bold py-3 rounded-xl hover:bg-[#FFF9F2] transition-colors shadow-md">
-                  Login to Post
+                  {en ? "Login to Post" : "पोस्ट करने के लिए लॉगिन करें"}
                 </button>
               </div>
             </div>
@@ -179,18 +185,18 @@ export default function Forums() {
 
           <FadeSection delay={300}>
             <div className="bg-white rounded-2xl border border-[#F0D5B8] p-6 shadow-sm">
-              <h3 className="font-serif font-bold text-lg text-[#5C1010] mb-4">Forum Statistics</h3>
+              <h3 className="font-serif font-bold text-lg text-[#5C1010] mb-4">{en ? "Forum Statistics" : "फोरम सांख्यिकी"}</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-[#F0D5B8]/50 pb-3">
-                  <span className="text-[#7A5C45] text-sm font-medium">Total Members</span>
+                  <span className="text-[#7A5C45] text-sm font-medium">{en ? "Total Members" : "कुल सदस्य"}</span>
                   <span className="font-bold text-[#1E0F05]">14,205</span>
                 </div>
                 <div className="flex items-center justify-between border-b border-[#F0D5B8]/50 pb-3">
-                  <span className="text-[#7A5C45] text-sm font-medium">Active Threads</span>
+                  <span className="text-[#7A5C45] text-sm font-medium">{en ? "Active Threads" : "सक्रिय थ्रेड्स"}</span>
                   <span className="font-bold text-[#1E0F05]">3,492</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[#7A5C45] text-sm font-medium">Messages Sent</span>
+                  <span className="text-[#7A5C45] text-sm font-medium">{en ? "Messages Sent" : "भेजे गए संदेश"}</span>
                   <span className="font-bold text-[#1E0F05]">128,944</span>
                 </div>
               </div>

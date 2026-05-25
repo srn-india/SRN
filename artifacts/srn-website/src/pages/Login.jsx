@@ -29,9 +29,13 @@ function DecorativePanel() {
 
 export default function Login() {
   const { t } = useLanguage();
-  const { login } = useAuth();
+  const { login, API_BASE } = useAuth();
   const navigate = useNavigate();
   const lc = t.login;
+
+  const handleGoogleLogin = () => {
+    window.location.href = `${API_BASE}/api/auth/google`;
+  };
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -105,6 +109,46 @@ export default function Login() {
                 </motion.div>
               </motion.div>
             </form>
+
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-[#E8D5B8]" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-[#FDF5EC] px-3 text-[#7A5C45] font-medium">Or continue with</span>
+              </div>
+            </div>
+
+            {/* Google Login Button */}
+            <motion.button
+              type="button"
+              onClick={handleGoogleLogin}
+              className="w-full py-3 px-6 rounded-xl font-semibold border border-[#E8D5B8] bg-white text-[#2C1810] text-sm hover:bg-[#FEF0E6] hover:border-[#E8622A]/40 active:bg-white flex items-center justify-center gap-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.4 }}
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <path
+                  fill="#EA4335"
+                  d="M12 5.04c1.66 0 3.2.57 4.38 1.69l3.27-3.27C17.67 1.54 14.98 1 12 1 7.35 1 3.37 3.67 1.39 7.56l3.85 2.99c.9-2.7 3.42-4.51 6.76-4.51z"
+                />
+                <path
+                  fill="#4285F4"
+                  d="M23.49 12.27c0-.81-.07-1.59-.2-2.35H12v4.45h6.44c-.28 1.48-1.12 2.73-2.38 3.58l3.69 2.86c2.16-1.99 3.74-4.91 3.74-8.54z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.24 14.55c-.23-.69-.36-1.43-.36-2.2s.13-1.51.36-2.2L1.39 7.16C.5 8.93 0 10.91 0 13s.5 4.07 1.39 5.84l3.85-2.99z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c3.24 0 5.97-1.07 7.96-2.91l-3.69-2.86c-1.12.75-2.55 1.2-4.27 1.2-3.34 0-5.86-1.81-6.76-4.51L1.39 16.92C3.37 20.81 7.35 23 12 23z"
+                />
+              </svg>
+              {lc.googleBtn}
+            </motion.button>
 
             <motion.p className="mt-6 text-center text-sm text-[#7A5C45]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, delay: 0.45 }}>
               <Link to="/signup" className="font-semibold text-[#E8622A] hover:text-[#C04A18] transition-colors duration-200">

@@ -16,11 +16,13 @@ import Profile from "./pages/Profile";
 import Placeholder from "./pages/Placeholder";
 import Events from "./pages/Events";
 import Forums from "./pages/Forums";
-import MargdarshakMandal from "./pages/MargdarshakMandal";
 import Initiatives from "./pages/Initiatives";
 import Media from "./pages/Media";
 import Donate from "./pages/Donate";
 import BecomeMember from "./pages/BecomeMember";
+import AuthSuccess from "./pages/AuthSuccess";
+import NationalPresident from "./pages/NationalPresident";
+import Sansrakshak from "./pages/Sanrakshak";
 
 function Layout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -45,11 +47,14 @@ function AuthLayout({ children }) {
 }
 
 export default function App() {
-  const [splashDone, setSplashDone] = useState(false);
+  const [splashDone, setSplashDone] = useState(() => {
+    // Skip splash screen only if returning from OAuth redirect
+    return window.location.pathname.startsWith("/auth/success");
+  });
 
   return (
     <>
-      {/* Splash screen — shown once on first load */}
+      {/* Splash screen — shown on fresh load */}
       <AnimatePresence>
         {!splashDone && (
           <SplashScreen onDone={() => setSplashDone(true)} />
@@ -71,7 +76,8 @@ export default function App() {
               <Route path="/become-member" element={<Layout><BecomeMember /></Layout>} />
               <Route path="/donate" element={<Layout><Donate /></Layout>} />
               <Route path="/leadership/founding-presidents" element={<Layout><Placeholder title="Founding Presidents" /></Layout>} />
-              <Route path="/margdarshak-mandal" element={<Layout><MargdarshakMandal /></Layout>} />
+              <Route path="/organisation/sansrakshak" element={<Layout><Sansrakshak /></Layout>} />
+              <Route path="/organisation/national-president" element={<Layout><NationalPresident /></Layout>} />
               <Route path="/initiatives" element={<Layout><Initiatives /></Layout>} />
               <Route path="/media" element={<Layout><Media /></Layout>} />
               <Route path="/volunteer" element={<Layout><Placeholder title="Volunteer" /></Layout>} />
@@ -80,6 +86,7 @@ export default function App() {
               {/* Auth pages — no Footer */}
               <Route path="/login" element={<AuthLayout><Login /></AuthLayout>} />
               <Route path="/signup" element={<AuthLayout><Signup /></AuthLayout>} />
+              <Route path="/auth/success" element={<AuthLayout><AuthSuccess /></AuthLayout>} />
               <Route path="/dashboard" element={<AuthLayout><Dashboard /></AuthLayout>} />
               <Route path="/profile" element={<AuthLayout><Profile /></AuthLayout>} />
 

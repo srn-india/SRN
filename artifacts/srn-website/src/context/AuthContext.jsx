@@ -53,8 +53,24 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const checkAuth = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/me`, { credentials: "include" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.data?.user) {
+          setUser(data.data.user);
+          return data.data.user;
+        }
+      }
+    } catch (err) {
+      console.error("Auth check failed:", err);
+    }
+    return null;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, checkAuth, API_BASE }}>
       {children}
     </AuthContext.Provider>
   );

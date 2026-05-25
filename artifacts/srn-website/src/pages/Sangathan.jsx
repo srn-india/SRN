@@ -58,9 +58,6 @@ export default function Sangathan() {
           <h1 className="text-4xl md:text-6xl font-bold text-white font-serif tracking-tight">
             {en ? s.bannerTitle : s.bannerTitleHindi}
           </h1>
-          <p className="text-[#F47A3A] text-xl mt-3 font-medium">
-            {en ? s.bannerTitleHindi : s.bannerTitle}
-          </p>
           <p className="text-orange-200/70 text-base mt-3 max-w-lg mx-auto">{s.bannerTagline}</p>
           <motion.div
             initial={{ scaleX: 0 }}
@@ -77,8 +74,7 @@ export default function Sangathan() {
           <FadeSection>
             <SectionHeader
               hindi={s.leadershipTitleHindi}
-              english={en ? s.leadershipTitle : null}
-              lang={lang}
+              english={s.leadershipTitle}
             />
           </FadeSection>
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-stretch mt-10">
@@ -91,9 +87,6 @@ export default function Sangathan() {
                 <h3 className="text-xl font-bold text-[#5C1010] font-serif leading-tight">
                   {en ? s.patron.english : s.patron.nameHindi}
                 </h3>
-                <p className="text-sm text-[#7A5C45] mt-1">
-                  {en ? s.patron.nameHindi : s.patron.english}
-                </p>
                 <p className="text-sm text-[#7A5C45] mt-2">
                   {en ? s.patron.designation : s.patron.designationHindi}
                 </p>
@@ -109,9 +102,6 @@ export default function Sangathan() {
                 <h3 className="text-xl font-bold text-white font-serif leading-tight">
                   {en ? s.president.name : s.president.nameHindi}
                 </h3>
-                <p className="text-[#F47A3A] text-sm mt-1">
-                  {en ? s.president.nameHindi : s.president.name}
-                </p>
                 <p className="text-white/60 text-sm mt-2">{s.president.credentials}</p>
               </div>
             </FadeSection>
@@ -125,8 +115,7 @@ export default function Sangathan() {
           <FadeSection>
             <SectionHeader
               hindi={s.advisoryTitleHindi}
-              english={en ? s.advisoryTitle : null}
-              lang={lang}
+              english={s.advisoryTitle}
             />
           </FadeSection>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
@@ -145,8 +134,7 @@ export default function Sangathan() {
           <FadeSection>
             <SectionHeader
               hindi="राष्ट्रीय पदाधिकारी"
-              english={en ? "National Bearers" : null}
-              lang={lang}
+              english="National Bearers"
             />
           </FadeSection>
           <NationalBearersChart lang={lang} />
@@ -160,8 +148,7 @@ export default function Sangathan() {
           <FadeSection>
             <SectionHeader
               hindi="प्रदेश पदाधिकारी"
-              english={en ? "State Bearers" : null}
-              lang={lang}
+              english="State Bearers"
             />
             <p className="text-center text-[#7A5C45] text-sm -mt-6 mb-10 max-w-xl mx-auto">
               {en

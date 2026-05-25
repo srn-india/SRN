@@ -166,10 +166,10 @@ export default function BecomeMember() {
                         <div>
                           <label className="block text-xs font-semibold text-[#7A5C45] mb-1.5 uppercase">{en ? "Area of Interest" : "रुचि का क्षेत्र"}</label>
                           <select name="interest" value={formData.interest} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none">
-                            <option value="volunteer">Active Volunteer</option>
-                            <option value="leadership">Leadership & Strategy</option>
-                            <option value="donor">Donor / Supporter</option>
-                            <option value="advisor">Subject Matter Expert</option>
+                            <option value="volunteer">{en ? "Active Volunteer" : "सक्रिय स्वयंसेवक"}</option>
+                            <option value="leadership">{en ? "Leadership & Strategy" : "नेतृत्व और रणनीति"}</option>
+                            <option value="donor">{en ? "Donor / Supporter" : "दानकर्ता / समर्थक"}</option>
+                            <option value="advisor">{en ? "Subject Matter Expert" : "विषय विशेषज्ञ"}</option>
                           </select>
                         </div>
                       </div>

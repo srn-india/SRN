@@ -5,9 +5,8 @@ import { ChevronDown, CheckCircle2 } from "lucide-react";
 export default function AccordionItem({ number, titleHindi, title, points, defaultOpen, lang }) {
   const [open, setOpen] = useState(defaultOpen || false);
 
-  // Active language title on top, other language below
+  // Active language title
   const primaryTitle   = lang === "en" ? title      : titleHindi;
-  const secondaryTitle = lang === "en" ? titleHindi : title;
 
   return (
     <div
@@ -37,9 +36,6 @@ export default function AccordionItem({ number, titleHindi, title, points, defau
           <p className={`font-bold leading-tight font-serif text-base transition-colors duration-200 ${open ? "text-[#E8622A]" : "text-[#1E0F05]"}`}>
             {primaryTitle}
           </p>
-          {secondaryTitle && (
-            <p className="text-sm text-[#7A5C45] mt-0.5">{secondaryTitle}</p>
-          )}
         </div>
 
         {/* Chevron pill */}
