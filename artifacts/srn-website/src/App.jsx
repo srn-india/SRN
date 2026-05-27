@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
+import { Analytics } from "@vercel/analytics/react";
 import { LanguageProvider } from "./context/LanguageContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -104,6 +105,7 @@ export default function App() {
         </BrowserRouter>
         </AuthProvider>
       </LanguageProvider>
+      <Analytics />
     </>
   );
 }
