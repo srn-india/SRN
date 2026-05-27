@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
+import { Analytics } from "@vercel/analytics/react";
 import { LanguageProvider } from "./context/LanguageContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import SplashScreen from "./components/SplashScreen";
+import SmoothScroll from "./components/SmoothScroll";
+import PageTransition from "./components/PageTransition";
 import Home from "./pages/Home";
 import Sangathan from "./pages/Sangathan";
 import Uddeshya from "./pages/Uddeshya";
@@ -21,6 +24,7 @@ import Media from "./pages/Media";
 import Donate from "./pages/Donate";
 import BecomeMember from "./pages/BecomeMember";
 import AuthSuccess from "./pages/AuthSuccess";
+import Contact from "./pages/Contact";
 import NationalPresident from "./pages/NationalPresident";
 import Sansrakshak from "./pages/Sanrakshak";
 
@@ -46,6 +50,14 @@ function AuthLayout({ children }) {
   );
 }
 
+function NoNavLayout({ children }) {
+  return (
+    <div className="min-h-screen flex flex-col bg-black">
+      <main className="flex-1 flex flex-col">{children}</main>
+    </div>
+  );
+}
+
 export default function App() {
   const [splashDone, setSplashDone] = useState(() => {
     // Skip splash screen only if returning from OAuth redirect
@@ -65,8 +77,10 @@ export default function App() {
       <LanguageProvider>
         <AuthProvider>
           <BrowserRouter basename={import.meta.env.BASE_URL}>
-            <Routes>
-              {/* Standard pages — with Footer */}
+            <SmoothScroll>
+              <PageTransition>
+                <Routes>
+                  {/* Standard pages — with Footer */}
               <Route path="/" element={<Layout><Home /></Layout>} />
               <Route path="/sangathan" element={<Layout><Sangathan /></Layout>} />
               <Route path="/uddeshya" element={<Layout><Uddeshya /></Layout>} />
@@ -81,12 +95,14 @@ export default function App() {
               <Route path="/initiatives" element={<Layout><Initiatives /></Layout>} />
               <Route path="/media" element={<Layout><Media /></Layout>} />
               <Route path="/volunteer" element={<Layout><Placeholder title="Volunteer" /></Layout>} />
-              <Route path="/contact" element={<Layout><Placeholder title="Contact Us" /></Layout>} />
+              <Route path="/contact" element={<Layout><Contact /></Layout>} />
 
-              {/* Auth pages — no Footer */}
-              <Route path="/login" element={<AuthLayout><Login /></AuthLayout>} />
-              <Route path="/signup" element={<AuthLayout><Signup /></AuthLayout>} />
-              <Route path="/auth/success" element={<AuthLayout><AuthSuccess /></AuthLayout>} />
+              {/* Auth pages — no Navbar, no Footer */}
+              <Route path="/login" element={<NoNavLayout><Login /></NoNavLayout>} />
+              <Route path="/signup" element={<NoNavLayout><Signup /></NoNavLayout>} />
+              <Route path="/auth/success" element={<NoNavLayout><AuthSuccess /></NoNavLayout>} />
+
+              {/* Dashboard pages — with Navbar, no Footer */}
               <Route path="/dashboard" element={<AuthLayout><Dashboard /></AuthLayout>} />
               <Route path="/profile" element={<AuthLayout><Profile /></AuthLayout>} />
 
@@ -101,9 +117,12 @@ export default function App() {
               </Layout>
             } />
           </Routes>
-        </BrowserRouter>
+        </PageTransition>
+      </SmoothScroll>
+    </BrowserRouter>
         </AuthProvider>
       </LanguageProvider>
+      <Analytics />
     </>
   );
 }
