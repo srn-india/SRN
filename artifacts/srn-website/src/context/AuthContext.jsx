@@ -81,8 +81,8 @@ export function AuthProvider({ children }) {
     // Optimistically update the frontend user state
     setUser(prev => ({ ...prev, ...updates }));
     try {
-      await fetch(`${API_BASE}/api/auth/update`, {
-        method: "PUT",
+      await fetch(`${API_BASE}/api/users/profile`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(updates),

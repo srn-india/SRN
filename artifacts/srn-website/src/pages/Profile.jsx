@@ -83,7 +83,13 @@ export default function Profile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
-    await updateProfile(formData);
+    
+    // Clean up empty strings to pass backend validation
+    const cleanedData = Object.fromEntries(
+      Object.entries(formData).filter(([_, v]) => v !== "")
+    );
+    
+    await updateProfile(cleanedData);
     setSuccessMsg("Profile updated successfully!");
     setIsSaving(false);
     setTimeout(() => setSuccessMsg(""), 3000);
