@@ -93,13 +93,17 @@ function Counter({ target, suffix, label, labelHindi, lang }) {
   }, [target]);
 
   return (
-    <div ref={ref} className="text-center">
-      <p className="text-4xl md:text-5xl font-bold text-[#F47A3A]">
-        {count.toLocaleString()}{suffix}
-      </p>
-      <p className="text-white/70 mt-2 text-sm">
-        {lang === "hi" ? labelHindi : label}
-      </p>
+    <div ref={ref} className="group relative bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-8 hover:bg-white/10 hover:-translate-y-2 hover:border-[#E8622A]/50 transition-all duration-500 shadow-2xl overflow-hidden flex flex-col items-center justify-center min-h-[160px]">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#E8622A]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#E8622A] to-[#D4880C] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="relative z-10 flex flex-col items-center text-center">
+        <p className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#F47A3A] to-[#FFC5A8] bg-clip-text text-transparent mb-3 drop-shadow-lg filter group-hover:brightness-110 transition-all">
+          {count.toLocaleString()}{suffix}
+        </p>
+        <p className="text-white/80 text-sm font-bold tracking-widest uppercase group-hover:text-white transition-colors">
+          {lang === "hi" ? labelHindi : label}
+        </p>
+      </div>
     </div>
   );
 }
@@ -394,17 +398,31 @@ export default function Home() {
       </section>
 
       {/* ── Impact Counter ───────────────────────────────────────────── */}
-      <section className="py-20 px-6 relative bg-[#5C2710] overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-[0.035]"
-          style={{
-            backgroundImage: `repeating-linear-gradient(-45deg, white, white 1px, transparent 1px, transparent 24px)`,
-          }}
+      <section className="py-24 px-6 relative bg-[url('/hero-bg-2.png')] bg-fixed bg-cover bg-center overflow-hidden">
+        {/* Premium Glass Overlay */}
+        <div className="absolute inset-0 bg-[#2C1810]/70 backdrop-blur-md" />
+        
+        {/* Animated Glowing Orbs for ambiance */}
+        <motion.div 
+          animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.3, 0.15] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-[#E8622A] rounded-full blur-[100px] pointer-events-none" 
         />
-        <div className="absolute inset-0 hero-glow pointer-events-none opacity-60" />
-        <div className="relative max-w-5xl mx-auto">
+        <motion.div 
+          animate={{ scale: [1, 1.3, 1], opacity: [0.15, 0.3, 0.15] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+          className="absolute -bottom-40 -left-20 w-[500px] h-[500px] bg-[#D4880C] rounded-full blur-[100px] pointer-events-none" 
+        />
+        
+        {/* Subtle Texture */}
+        <div 
+          className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none"
+          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='2' fill='%23ffffff' fill-rule='evenodd'/%3E%3C/svg%3E")` }}
+        />
+
+        <div className="relative max-w-6xl mx-auto z-10">
           <FadeSection>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
               {h.impactCounters.map((item, i) => (
                 <Counter
                   key={i}
@@ -417,10 +435,17 @@ export default function Home() {
               ))}
             </div>
           </FadeSection>
+
           <FadeSection delay={200}>
-            <p className="text-center italic text-orange-200/70 mt-12 text-base max-w-xl mx-auto">
-              "{lang === "en" ? h.impactQuote : h.impactQuoteHindi}"
-            </p>
+            <div className="mt-16 text-center">
+              <div className="inline-block relative">
+                <span className="absolute -top-6 -left-8 text-6xl text-[#E8622A]/40 font-serif leading-none">"</span>
+                <p className="text-xl md:text-2xl italic font-serif text-white/95 leading-relaxed max-w-3xl mx-auto drop-shadow-lg">
+                  {lang === "en" ? h.impactQuote : h.impactQuoteHindi}
+                </p>
+                <span className="absolute -bottom-10 -right-8 text-6xl text-[#E8622A]/40 font-serif leading-none rotate-180">"</span>
+              </div>
+            </div>
           </FadeSection>
         </div>
       </section>

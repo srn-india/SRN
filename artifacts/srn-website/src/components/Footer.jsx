@@ -1,101 +1,179 @@
 import { Link } from "react-router-dom";
-import { Phone, Mail } from "lucide-react";
+import { Phone, Mail, ArrowRight, Facebook, Twitter, Instagram, Youtube } from "lucide-react";
+import { motion } from "framer-motion";
 import { useLanguage } from "../context/LanguageContext";
 
 export default function Footer() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const f = t.footer;
+  const en = lang === "en";
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  };
 
   return (
-    <footer className="bg-[#1E0F05] text-white pb-8">
-      {/* Integrated Contact Strip at the top of Footer */}
-      <div className="bg-gradient-to-r from-[#E8622A] to-[#C04A18] py-8 px-6 mb-12">
-        <div className="max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-6">
-          <a
-            href="tel:+917652012487"
-            className="flex items-center gap-2 text-white hover:text-white/80 font-medium transition-colors duration-200"
-          >
-            <Phone className="w-5 h-5 shrink-0" />
-            +91 76520 12487
-          </a>
-          <div className="hidden sm:block h-5 w-px bg-white/30" />
-          <a
-            href="mailto:srnindia@yahoo.com"
-            className="flex items-center gap-2 text-white hover:text-white/80 font-medium transition-colors duration-200"
-          >
-            <Mail className="w-5 h-5 shrink-0" />
-            srnindia@yahoo.com
-          </a>
-        </div>
-      </div>
+    <footer className="relative bg-[#F0E1D2] text-[#2C1810] pt-20 pb-8 overflow-hidden font-sans border-t-2 border-[#5C3A1E]/30">
+      {/* Subtle Immersive Background Effects for Light Theme */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#E8622A]/5 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#D4880C]/5 blur-[150px] rounded-full pointer-events-none" />
 
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-          {/* Brand */}
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <img
-                src="/logo.PNG"
-                alt="Sashakt Rashtra Nirman Logo"
-                className="w-12 h-12 object-contain shrink-0"
-              />
-              <div>
-                <p className="font-bold font-serif text-lg leading-tight">सशक्त राष्ट्र निर्माण</p>
-                <p className="text-[#F47A3A] text-xs">Sashakt Rashtra Nirman</p>
-              </div>
+      {/* Floating Contact Strip Line */}
+      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#E8622A]/30 to-transparent" />
+      
+      <motion.div 
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-50px" }}
+        variants={containerVariants}
+        className="max-w-7xl mx-auto px-6 relative z-10"
+      >
+        {/* Contact Banner (Glassmorphic Light) */}
+        <motion.div variants={itemVariants} className="mb-20">
+          <div className="bg-white/70 backdrop-blur-xl border border-white rounded-3xl p-8 md:p-10 shadow-[0_8px_32px_rgba(0,0,0,0.05)] flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
+            <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#E8622A]/10 blur-[60px] rounded-full" />
+            
+            <div className="relative z-10 text-center md:text-left">
+              <h3 className="text-2xl font-bold font-serif text-[#2C1810] mb-2">
+                {en ? "Need Assistance?" : "सहायता की आवश्यकता है?"}
+              </h3>
+              <p className="text-[#7A5C45]">
+                {en ? "Reach out to us for any inquiries." : "किसी भी पूछताछ के लिए हमसे संपर्क करें।"}
+              </p>
             </div>
-            <p className="text-white/50 text-sm">{f.tagline}</p>
-            <p className="text-white/35 text-xs mt-2">{f.npoId}</p>
-          </div>
 
-          {/* Quick Links */}
-          <div>
-            <h3 className="font-bold text-[#F47A3A] mb-4 text-sm uppercase tracking-wider">{f.quickLinks}</h3>
-            <ul className="space-y-2.5">
-              <li>
-                <Link to="/" className="text-white/55 hover:text-[#F47A3A] text-sm transition-colors duration-200">
-                  मुखपृष्ठ / Home
-                </Link>
-              </li>
-              <li>
-                <Link to="/sangathan" className="text-white/55 hover:text-[#F47A3A] text-sm transition-colors duration-200">
-                  संगठन / Sangathan
-                </Link>
-              </li>
-              <li>
-                <Link to="/uddeshya" className="text-white/55 hover:text-[#F47A3A] text-sm transition-colors duration-200">
-                  उद्देश्य / Objectives
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h3 className="font-bold text-[#F47A3A] mb-4 text-sm uppercase tracking-wider">{f.contact}</h3>
-            <div className="space-y-3">
+            <div className="relative z-10 flex flex-col sm:flex-row gap-6">
               <a
                 href="tel:+917652012487"
-                className="flex items-center gap-2 text-white/55 hover:text-[#F47A3A] text-sm transition-colors duration-200"
+                className="flex items-center gap-3 bg-white hover:bg-[#FDF5EC] border border-[#E8D5B8]/50 px-6 py-3 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-1 group"
               >
-                <Phone className="w-4 h-4 shrink-0 text-[#E8622A]" />
-                +91 76520 12487
+                <div className="w-10 h-10 rounded-full bg-[#FFF9F2] border border-[#E8D5B8]/50 flex items-center justify-center group-hover:bg-[#E8622A] group-hover:border-[#E8622A] transition-colors">
+                  <Phone className="w-4 h-4 text-[#E8622A] group-hover:text-white transition-colors" />
+                </div>
+                <span className="font-semibold tracking-wide text-[#5C3A1E]">+91 76520 12487</span>
               </a>
               <a
                 href="mailto:srnindia@yahoo.com"
-                className="flex items-center gap-2 text-white/55 hover:text-[#F47A3A] text-sm transition-colors duration-200"
+                className="flex items-center gap-3 bg-white hover:bg-[#FDF5EC] border border-[#E8D5B8]/50 px-6 py-3 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-1 group"
               >
-                <Mail className="w-4 h-4 shrink-0 text-[#E8622A]" />
-                srnindia@yahoo.com
+                <div className="w-10 h-10 rounded-full bg-[#FFF9F2] border border-[#E8D5B8]/50 flex items-center justify-center group-hover:bg-[#E8622A] group-hover:border-[#E8622A] transition-colors">
+                  <Mail className="w-4 h-4 text-[#E8622A] group-hover:text-white transition-colors" />
+                </div>
+                <span className="font-semibold tracking-wide text-[#5C3A1E]">srnindia@yahoo.com</span>
               </a>
             </div>
           </div>
+        </motion.div>
+
+        {/* Main Footer Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
+          {/* Brand Column */}
+          <motion.div variants={itemVariants} className="md:col-span-5">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="relative">
+                <div className="absolute inset-0 bg-[#E8622A]/10 blur-[10px] rounded-full" />
+                <img
+                  src="/logo.PNG"
+                  alt="Sashakt Rashtra Nirman Logo"
+                  className="w-16 h-16 object-contain relative z-10 drop-shadow-sm"
+                />
+              </div>
+              <div>
+                <h2 className="font-bold font-serif text-2xl leading-tight text-[#2C1810]">
+                  {en ? "Sashakt Rashtra Nirman" : "सशक्त राष्ट्र निर्माण"}
+                </h2>
+                <p className="text-[#E8622A] text-sm font-bold tracking-wide">
+                  {en ? "सशक्त राष्ट्र निर्माण" : "Sashakt Rashtra Nirman"}
+                </p>
+              </div>
+            </div>
+            <p className="text-[#7A5C45] text-base leading-relaxed mb-6 max-w-sm">
+              {f.tagline || "Dedicated to building a self-reliant and empowered nation through unity and service."}
+            </p>
+            <div className="flex gap-4">
+              <a href="#" className="w-10 h-10 rounded-full bg-white border border-[#E8D5B8] flex items-center justify-center text-[#B89070] hover:text-white hover:bg-[#E8622A] hover:border-[#E8622A] shadow-sm transition-all duration-300 hover:-translate-y-1">
+                <Facebook className="w-4 h-4" />
+              </a>
+              <a href="#" className="w-10 h-10 rounded-full bg-white border border-[#E8D5B8] flex items-center justify-center text-[#B89070] hover:text-white hover:bg-[#E8622A] hover:border-[#E8622A] shadow-sm transition-all duration-300 hover:-translate-y-1">
+                <Twitter className="w-4 h-4" />
+              </a>
+              <a href="#" className="w-10 h-10 rounded-full bg-white border border-[#E8D5B8] flex items-center justify-center text-[#B89070] hover:text-white hover:bg-[#E8622A] hover:border-[#E8622A] shadow-sm transition-all duration-300 hover:-translate-y-1">
+                <Instagram className="w-4 h-4" />
+              </a>
+              <a href="#" className="w-10 h-10 rounded-full bg-white border border-[#E8D5B8] flex items-center justify-center text-[#B89070] hover:text-white hover:bg-[#E8622A] hover:border-[#E8622A] shadow-sm transition-all duration-300 hover:-translate-y-1">
+                <Youtube className="w-4 h-4" />
+              </a>
+            </div>
+          </motion.div>
+
+          {/* Quick Links Column */}
+          <motion.div variants={itemVariants} className="md:col-span-3">
+            <h3 className="font-bold text-[#5C3A1E] mb-6 text-sm uppercase tracking-widest flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#E8622A]" />
+              {f.quickLinks}
+            </h3>
+            <ul className="space-y-4">
+              {[
+                { to: "/", label: en ? "Home" : "मुखपृष्ठ" },
+                { to: "/sangathan", label: en ? "Sangathan" : "संगठन" },
+                { to: "/uddeshya", label: en ? "Objectives" : "उद्देश्य" },
+                { to: "/contact", label: en ? "Contact Us" : "संपर्क" },
+              ].map((link, idx) => (
+                <li key={idx}>
+                  <Link to={link.to} className="group flex items-center text-[#7A5C45] hover:text-[#E8622A] font-medium transition-colors duration-300">
+                    <span className="relative">
+                      {link.label}
+                      <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#E8622A] transition-all duration-300 group-hover:w-full" />
+                    </span>
+                    <ArrowRight className="w-4 h-4 ml-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-[#E8622A]" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* Additional Info / Registration */}
+          <motion.div variants={itemVariants} className="md:col-span-4">
+            <h3 className="font-bold text-[#5C3A1E] mb-6 text-sm uppercase tracking-widest flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#E8622A]" />
+              {f.contact} {en ? "& Info" : "और जानकारी"}
+            </h3>
+            <div className="space-y-6">
+              <div className="bg-white/60 rounded-2xl p-5 border border-[#E8D5B8]/50 shadow-sm">
+                <p className="text-[#B89070] text-xs uppercase tracking-wider mb-1 font-bold">{en ? "Registration" : "पंजीकरण"}</p>
+                <p className="text-[#5C3A1E] font-medium font-mono text-sm">{f.npoId}</p>
+              </div>
+              <div className="bg-gradient-to-r from-[#E8622A]/5 to-transparent rounded-2xl p-5 border border-[#E8622A]/20">
+                <p className="text-[#E8622A] text-sm font-bold mb-2">{en ? "Join the Movement" : "आंदोलन में शामिल हों"}</p>
+                <Link to="/become-member" className="inline-flex items-center text-[#2C1810] text-sm font-bold hover:text-[#E8622A] transition-colors">
+                  {en ? "Become a Member" : "सदस्य बनें"} <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
+              </div>
+            </div>
+          </motion.div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-white/[0.07] text-center">
-          <p className="text-white/35 text-sm">{f.copyright}</p>
-        </div>
-      </div>
+        {/* Copyright */}
+        <motion.div variants={itemVariants} className="pt-8 border-t border-[#5C3A1E]/30 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-[#B89070] text-sm font-medium">{f.copyright}</p>
+          <div className="flex gap-6 text-sm font-medium text-[#B89070]">
+            <Link to="#" className="hover:text-[#E8622A] transition-colors">{en ? "Privacy Policy" : "गोपनीयता नीति"}</Link>
+            <Link to="#" className="hover:text-[#E8622A] transition-colors">{en ? "Terms of Service" : "सेवा की शर्तें"}</Link>
+          </div>
+        </motion.div>
+      </motion.div>
     </footer>
   );
 }

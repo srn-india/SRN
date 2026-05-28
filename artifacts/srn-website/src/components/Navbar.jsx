@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, Mail, Languages, User, Calendar, MessageSquare, X, Lock } from "lucide-react";
+import { Phone, Mail, Languages, User, Calendar, MessageSquare, X, Lock, ArrowLeft } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 import { useAuth } from "../context/AuthContext";
 
@@ -53,10 +53,12 @@ const menuCategories = [
 
 export default function Navbar({ isOpen, setIsOpen }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const { lang, toggleLang } = useLanguage();
   const { user } = useAuth();
   const en = lang === "en";
   
+  const isHome = location.pathname === "/";
   const isDashboard = location.pathname === "/dashboard";
 
   useEffect(() => {
@@ -117,9 +119,13 @@ export default function Navbar({ isOpen, setIsOpen }) {
     visible: (i) => ({ opacity: 1, x: 0, transition: { duration: 0.35, ease: "easeOut", delay: 0.15 + i * 0.05 } }),
   };
 
+  const isProfile = location.pathname === "/profile";
+  if (isDashboard || isProfile) return null;
+
   return (
     <>
       {/* ── Global Header ─────────────────────────────────────── */}
+      {isHome ? (
       <div className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-3 bg-[#1E0F05]/65 backdrop-blur-md border-b border-white/10 pointer-events-auto shadow-md transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
         
         {/* Top Left: Logo & Name */}
@@ -164,6 +170,31 @@ export default function Navbar({ isOpen, setIsOpen }) {
           </button>
         </div>
       </div>
+      ) : (
+        <>
+          <button 
+            onClick={() => navigate(-1)} 
+            className={`fixed top-6 left-6 z-50 w-12 h-12 bg-white hover:bg-gray-50 border border-gray-200 rounded-full flex items-center justify-center text-[#2C1810] shadow-xl hover:shadow-2xl transition-all duration-300 group ${isOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+            aria-label="Go Back"
+          >
+            <ArrowLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
+          </button>
+          
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className={`fixed top-6 right-6 z-50 w-12 h-12 rounded-full border text-white shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center ${
+              isOpen 
+                ? 'bg-transparent border-transparent text-white w-10 h-10' 
+                : 'bg-[#E8622A] hover:bg-[#C04A18] border-transparent'
+            }`}
+            aria-label="Toggle menu"
+          >
+            <span className={`absolute left-1/2 -translate-x-1/2 w-5 h-0.5 bg-current rounded-full transition-all duration-300 origin-center ${isOpen ? "top-1/2 -translate-y-1/2 rotate-45" : "top-[14px]"}`} />
+            <span className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-5 h-0.5 bg-current rounded-full transition-all duration-300 ${isOpen ? "opacity-0 scale-x-0" : ""}`} />
+            <span className={`absolute left-1/2 -translate-x-1/2 w-5 h-0.5 bg-current rounded-full transition-all duration-300 origin-center ${isOpen ? "top-1/2 -translate-y-1/2 -rotate-45" : "bottom-[14px]"}`} />
+          </button>
+        </>
+      )}
 
       {/* ── Full-screen Mega Menu Overlay ───────────────────────────── */}
       <AnimatePresence>
@@ -199,7 +230,17 @@ export default function Navbar({ isOpen, setIsOpen }) {
               <div className="max-w-7xl mx-auto w-full">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-6">
                   
-                  {menuCategories.map((category, colIdx) => (
+                  {menuCategories.map((category, colIdx) => {
+                    let linksToRender = category.links;
+                    // Add Dashboard button to Action & Contact if user is logged in
+                    if (category.titleEn === "Action & Contact" && user) {
+                      linksToRender = [
+                        { path: "/dashboard", hindiName: "डैशबोर्ड", englishName: "Go to Dashboard", isButton: true },
+                        ...category.links
+                      ];
+                    }
+                    
+                    return (
                     <div key={category.titleEn} className="flex flex-col">
                       <motion.h2 
                         custom={colIdx}
@@ -210,7 +251,7 @@ export default function Navbar({ isOpen, setIsOpen }) {
                       </motion.h2>
                       
                       <ul className="flex flex-col gap-1.5">
-                        {category.links.map((link, linkIdx) => {
+                        {linksToRender.map((link, linkIdx) => {
                           const isActive = location.pathname === link.path;
                           
                           if (link.isButton) {
@@ -274,7 +315,8 @@ export default function Navbar({ isOpen, setIsOpen }) {
                         })}
                       </ul>
                     </div>
-                  ))}
+                  );
+                })}
 
                 </div>
               </div>

@@ -57,6 +57,7 @@ router.post('/register', validate(registerSchema), authController.register);
  */
 router.post('/login', validate(loginSchema), authController.login);
 router.post('/logout', authController.logout);
+router.post('/verify-otp', authController.verifyOtp);
 
 router.get('/me', protect, authController.getMe);
 

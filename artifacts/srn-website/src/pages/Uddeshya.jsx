@@ -142,11 +142,29 @@ export default function Uddeshya() {
       </section>
 
       {/* ── Legal Framework ────────────────────────────────────────── */}
-      <section className="py-20 px-6 bg-[#1E0F05] relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: `repeating-linear-gradient(-45deg, white, white 1px, transparent 1px, transparent 28px)` }} />
-        <div className="absolute inset-0 hero-glow pointer-events-none opacity-40" />
+      <section className="py-24 px-6 relative bg-[url('/hero-bg-3.png')] bg-fixed bg-cover bg-center overflow-hidden">
+        {/* Premium Glass Overlay */}
+        <div className="absolute inset-0 bg-[#1E0F05]/80 backdrop-blur-md" />
+        
+        {/* Animated Glowing Orbs for ambiance */}
+        <motion.div 
+          animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.3, 0.15] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-[#E8622A] rounded-full blur-[100px] pointer-events-none" 
+        />
+        <motion.div 
+          animate={{ scale: [1, 1.3, 1], opacity: [0.15, 0.3, 0.15] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+          className="absolute -bottom-40 -right-20 w-[500px] h-[500px] bg-[#D4880C] rounded-full blur-[100px] pointer-events-none" 
+        />
+        
+        {/* Subtle Texture */}
+        <div 
+          className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none"
+          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='2' fill='%23ffffff' fill-rule='evenodd'/%3E%3C/svg%3E")` }}
+        />
 
-        <div className="relative max-w-4xl mx-auto text-center">
+        <div className="relative max-w-4xl mx-auto text-center z-10">
           <FadeSection>
             <span className="inline-block bg-[#E8622A]/15 border border-[#E8622A]/30 text-[#F47A3A] text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">
               {en ? "Registered & Recognized" : "पंजीकृत एवं मान्यता प्राप्त"}

@@ -8,6 +8,18 @@ router.use(protect);
 
 /**
  * @swagger
+ * /api/payments/key:
+ *   get:
+ *     summary: Get Razorpay Key ID
+ *     tags: [Payments]
+ *     responses:
+ *       200:
+ *         description: Key fetched successfully
+ */
+router.get('/key', paymentController.getRazorpayKey);
+
+/**
+ * @swagger
  * /api/payments/order:
  *   post:
  *     summary: Create a payment order
