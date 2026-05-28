@@ -7,10 +7,14 @@ import bcrypt from 'bcrypt';
 import { generateAccessToken } from '../utils/jwt';
 
 jest.mock('razorpay', () => {
+  let counter = 0;
   return jest.fn().mockImplementation(() => {
     return {
       orders: {
-        create: jest.fn().mockResolvedValue({ id: 'mock_razorpay_order_id' }),
+        create: jest.fn().mockImplementation(() => {
+          counter++;
+          return Promise.resolve({ id: `mock_razorpay_order_id_${counter}` });
+        }),
       },
     };
   });
