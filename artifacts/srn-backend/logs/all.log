@@ -11,3 +11,71 @@
 2026-05-14 12:07:18:718 [34minfo[39m: [34mServer is running on port 3000[39m
 2026-05-17 18:41:10:4110 [34minfo[39m: [34mServer is running on port 3000[39m
 2026-05-17 18:56:17:5617 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-17 18:59:10:5910 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-17 19:25:28:2528 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-17 19:26:46:2646 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-17 19:26:53:2653 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-17 19:27:02:272 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-17 19:27:14:2714 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-17 19:30:05:305 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-17 19:30:15:3015 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-17 19:30:34:3034 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-17 19:37:38:3738 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-17 20:00:31:031 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-17 20:06:11:611 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-17 20:06:21:621 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-17 20:06:39:639 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-17 20:08:05:85 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-17 20:08:27:827 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-17 20:08:41:841 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-17 20:09:03:93 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-17 20:23:53:2353 [31merror[39m: [31mTypeError: Cannot read properties of undefined (reading 'client_id')[39m
+[31m    at OAuth2Client.getTokenAsync (/Users/anshjohnson/SRN/node_modules/.pnpm/google-auth-library@10.6.2/node_modules/google-auth-library/build/src/auth/oauth2client.js:184:32)[39m
+[31m    at OAuth2Client.getToken (/Users/anshjohnson/SRN/node_modules/.pnpm/google-auth-library@10.6.2/node_modules/google-auth-library/build/src/auth/oauth2client.js:177:25)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/src/modules/auth/auth.controller.ts:93:35[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/src/utils/catchAsync.ts:5:21[39m
+[31m    at Layer.handleRequest (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/layer.js:152:17)[39m
+[31m    at next (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/route.js:157:13)[39m
+[31m    at Route.dispatch (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/route.js:117:3)[39m
+[31m    at handle (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/index.js:435:11)[39m
+[31m    at Layer.handleRequest (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/layer.js:152:17)[39m
+[31m    at /Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/index.js:295:15[39m
+2026-05-17 20:24:46:2446 [31merror[39m: [31mTypeError: Cannot read properties of undefined (reading 'client_id')[39m
+[31m    at OAuth2Client.getTokenAsync (/Users/anshjohnson/SRN/node_modules/.pnpm/google-auth-library@10.6.2/node_modules/google-auth-library/build/src/auth/oauth2client.js:184:32)[39m
+[31m    at OAuth2Client.getToken (/Users/anshjohnson/SRN/node_modules/.pnpm/google-auth-library@10.6.2/node_modules/google-auth-library/build/src/auth/oauth2client.js:177:25)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/src/modules/auth/auth.controller.ts:93:35[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/src/utils/catchAsync.ts:5:21[39m
+[31m    at Layer.handleRequest (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/layer.js:152:17)[39m
+[31m    at next (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/route.js:157:13)[39m
+[31m    at Route.dispatch (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/route.js:117:3)[39m
+[31m    at handle (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/index.js:435:11)[39m
+[31m    at Layer.handleRequest (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/layer.js:152:17)[39m
+[31m    at /Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/index.js:295:15[39m
+2026-05-28 00:48:02:482 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-28 02:14:34:1434 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-28 02:24:17:2417 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-28 02:36:28:3628 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-28 02:36:34:3634 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-28 02:44:17:4417 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-05-28 22:11:42:1142 [31merror[39m: [31m[31merror[31m[39m
+2026-05-28 22:11:42:1142 [31merror[39m: [31m[31merror[31m[39m
+2026-05-28 22:13:05:135 [31merror[39m: [31mError: Payment record not found[39m
+[31m    at Object.verifyPayment (/Users/anshjohnson/SRN/artifacts/srn-backend/src/modules/payment/payment.service.ts:35:11)[39m
+[31m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/src/modules/payment/payment.controller.ts:16:18[39m
+2026-05-28 22:17:46:1746 [31merror[39m: [31mPrismaClientKnownRequestError: [39m
+[31mInvalid `prisma.payment.create()` invocation in[39m
+[31m/Users/anshjohnson/SRN/artifacts/srn-backend/src/modules/payment/payment.service.ts:19:31[39m
+
+[31m  16 [39m
+[31m  17 const razorpayOrder = await razorpay.orders.create(orderOptions);[39m
+[31m  18 [39m
+[31m→ 19 return await prisma.payment.create([39m
+[31mForeign key constraint violated on the constraint: `Payment_userId_fkey`[39m
+[31m    at zr.handleRequestError (/Users/anshjohnson/SRN/node_modules/.pnpm/@prisma+client@7.8.0_prisma@7.8.0_@types+react-dom@19.2.3_@types+react@19.2.14__@types+_1651e8bc9bdeb6ea8e90f9b95d1a57d9/node_modules/@prisma/client/src/runtime/RequestHandler.ts:237:13)[39m
+[31m    at zr.handleAndLogRequestError (/Users/anshjohnson/SRN/node_modules/.pnpm/@prisma+client@7.8.0_prisma@7.8.0_@types+react-dom@19.2.3_@types+react@19.2.14__@types+_1651e8bc9bdeb6ea8e90f9b95d1a57d9/node_modules/@prisma/client/src/runtime/RequestHandler.ts:183:12)[39m
+[31m    at zr.request (/Users/anshjohnson/SRN/node_modules/.pnpm/@prisma+client@7.8.0_prisma@7.8.0_@types+react-dom@19.2.3_@types+react@19.2.14__@types+_1651e8bc9bdeb6ea8e90f9b95d1a57d9/node_modules/@prisma/client/src/runtime/RequestHandler.ts:152:12)[39m
+[31m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+[31m    at a (/Users/anshjohnson/SRN/node_modules/.pnpm/@prisma+client@7.8.0_prisma@7.8.0_@types+react-dom@19.2.3_@types+react@19.2.14__@types+_1651e8bc9bdeb6ea8e90f9b95d1a57d9/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:963:24)[39m
+[31m    at Object.createOrder (/Users/anshjohnson/SRN/artifacts/srn-backend/src/modules/payment/payment.service.ts:19:10)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/src/modules/payment/payment.controller.ts:11:17[39m

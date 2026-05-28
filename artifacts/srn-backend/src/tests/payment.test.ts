@@ -2,6 +2,9 @@ import request from 'supertest';
 import app from '../index';
 import { prisma } from '../lib/prisma';
 import { setupTestDB, closeConnections } from './setup';
+import crypto from 'crypto';
+import bcrypt from 'bcrypt';
+import { generateAccessToken } from '../utils/jwt';
 
 describe('Payment & Membership Module', () => {
   let userToken: string;
@@ -11,18 +14,25 @@ describe('Payment & Membership Module', () => {
     await setupTestDB();
     
     // Register User
-    const userReg = await request(app).post('/api/auth/register').send({ 
-      firstName: 'Test', 
-      lastName: 'Payer',
-      phone: '1234567890',
-      state: 'Delhi',
-      district: 'New Delhi',
-      gender: 'Male',
-      email: 'payer@test.com', 
-      password: 'password123' 
+    const hashedPassword = await bcrypt.hash('password123', 10);
+    const user = await prisma.user.upsert({
+      where: { email: 'payer@test.com' },
+      update: { isVerified: true, password: hashedPassword },
+      create: { 
+        firstName: 'Test', 
+        lastName: 'Payer',
+        phone: '1234567890',
+        state: 'Delhi',
+        district: 'New Delhi',
+        gender: 'Male',
+        email: 'payer@test.com', 
+        password: hashedPassword,
+        isVerified: true
+      }
     });
-    userToken = userReg.body.data.accessToken;
-    userId = userReg.body.data.user.id;
+
+    userToken = generateAccessToken({ id: user.id, role: user.role });
+    userId = user.id;
   });
 
   afterAll(async () => {
@@ -51,14 +61,23 @@ describe('Payment & Membership Module', () => {
       .send({ amount: 999 });
 
     const paymentId = orderRes.body.data.id;
+    const razorpay_order_id = orderRes.body.data.transactionId;
+    const razorpay_payment_id = 'fake_payment_id';
+
+    const body = razorpay_order_id + "|" + razorpay_payment_id;
+    const expectedSignature = crypto
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET as string)
+      .update(body.toString())
+      .digest('hex');
 
     const res = await request(app)
       .post('/api/payments/verify')
       .set('Authorization', `Bearer ${userToken}`)
       .send({
-        razorpay_order_id: 'fake_order',
-        paymentId: paymentId, // Match controller's expected field
-        razorpay_signature: 'fake_sig'
+        razorpay_order_id: razorpay_order_id,
+        razorpay_payment_id: razorpay_payment_id,
+        razorpay_signature: expectedSignature
+
       });
 
     expect(res.status).toBe(200);

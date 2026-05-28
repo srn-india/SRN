@@ -2,6 +2,8 @@ import request from 'supertest';
 import app from '../index';
 import { prisma } from '../lib/prisma';
 import { setupTestDB, closeConnections } from './setup';
+import bcrypt from 'bcrypt';
+import { generateAccessToken } from '../utils/jwt';
 
 describe('Posts Module', () => {
   let adminToken: string;
@@ -10,15 +12,23 @@ describe('Posts Module', () => {
   beforeAll(async () => {
     await setupTestDB();
     
-    // Register Admin
-    const adminReg = await request(app).post('/api/auth/register').send({ firstName: 'Admin', lastName: 'User', phone: '1234567890', state: 'Delhi', district: 'New Delhi', gender: 'Male', email: 'admin@test.com', password: 'password123' });
-    adminToken = adminReg.body.data.accessToken;
-    // Manually promote to ADMIN in DB
-    await prisma.user.update({ where: { email: 'admin@test.com' }, data: { role: 'ADMIN' } });
+    const hashedPassword = await bcrypt.hash('password123', 10);
+    
+    // Create Admin
+    const adminUser = await prisma.user.upsert({
+      where: { email: 'admin@test.com' },
+      update: { role: 'ADMIN', isVerified: true, password: hashedPassword },
+      create: { firstName: 'Admin', lastName: 'User', phone: '1234567890', state: 'Delhi', district: 'New Delhi', gender: 'Male', email: 'admin@test.com', password: hashedPassword, role: 'ADMIN', isVerified: true }
+    });
+    adminToken = generateAccessToken({ id: adminUser.id, role: adminUser.role });
 
-    // Register User
-    const userReg = await request(app).post('/api/auth/register').send({ firstName: 'User', lastName: 'Test', phone: '0987654321', state: 'Delhi', district: 'New Delhi', gender: 'Female', email: 'user@test.com', password: 'password123' });
-    userToken = userReg.body.data.accessToken;
+    // Create User
+    const regularUser = await prisma.user.upsert({
+      where: { email: 'user@test.com' },
+      update: { role: 'USER', isVerified: true, password: hashedPassword },
+      create: { firstName: 'User', lastName: 'Test', phone: '0987654321', state: 'Delhi', district: 'New Delhi', gender: 'Female', email: 'user@test.com', password: hashedPassword, role: 'USER', isVerified: true }
+    });
+    userToken = generateAccessToken({ id: regularUser.id, role: regularUser.role });
   });
 
   afterAll(async () => {
