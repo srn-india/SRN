@@ -9,7 +9,9 @@ services:
     environment:
       - NODE_ENV=production
       - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://user:password@db:5432/srn_db
     depends_on:
+      - db
       - redis
 
   db:
