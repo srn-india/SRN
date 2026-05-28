@@ -28,6 +28,11 @@ export function AuthProvider({ children }) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Login failed");
+    
+    if (data.data?.requiresOtp) {
+      return data.data; // { requiresOtp: true, email: ... }
+    }
+    
     setUser(data.data.user);
     return data.data.user;
   };
@@ -41,6 +46,25 @@ export function AuthProvider({ children }) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Registration failed");
+    
+    if (data.data?.requiresOtp) {
+      return data.data;
+    }
+    
+    setUser(data.data.user);
+    return data.data.user;
+  };
+
+  const verifyOtp = async (email, otp) => {
+    const res = await fetch(`${API_BASE}/api/auth/verify-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ email, otp }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Invalid OTP");
+    
     setUser(data.data.user);
     return data.data.user;
   };
@@ -51,6 +75,21 @@ export function AuthProvider({ children }) {
       credentials: "include",
     });
     setUser(null);
+  };
+
+  const updateProfile = async (updates) => {
+    // Optimistically update the frontend user state
+    setUser(prev => ({ ...prev, ...updates }));
+    try {
+      await fetch(`${API_BASE}/api/auth/update`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(updates),
+      });
+    } catch(err) {
+      console.log("Failed to persist profile update:", err);
+    }
   };
 
   const checkAuth = async () => {
@@ -70,7 +109,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, checkAuth, API_BASE }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, checkAuth, updateProfile, verifyOtp, API_BASE }}>
       {children}
     </AuthContext.Provider>
   );
