@@ -28,13 +28,22 @@ describe('Auth Module', () => {
       .post('/api/auth/register')
       .send(testUser);
 
-    expect(res.status).toBe(201);
+    expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
-    expect(res.body.data.user.email).toBe(testUser.email);
-    expect(res.header['set-cookie']).toBeDefined();
+    expect(res.body.data.requiresOtp).toBe(true);
+    expect(res.body.data.email).toBe(testUser.email);
   });
 
   it('should not register user with existing email', async () => {
+    // Ensure the user actually exists right before testing
+    const bcrypt = require('bcrypt');
+    const hashedPassword = await bcrypt.hash(testUser.password, 10);
+    await prisma.user.upsert({
+      where: { email: testUser.email },
+      update: { password: hashedPassword },
+      create: { ...testUser, password: hashedPassword }
+    });
+    
     const res = await request(app)
       .post('/api/auth/register')
       .send(testUser);
@@ -44,6 +53,12 @@ describe('Auth Module', () => {
   });
 
   it('should login user', async () => {
+    // Manually verify user so we can get an access token
+    await prisma.user.update({
+      where: { email: testUser.email },
+      data: { isVerified: true }
+    });
+
     const res = await request(app)
       .post('/api/auth/login')
       .send({
