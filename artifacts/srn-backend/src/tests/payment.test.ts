@@ -6,6 +6,16 @@ import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import { generateAccessToken } from '../utils/jwt';
 
+jest.mock('razorpay', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+      orders: {
+        create: jest.fn().mockResolvedValue({ id: 'mock_razorpay_order_id' }),
+      },
+    };
+  });
+});
+
 describe('Payment & Membership Module', () => {
   let userToken: string;
   let userId: string;
