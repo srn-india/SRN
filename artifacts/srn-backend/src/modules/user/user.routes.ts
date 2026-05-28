@@ -23,6 +23,8 @@ router.use(protect);
  *         description: User profile retrieved successfully
  */
 router.get('/me', userController.getProfile);
+router.get('/membership', userController.getMembership);
+
 
 /**
  * @swagger

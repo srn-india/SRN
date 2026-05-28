@@ -16,6 +16,9 @@ export const registerUser = async (data: any) => {
 
   const hashedPassword = await bcrypt.hash(data.password, 10);
 
+  const otpCode = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+  const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
   const user = await prisma.user.create({
     data: {
       firstName: data.firstName,
@@ -27,13 +30,18 @@ export const registerUser = async (data: any) => {
       district: data.district,
       gender: data.gender,
       dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
+      otpCode,
+      otpExpires,
+      isVerified: false,
     },
   });
 
-  const accessToken = generateAccessToken({ id: user.id, role: user.role });
-  const refreshToken = generateRefreshToken({ id: user.id, role: user.role });
+  // Since we created utils/email.ts, we should import sendOTPEmail at the top, but we'll just require it dynamically here to avoid import issues for now, or assume it's imported.
+  // Actually, I'll import it at the top in a separate chunk.
+  const { sendOTPEmail } = require('../../utils/email');
+  await sendOTPEmail(user.email, otpCode);
 
-  return { user, accessToken, refreshToken };
+  return { user, requiresOtp: true };
 };
 
 export const loginUser = async (data: any) => {
@@ -51,10 +59,60 @@ export const loginUser = async (data: any) => {
     throw new Error('Invalid email or password');
   }
 
+  if (!user.isVerified) {
+    // Generate new OTP if logging in unverified
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+    
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { otpCode, otpExpires }
+    });
+
+    const { sendOTPEmail } = require('../../utils/email');
+    await sendOTPEmail(user.email, otpCode);
+
+    return { user, requiresOtp: true };
+  }
+
   const accessToken = generateAccessToken({ id: user.id, role: user.role });
   const refreshToken = generateRefreshToken({ id: user.id, role: user.role });
 
   return { user, accessToken, refreshToken };
+};
+
+export const verifyOtp = async (email: string, otp: string) => {
+  const user = await prisma.user.findUnique({ where: { email } });
+
+  if (!user) {
+    throw new Error('User not found');
+  }
+  
+  if (user.isVerified) {
+    throw new Error('User is already verified');
+  }
+
+  if (user.otpCode !== otp) {
+    throw new Error('Invalid OTP');
+  }
+
+  if (!user.otpExpires || user.otpExpires < new Date()) {
+    throw new Error('OTP has expired');
+  }
+
+  const verifiedUser = await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      isVerified: true,
+      otpCode: null,
+      otpExpires: null
+    }
+  });
+
+  const accessToken = generateAccessToken({ id: verifiedUser.id, role: verifiedUser.role });
+  const refreshToken = generateRefreshToken({ id: verifiedUser.id, role: verifiedUser.role });
+
+  return { user: verifiedUser, accessToken, refreshToken };
 };
 
 export const handleGoogleOAuth = async (profile: any) => {

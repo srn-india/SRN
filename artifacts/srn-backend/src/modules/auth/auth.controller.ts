@@ -8,22 +8,40 @@ import { redis } from '../../lib/cache';
 export const register = catchAsync(async (req: Request, res: Response) => {
   try {
     const result = await authService.registerUser(req.body);
+    if ('requiresOtp' in result) {
+      return sendSuccess(res, {
+        requiresOtp: true,
+        email: result.user.email
+      }, 'OTP sent to email', 200);
+    }
     
-    res.cookie('accessToken', result.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 15 * 60 * 1000 // 15 minutes
-    });
+    // In case registration bypasses OTP in the future
+    const accessToken = (result as any).accessToken;
+    const refreshToken = (result as any).refreshToken;
 
-    res.cookie('refreshToken', result.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-    });
+    if (accessToken && refreshToken) {
+      res.cookie('accessToken', accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 15 * 60 * 1000 // 15 minutes
+      });
+
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      });
+    }
 
     sendSuccess(res, {
-      user: { id: result.user.id, firstName: result.user.firstName, lastName: result.user.lastName, email: result.user.email, role: result.user.role },
-      accessToken: result.accessToken
+      user: { 
+        id: (result as any).user.id, 
+        firstName: (result as any).user.firstName, 
+        lastName: (result as any).user.lastName, 
+        email: (result as any).user.email, 
+        role: (result as any).user.role 
+      },
+      accessToken: accessToken
     }, 'Registration successful', 201);
   } catch (error: any) {
     sendError(res, error.message, null, 400);
@@ -33,22 +51,37 @@ export const register = catchAsync(async (req: Request, res: Response) => {
 export const login = catchAsync(async (req: Request, res: Response) => {
   try {
     const result = await authService.loginUser(req.body);
+    if ('requiresOtp' in result) {
+      return sendSuccess(res, {
+        requiresOtp: true,
+        email: result.user.email
+      }, 'Account not verified. OTP sent to email', 200);
+    }
 
-    res.cookie('accessToken', result.accessToken, {
+    const accessToken = (result as any).accessToken;
+    const refreshToken = (result as any).refreshToken;
+
+    res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 15 * 60 * 1000
     });
 
-    res.cookie('refreshToken', result.refreshToken, {
+    res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
     sendSuccess(res, {
-      user: { id: result.user.id, firstName: result.user.firstName, lastName: result.user.lastName, email: result.user.email, role: result.user.role },
-      accessToken: result.accessToken
+      user: { 
+        id: (result as any).user.id, 
+        firstName: (result as any).user.firstName, 
+        lastName: (result as any).user.lastName, 
+        email: (result as any).user.email, 
+        role: (result as any).user.role 
+      },
+      accessToken: accessToken
     }, 'Login successful');
   } catch (error: any) {
     sendError(res, error.message, null, 401);
@@ -141,4 +174,31 @@ export const verifyEmail = catchAsync(async (req: Request, res: Response) => {
   const { token } = req.query;
   const result = await authService.verifyEmail(token as string);
   sendSuccess(res, result, 'Email verified successfully');
+});
+
+export const verifyOtp = catchAsync(async (req: Request, res: Response) => {
+  const { email, otp } = req.body;
+  
+  if (!email || !otp) {
+    return sendError(res, 'Email and OTP are required', null, 400);
+  }
+
+  const result = await authService.verifyOtp(email, otp);
+
+  res.cookie('accessToken', result.accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 15 * 60 * 1000
+  });
+
+  res.cookie('refreshToken', result.refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 7 * 24 * 60 * 60 * 1000
+  });
+
+  sendSuccess(res, {
+    user: { id: result.user.id, firstName: result.user.firstName, lastName: result.user.lastName, email: result.user.email, role: result.user.role },
+    accessToken: result.accessToken
+  }, 'Email verified and logged in successfully');
 });

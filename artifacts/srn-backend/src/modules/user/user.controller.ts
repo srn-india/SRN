@@ -3,6 +3,7 @@ import * as userService from './user.service';
 import { catchAsync } from '../../utils/catchAsync';
 import { sendSuccess, sendError } from '../../utils/response';
 import { uploadToSupabase } from '../../utils/upload';
+import { prisma } from '../../lib/prisma';
 
 export const getProfile = catchAsync(async (req: Request, res: Response) => {
   try {
@@ -28,4 +29,12 @@ export const updateProfile = catchAsync(async (req: Request, res: Response) => {
 export const changePassword = catchAsync(async (req: Request, res: Response) => {
   const result = await userService.changePassword(req.user.id, req.body);
   sendSuccess(res, result, 'Password changed successfully');
+});
+
+export const getMembership = catchAsync(async (req: Request, res: Response) => {
+  const membership = await prisma.membership.findFirst({
+    where: { userId: req.user.id, status: 'ACTIVE' },
+    orderBy: { createdAt: 'desc' },
+  });
+  sendSuccess(res, membership, 'Membership status fetched');
 });

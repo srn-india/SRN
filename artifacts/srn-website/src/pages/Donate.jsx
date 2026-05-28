@@ -2,16 +2,23 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Heart, ShieldCheck, IndianRupee, ArrowRight, CheckCircle2 } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
+import { useAuth } from "../context/AuthContext";
+import ProfileCompletionModal from "../components/ProfileCompletionModal";
+import { loadRazorpayScript } from "../utils/razorpay";
 
 const QUICK_AMOUNTS = [500, 1000, 2500, 5000];
 
 export default function Donate() {
   const { lang } = useLanguage();
+  const { user, API_BASE } = useAuth();
   const en = lang === "en";
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [amount, setAmount] = useState(1000);
   const [customAmount, setCustomAmount] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleQuickSelect = (val) => {
     setAmount(val);
@@ -24,15 +31,91 @@ export default function Donate() {
     setAmount(Number(val));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Simulate payment process
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      setAmount(1000);
-      setCustomAmount("");
-    }, 4000);
+    if (!user) {
+      setIsModalOpen(true);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // 1. Create Order
+      const orderRes = await fetch(`${API_BASE}/api/payments/order`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ amount: amount || 1000, currency: "INR" })
+      });
+      const orderData = await orderRes.json();
+      if (!orderRes.ok) throw new Error(orderData.message || "Failed to create order");
+
+      // 2. Get Razorpay Key
+      const keyRes = await fetch(`${API_BASE}/api/payments/key`, {
+        credentials: "include"
+      });
+      const keyData = await keyRes.json();
+      
+      const res = await loadRazorpayScript();
+      if (!res) {
+        alert("Razorpay SDK failed to load. Are you online?");
+        setLoading(false);
+        return;
+      }
+      
+      const options = {
+        key: keyData.data.keyId,
+        amount: orderData.data.amount,
+        currency: orderData.data.currency || "INR",
+        name: "Sashakt Rashtra Nirman",
+        description: "Donation",
+        order_id: orderData.data.transactionId,
+        handler: async function (response) {
+          try {
+            // 3. Verify Payment
+            const verifyRes = await fetch(`${API_BASE}/api/payments/verify`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({ 
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature 
+              })
+            });
+            
+            if (!verifyRes.ok) throw new Error("Payment verification failed");
+
+            setSubmitted(true);
+            setTimeout(() => {
+              setSubmitted(false);
+              setAmount(1000);
+              setCustomAmount("");
+            }, 4000);
+          } catch (err) {
+            console.error("Donation verification failed:", err);
+            alert("Payment verification failed.");
+          }
+        },
+        prefill: {
+          name: `${user.firstName} ${user.lastName}`,
+          email: user.email,
+          contact: user.phone
+        },
+        theme: {
+          color: "#E8622A"
+        }
+      };
+      
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+      
+      setLoading(false);
+    } catch (err) {
+      console.error("Donation failed:", err);
+      alert("Something went wrong processing your donation.");
+      setLoading(false);
+    }
   };
 
   return (
@@ -175,9 +258,10 @@ export default function Donate() {
 
                 <button
                   type="submit"
-                  className="w-full py-4 bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-orange-900/30 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2"
+                  disabled={loading}
+                  className="w-full py-4 bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-orange-900/30 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  {en ? "Proceed to Pay" : "भुगतान करें"} ₹{amount || 0}
+                  {loading ? "Processing..." : (en ? "Proceed to Pay" : "भुगतान करें")} ₹{amount || 0}
                   <ArrowRight className="w-5 h-5" />
                 </button>
                 <p className="text-center text-xs text-gray-400 mt-4">
@@ -188,6 +272,21 @@ export default function Donate() {
           </motion.div>
         </div>
       </div>
+
+      <ProfileCompletionModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onComplete={() => {
+          setIsModalOpen(false);
+          // Simulate successful payment directly after modal completes
+          setSubmitted(true);
+          setTimeout(() => {
+            setSubmitted(false);
+            setAmount(1000);
+            setCustomAmount("");
+          }, 4000);
+        }} 
+      />
     </div>
   );
 }
