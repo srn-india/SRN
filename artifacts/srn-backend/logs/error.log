@@ -42,3 +42,25 @@
 [31m    at a (/Users/anshjohnson/SRN/node_modules/.pnpm/@prisma+client@7.8.0_prisma@7.8.0_@types+react-dom@19.2.3_@types+react@19.2.14__@types+_1651e8bc9bdeb6ea8e90f9b95d1a57d9/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:963:24)[39m
 [31m    at Object.createOrder (/Users/anshjohnson/SRN/artifacts/srn-backend/src/modules/payment/payment.service.ts:19:10)[39m
 [31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/src/modules/payment/payment.controller.ts:11:17[39m
+2026-05-29 00:15:51:1551 [31merror[39m: [31mPayloadTooLargeError: request entity too large[39m
+[31m    at readStream (C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\raw-body@3.0.2\node_modules\raw-body\index.js:163:17)[39m
+[31m    at getRawBody (C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\raw-body@3.0.2\node_modules\raw-body\index.js:116:12)[39m
+[31m    at read (C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\body-parser@2.2.2\node_modules\body-parser\lib\read.js:113:3)[39m
+[31m    at jsonParser (C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\body-parser@2.2.2\node_modules\body-parser\lib\types\json.js:88:5)[39m
+[31m    at Layer.handleRequest (C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\router@2.2.0\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at trimPrefix (C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\router@2.2.0\node_modules\router\index.js:342:13)[39m
+[31m    at C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\router@2.2.0\node_modules\router\index.js:297:9[39m
+[31m    at processParams (C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\router@2.2.0\node_modules\router\index.js:582:12)[39m
+[31m    at next (C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\router@2.2.0\node_modules\router\index.js:291:5)[39m
+[31m    at cors (C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\cors@2.8.6\node_modules\cors\lib\index.js:188:7)[39m
+2026-05-29 00:29:31:2931 [31merror[39m: [31mPayloadTooLargeError: request entity too large[39m
+[31m    at readStream (C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\raw-body@3.0.2\node_modules\raw-body\index.js:163:17)[39m
+[31m    at getRawBody (C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\raw-body@3.0.2\node_modules\raw-body\index.js:116:12)[39m
+[31m    at read (C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\body-parser@2.2.2\node_modules\body-parser\lib\read.js:113:3)[39m
+[31m    at jsonParser (C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\body-parser@2.2.2\node_modules\body-parser\lib\types\json.js:88:5)[39m
+[31m    at Layer.handleRequest (C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\router@2.2.0\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at trimPrefix (C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\router@2.2.0\node_modules\router\index.js:342:13)[39m
+[31m    at C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\router@2.2.0\node_modules\router\index.js:297:9[39m
+[31m    at processParams (C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\router@2.2.0\node_modules\router\index.js:582:12)[39m
+[31m    at next (C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\router@2.2.0\node_modules\router\index.js:291:5)[39m
+[31m    at cors (C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\cors@2.8.6\node_modules\cors\lib\index.js:188:7)[39m

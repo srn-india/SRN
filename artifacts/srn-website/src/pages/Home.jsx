@@ -7,58 +7,12 @@ import {
 } from "lucide-react";
 import SectionHeader from "../components/SectionHeader";
 import LegalBadge from "../components/LegalBadge";
+import FocusAreasSection from "../components/FocusAreasSection";
 import { useLanguage } from "../context/LanguageContext";
 import { useFadeIn } from "../hooks/useFadeIn";
 
 const iconMap = { BookOpen, Heart, Users, Star, Leaf, Home: HomeIcon, Eye, Target };
 
-const foundingMembers = [
-  {
-    id: 1,
-    nameEn: "Dr. Manoj Kumar Shukla",
-    nameHi: "डॉ० मनोज कुमार शुक्ल",
-    fatherEn: "S/O Late Vaidyanath Shukla",
-    fatherHi: "पुत्र स्व० वैद्यनाथ शुक्ल",
-    positionEn: "Founder / Chief Trustee / President",
-    positionHi: "संस्थापक / मुख्य ट्रस्टी / अध्यक्ष",
-  },
-  {
-    id: 2,
-    nameEn: "Dr. Shravan Kumar Shukla",
-    nameHi: "डॉ० श्रवण कुमार शुक्ल",
-    fatherEn: "S/O Late Vaidyanath Shukla",
-    fatherHi: "पुत्र स्व० वैद्यनाथ शुक्ल",
-    positionEn: "Vice President",
-    positionHi: "उपाध्यक्ष",
-  },
-  {
-    id: 3,
-    nameEn: "Shri Vindeshwar Kumar Shukla",
-    nameHi: "श्री विंदेश्वर कुमार शुक्ल",
-    fatherEn: "S/O Late Vaidyanath Shukla",
-    fatherHi: "पुत्र स्व० वैद्यनाथ शुक्ल",
-    positionEn: "General Secretary",
-    positionHi: "महासचिव",
-  },
-  {
-    id: 4,
-    nameEn: "Shri Krishna Mohan Rai",
-    nameHi: "श्री कृष्ण मोहन राय",
-    fatherEn: "S/O Late Aniruddh Rai",
-    fatherHi: "पुत्र स्व० अनिरुद्ध राय",
-    positionEn: "Member",
-    positionHi: "सदस्य",
-  },
-  {
-    id: 5,
-    nameEn: "Shri Jang Bahadur Patel",
-    nameHi: "श्री जंग बहादुर पटेल",
-    fatherEn: "S/O Late Chandrabali",
-    fatherHi: "पुत्र स्व० चन्द्रबली",
-    positionEn: "Member",
-    positionHi: "सदस्य",
-  }
-];
 
 /* ─── Animated counter ────────────────────────────────────────────────── */
 function Counter({ target, suffix, label, labelHindi, lang }) {
@@ -100,7 +54,7 @@ function Counter({ target, suffix, label, labelHindi, lang }) {
         <p className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#F47A3A] to-[#FFC5A8] bg-clip-text text-transparent mb-3 drop-shadow-lg filter group-hover:brightness-110 transition-all">
           {count.toLocaleString()}{suffix}
         </p>
-        <p className="text-white/80 text-sm font-bold tracking-widest uppercase group-hover:text-white transition-colors">
+        <p className="text-white/80 text-xs font-bold tracking-widest uppercase group-hover:text-white transition-colors">
           {lang === "hi" ? labelHindi : label}
         </p>
       </div>
@@ -189,7 +143,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.7 }}
           >
-            <h1 className="text-4xl md:text-6xl font-bold text-white font-serif leading-tight tracking-tight drop-shadow-lg">
+            <h1 className="text-5xl md:text-6xl font-bold text-white font-serif leading-tight tracking-tight drop-shadow-lg">
               {lang === "en" ? "Sashakt Rashtra Nirman" : "सशक्त राष्ट्र निर्माण"}
             </h1>
 
@@ -203,7 +157,7 @@ export default function Home() {
             transition={{ delay: 0.55, duration: 0.45 }}
             className="mt-5"
           >
-            <span className="inline-block bg-gradient-to-r from-[#E8622A] to-[#D4880C] text-white text-base font-semibold py-2.5 px-8 rounded-full shadow-lg shadow-black/30">
+            <span className="inline-block bg-gradient-to-r from-[#E8622A] to-[#D4880C] text-white text-xl font-semibold py-2.5 px-8 rounded-full shadow-lg shadow-black/30">
               {h.slogan}
             </span>
           </motion.div>
@@ -281,7 +235,7 @@ export default function Home() {
                   {lang === "en" ? h.visionTitle : h.visionTitleHindi}
                 </h3>
               </div>
-              <p className="text-[#7A5C45] text-sm leading-relaxed">{h.visionText}</p>
+              <p className="text-[#7A5C45] text-base leading-relaxed">{h.visionText}</p>
             </div>
           </FadeSection>
           <FadeSection delay={150}>
@@ -296,7 +250,7 @@ export default function Home() {
               </div>
               <ul className="space-y-2">
                 {h.missionPoints.map((point, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-[#7A5C45]">
+                  <li key={i} className="flex items-start gap-2 text-base text-[#7A5C45]">
                     <span className="text-[#E8622A] mt-0.5 shrink-0">▸</span>
                     <span>{point}</span>
                   </li>
@@ -308,94 +262,38 @@ export default function Home() {
       </section>
 
       {/* ── Legal Legitimacy ─────────────────────────────────────────── */}
-      <section className="py-20 px-6 bg-[#FDF5EC]">
-        <div className="max-w-5xl mx-auto">
+      <section className="py-24 px-6 relative bg-[url('/hero-bg-2.png')] bg-fixed bg-cover bg-center overflow-hidden">
+        {/* Premium Glass Overlay */}
+        <div className="absolute inset-0 bg-[#2C1810]/75 backdrop-blur-md" />
+        
+        {/* Animated Glowing Orbs */}
+        <motion.div 
+          animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.3, 0.15] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-[#E8622A] rounded-full blur-[100px] pointer-events-none" 
+        />
+        
+        <div className="relative max-w-5xl mx-auto z-10">
           <FadeSection>
             <SectionHeader
               hindi={h.legalTitleHindi}
               english={h.legalTitle}
+              darkBg={true}
             />
           </FadeSection>
           <FadeSection delay={150}>
-            <div className="flex flex-wrap gap-3 justify-center mt-8">
+            <div className="flex flex-wrap gap-4 justify-center mt-12">
               {h.legalBadges.map((badge, i) => (
-                <LegalBadge key={i} label={badge} />
+                <LegalBadge key={i} label={badge} darkBg={true} />
               ))}
             </div>
           </FadeSection>
         </div>
       </section>
 
-      {/* ── Founding Members ─────────────────────────────────────────── */}
-      <section className="py-24 px-6 bg-[#FFF9F2] border-t border-[#F0D5B8]/30">
-        <div className="max-w-6xl mx-auto">
-          <FadeSection>
-            <SectionHeader
-              hindi="संस्थापक सदस्य"
-              english="Founding Members"
-            />
-          </FadeSection>
-          
-          <div className="mt-12 flex flex-wrap justify-center gap-6">
-            {foundingMembers.map((member, index) => (
-              <FadeSection 
-                key={member.id} 
-                delay={index * 100} 
-                className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex"
-              >
-                <div className="w-full group rounded-3xl p-8 bg-white border border-[#F0D5B8] shadow-sm hover:shadow-xl hover:shadow-orange-900/10 hover:border-[#E8622A]/50 hover:-translate-y-1.5 transition-all duration-300 flex flex-col items-center text-center h-full relative overflow-hidden">
-                  
-                  {/* Icon Container */}
-                  <div className="w-20 h-20 rounded-2xl bg-[#FDF5EC] text-[#E8622A] group-hover:bg-gradient-to-br group-hover:from-[#E8622A] group-hover:to-[#C04A18] group-hover:text-white transition-all duration-300 flex items-center justify-center mb-6 shadow-inner">
-                    <User className="w-10 h-10 opacity-90" strokeWidth={1.5} />
-                  </div>
-
-                  {/* Content */}
-                  <h3 className="font-bold font-serif mb-2 leading-snug text-xl text-[#1E0F05] group-hover:text-[#E8622A] transition-colors">
-                    {lang === "en" ? member.nameEn : member.nameHi}
-                  </h3>
-                  <p className="text-sm text-[#7A5C45] mb-6 italic">
-                    {lang === "en" ? member.fatherEn : member.fatherHi}
-                  </p>
-
-                  {/* Badge */}
-                  <div className="mt-auto px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-orange-50 text-[#C04A18] border border-orange-200/50">
-                    {lang === "en" ? member.positionEn : member.positionHi}
-                  </div>
-                </div>
-              </FadeSection>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ── Focus Areas ──────────────────────────────────────────────── */}
-      <section className="py-20 px-6 bg-[#FDF5EC]">
-        <div className="max-w-5xl mx-auto">
-          <FadeSection>
-            <SectionHeader
-              hindi={h.focusTitleHindi}
-              english={h.focusTitle}
-            />
-          </FadeSection>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-8">
-            {h.focusAreas.map((area, i) => {
-              const Icon = iconMap[area.icon] || BookOpen;
-              return (
-                <FadeSection key={i} delay={i * 80}>
-                  <div className="bg-white rounded-xl p-5 border border-[#F0D5B8] hover:border-[#E8622A] hover:shadow-lg hover:-translate-y-1.5 transition-all duration-300 card-shimmer h-full">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#E8622A]/15 to-[#E8622A]/5 flex items-center justify-center mb-3">
-                      <Icon className="w-6 h-6 text-[#E8622A]" />
-                    </div>
-                    <h3 className="font-bold text-[#1E0F05] text-base mb-1">{lang === "en" ? area.title : area.titleHindi}</h3>
-                    <p className="text-sm text-[#7A5C45] mt-1">{area.desc}</p>
-                  </div>
-                </FadeSection>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      <FocusAreasSection titleEn={h.focusTitle} titleHi={h.focusTitleHindi} />
 
       {/* ── Impact Counter ───────────────────────────────────────────── */}
       <section className="py-24 px-6 relative bg-[url('/hero-bg-2.png')] bg-fixed bg-cover bg-center overflow-hidden">

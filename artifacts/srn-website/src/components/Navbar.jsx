@@ -7,12 +7,12 @@ import { useAuth } from "../context/AuthContext";
 
 const menuCategories = [
   {
-    titleEn: "The Party",
-    titleHi: "पार्टी",
+    titleEn: "About Us",
+    titleHi: "हमारे बारे में",
     links: [
       { path: "/", hindiName: "मुखपृष्ठ", englishName: "Home" },
-      { path: "/about", hindiName: "हमारे बारे में", englishName: "About Us" },
-      { path: "/uddeshya", hindiName: "उद्देश्य", englishName: "Objectives" },
+      { path: "/uddeshya", hindiName: "उद्देश्य", englishName: "Our Aim & Objectives" },
+      { path: "/about-team", hindiName: "टीम परिचय", englishName: "About the Team" },
       { path: "/initiatives", hindiName: "हमारी पहल", englishName: "Our Initiatives" },
     ],
   },
@@ -57,6 +57,7 @@ export default function Navbar({ isOpen, setIsOpen }) {
   const { lang, toggleLang } = useLanguage();
   const { user } = useAuth();
   const en = lang === "en";
+  const [showMoreOrg, setShowMoreOrg] = useState(false);
   
   const isHome = location.pathname === "/";
   const isDashboard = location.pathname === "/dashboard";
@@ -97,7 +98,9 @@ export default function Navbar({ isOpen, setIsOpen }) {
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    return () => { 
+      document.body.style.overflow = ""; 
+    };
   }, [isOpen]);
 
   const handleLinkClick = () => setTimeout(() => setIsOpen(false), 200);
@@ -223,7 +226,8 @@ export default function Navbar({ isOpen, setIsOpen }) {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="relative z-10 w-full h-full flex flex-col pt-28 pb-8 px-6 md:px-12 overflow-y-auto"
+              className="relative z-10 w-full h-full flex flex-col pt-28 pb-8 px-6 md:px-12 overflow-y-auto overscroll-contain"
+              data-lenis-prevent="true"
             >
               
               {/* Menu Grid Container */}
@@ -239,80 +243,126 @@ export default function Navbar({ isOpen, setIsOpen }) {
                         ...category.links
                       ];
                     }
+                    let baseLinks = linksToRender;
+                    let extraLinks = [];
+                    if (category.titleEn === "Organisation") {
+                      baseLinks = linksToRender.slice(0, 3);
+                      extraLinks = linksToRender.slice(3);
+                    }
+
+                    const renderLink = (link, linkIdx, isExtra = false) => {
+                      const isActive = location.pathname === link.path;
+                      const animationProps = isExtra ? {} : { custom: colIdx + linkIdx, variants: linkVariants };
+                      
+                      if (link.isButton) {
+                        return (
+                          <motion.li key={link.path} {...animationProps}>
+                            <Link
+                              to={link.path}
+                              onClick={handleLinkClick}
+                              className="flex items-center justify-center w-full px-3 py-2 mt-1 rounded-xl bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white font-semibold shadow-lg hover:shadow-orange-900/50 hover:scale-[1.02] transition-all duration-300 border border-[#F47A3A]/30 text-base"
+                            >
+                              {en ? link.englishName : link.hindiName}
+                            </Link>
+                          </motion.li>
+                        );
+                      }
+
+                      if (link.isLocked) {
+                        return (
+                          <motion.li key={link.path} {...animationProps}>
+                            <div
+                              className="block w-full px-3 py-1.5 rounded-xl border border-white/5 bg-white/5 backdrop-blur-md text-white/40 cursor-not-allowed select-none relative group"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex flex-col">
+                                  <span className="text-base font-semibold leading-snug">
+                                    {en ? link.englishName : link.hindiName}
+                                  </span>
+                                  <span className="text-xs text-white/40 font-medium">
+                                    {en ? link.hindiName : link.englishName}
+                                  </span>
+                                </div>
+                                <Lock className="w-3.5 h-3.5 text-[#E8622A]/70" />
+                              </div>
+                            </div>
+                          </motion.li>
+                        );
+                      }
+
+                      return (
+                        <motion.li key={link.path} {...animationProps}>
+                          <Link
+                            to={link.path}
+                            onClick={handleLinkClick}
+                            className={`block w-full px-3 py-1.5 rounded-xl border backdrop-blur-md transition-all duration-300 group ${
+                              isActive 
+                                ? "bg-[#E8622A]/20 border-[#E8622A]/50 shadow-[0_0_15px_rgba(232,98,42,0.15)] text-white" 
+                                : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 hover:-translate-y-px text-white/70 hover:text-white"
+                            }`}
+                          >
+                            <div className="flex flex-col">
+                              <span className="text-base font-semibold leading-snug">
+                                {en ? link.englishName : link.hindiName}
+                              </span>
+                              <span className={`text-xs font-medium transition-colors ${isActive ? "text-[#F47A3A]" : "text-white/40 group-hover:text-white/60"}`}>
+                                {en ? link.hindiName : link.englishName}
+                              </span>
+                            </div>
+                          </Link>
+                        </motion.li>
+                      );
+                    };
                     
                     return (
                     <div key={category.titleEn} className="flex flex-col">
                       <motion.h2 
                         custom={colIdx}
                         variants={linkVariants}
-                        className="text-[#E8622A] font-bold text-lg font-serif mb-3 pb-1.5 border-b border-white/10"
+                        className="text-[#E8622A] font-bold text-2xl font-serif mb-5 pb-2 border-b border-white/10"
                       >
                         {en ? category.titleEn : category.titleHi}
                       </motion.h2>
                       
                       <ul className="flex flex-col gap-1.5">
-                        {linksToRender.map((link, linkIdx) => {
-                          const isActive = location.pathname === link.path;
-                          
-                          if (link.isButton) {
-                            return (
-                              <motion.li key={link.path} custom={colIdx + linkIdx} variants={linkVariants}>
-                                <Link
-                                  to={link.path}
-                                  onClick={handleLinkClick}
-                                  className="flex items-center justify-center w-full px-3 py-2 mt-1 rounded-xl bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white font-semibold shadow-lg hover:shadow-orange-900/50 hover:scale-[1.02] transition-all duration-300 border border-[#F47A3A]/30 text-[13px]"
-                                >
-                                  {en ? link.englishName : link.hindiName}
-                                </Link>
-                              </motion.li>
-                            );
-                          }
+                        {baseLinks.map((link, linkIdx) => renderLink(link, linkIdx))}
 
-                          if (link.isLocked) {
-                            return (
-                              <motion.li key={link.path} custom={colIdx + linkIdx} variants={linkVariants}>
-                                <div
-                                  className="block w-full px-3 py-1.5 rounded-xl border border-white/5 bg-white/5 backdrop-blur-md text-white/40 cursor-not-allowed select-none relative group"
-                                >
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex flex-col">
-                                      <span className="text-[13px] font-medium leading-snug">
-                                        {en ? link.englishName : link.hindiName}
-                                      </span>
-                                      <span className="text-[10px] text-white/20">
-                                        {en ? link.hindiName : link.englishName}
-                                      </span>
-                                    </div>
-                                    <Lock className="w-3.5 h-3.5 text-[#E8622A]/70" />
-                                  </div>
-                                </div>
-                              </motion.li>
-                            );
-                          }
-
-                          return (
-                            <motion.li key={link.path} custom={colIdx + linkIdx} variants={linkVariants}>
-                              <Link
-                                to={link.path}
-                                onClick={handleLinkClick}
-                                className={`block w-full px-3 py-1.5 rounded-xl border backdrop-blur-md transition-all duration-300 group ${
-                                  isActive 
-                                    ? "bg-[#E8622A]/20 border-[#E8622A]/50 shadow-[0_0_15px_rgba(232,98,42,0.15)] text-white" 
-                                    : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 hover:-translate-y-px text-white/70 hover:text-white"
-                                }`}
+                        {extraLinks.length > 0 && (
+                          <AnimatePresence>
+                            {showMoreOrg && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="flex flex-col gap-1.5 overflow-hidden"
                               >
-                                <div className="flex flex-col">
-                                  <span className="text-[13px] font-medium leading-snug">
-                                    {en ? link.englishName : link.hindiName}
-                                  </span>
-                                  <span className={`text-[10px] transition-colors ${isActive ? "text-[#F47A3A]" : "text-white/30 group-hover:text-white/50"}`}>
-                                    {en ? link.hindiName : link.englishName}
-                                  </span>
-                                </div>
-                              </Link>
-                            </motion.li>
-                          );
-                        })}
+                                {extraLinks.map((link, linkIdx) => renderLink(link, linkIdx + 3, true))}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        )}
+
+                        {extraLinks.length > 0 && !showMoreOrg && (
+                          <motion.li variants={linkVariants}>
+                            <button
+                              onClick={() => setShowMoreOrg(true)}
+                              className="block w-full px-3 py-2 mt-2 rounded-xl border border-[#E8622A]/30 bg-[#E8622A]/10 text-[#E8622A] hover:bg-[#E8622A]/20 transition-all font-semibold text-center text-sm"
+                            >
+                              {en ? "View more ↓" : "और देखें ↓"}
+                            </button>
+                          </motion.li>
+                        )}
+                        {extraLinks.length > 0 && showMoreOrg && (
+                          <motion.li variants={linkVariants}>
+                            <button
+                              onClick={() => setShowMoreOrg(false)}
+                              className="block w-full px-3 py-2 mt-2 rounded-xl border border-white/20 bg-white/5 text-white/50 hover:bg-white/10 hover:text-white transition-all font-semibold text-center text-sm"
+                            >
+                              {en ? "View less ↑" : "कम देखें ↑"}
+                            </button>
+                          </motion.li>
+                        )}
                       </ul>
                     </div>
                   );
@@ -325,7 +375,7 @@ export default function Navbar({ isOpen, setIsOpen }) {
               <motion.div 
                 custom={10} 
                 variants={linkVariants}
-                className="mt-10 max-w-7xl mx-auto w-full border-t border-white/10 pt-6 flex flex-col md:flex-row items-center justify-between gap-6"
+                className="mt-auto max-w-7xl mx-auto w-full border-t border-white/10 pt-6 flex flex-col md:flex-row items-center justify-between gap-6"
               >
                 {/* Language Toggle */}
                 <div className="flex items-center gap-4 bg-white/5 p-1.5 rounded-xl border border-white/10">

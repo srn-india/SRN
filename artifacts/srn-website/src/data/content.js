@@ -82,7 +82,7 @@ export const content = {
       patron: {
         badge: "Patron",
         badgeHindi: "संरक्षक",
-        name: "Prof. (Dr.) Manoj Kumar Shukla",
+        name: "Dr.Manoj Kumar Shukla",
         nameHindi: "पूज्य स्वामी यतींद्रानंद गिरी जी महाराज",
         english: "Swami Yatindranand Giri",
         designation: "Senior Mahamandaleshwar, Juna Akhara",
@@ -91,8 +91,8 @@ export const content = {
       president: {
         badge: "National President",
         badgeHindi: "राष्ट्रीय अध्यक्ष",
-        name: "Prof. (Dr.) Manoj Kumar Shukla",
-        nameHindi: "प्रो (डॉ.) मनोज कुमार शुक्ल",
+        name: "Dr. Manoj Kumar Shukla",
+        nameHindi: "डॉ. मनोज कुमार शुक्ल",
         credentials: "B.Tech (CSE), M.Tech (CSE), Ph.D from IIT Dhanbad",
       },
       advisoryTitle: "Advisory Board",

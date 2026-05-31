@@ -15,6 +15,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import { AuthProvider } from "./context/AuthContext";
 import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import Profile from "./pages/Profile";
 import Placeholder from "./pages/Placeholder";
 import Events from "./pages/Events";
@@ -27,6 +28,7 @@ import AuthSuccess from "./pages/AuthSuccess";
 import Contact from "./pages/Contact";
 import NationalPresident from "./pages/NationalPresident";
 import Sansrakshak from "./pages/Sanrakshak";
+import AboutTeam from "./pages/AboutTeam";
 
 function Layout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -93,6 +95,7 @@ export default function App() {
               <Route path="/organisation/sansrakshak" element={<Layout><Sansrakshak /></Layout>} />
               <Route path="/organisation/national-president" element={<Layout><NationalPresident /></Layout>} />
               <Route path="/initiatives" element={<Layout><Initiatives /></Layout>} />
+              <Route path="/about-team" element={<Layout><AboutTeam /></Layout>} />
               <Route path="/media" element={<Layout><Media /></Layout>} />
               <Route path="/volunteer" element={<Layout><Placeholder title="Volunteer" /></Layout>} />
               <Route path="/contact" element={<Layout><Contact /></Layout>} />
@@ -103,8 +106,22 @@ export default function App() {
               <Route path="/auth/success" element={<NoNavLayout><AuthSuccess /></NoNavLayout>} />
 
               {/* Dashboard pages — with Navbar, no Footer */}
-              <Route path="/dashboard" element={<AuthLayout><Dashboard /></AuthLayout>} />
-              <Route path="/profile" element={<AuthLayout><Profile /></AuthLayout>} />
+        <Route 
+          path="/dashboard" 
+          element={
+            <AuthLayout>
+              <Dashboard />
+            </AuthLayout>
+          } 
+        />
+        <Route 
+          path="/admin-dashboard" 
+          element={
+            <AuthLayout>
+              <AdminDashboard />
+            </AuthLayout>
+          } 
+        /><Route path="/profile" element={<AuthLayout><Profile /></AuthLayout>} />
 
               {/* 404 */}
             <Route path="*" element={

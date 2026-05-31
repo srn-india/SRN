@@ -33,12 +33,13 @@ export default function Sangathan() {
     <div className="bg-[#FDF5EC] font-sans selection:bg-[#E8622A] selection:text-white">
 
       {/* ── Banner ───────────────────────────────────────────────────── */}
-      <section className="relative bg-[#0A0503] pt-40 pb-32 text-center px-6 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-[#FFF9F2] via-[#FDF5EC] to-[#FDE8D7] pt-40 pb-32 text-center px-6 overflow-hidden">
         {/* Immersive background glows */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-[#E8622A]/15 blur-[150px] rounded-full pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#E8622A]/10 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#D4880C]/10 blur-[150px] rounded-full pointer-events-none" />
         
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20 mix-blend-luminosity"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.25] mix-blend-multiply"
           style={{ backgroundImage: `url('/sangathan-hero.png')` }}
         />
         
@@ -51,13 +52,13 @@ export default function Sangathan() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="relative z-10"
         >
-          <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-[#FFB594] text-xs font-bold uppercase tracking-widest mb-6 backdrop-blur-md">
+          <span className="inline-block px-5 py-2 rounded-full bg-white/60 border border-[#E8622A]/20 text-[#C04A18] text-xs font-bold uppercase tracking-widest mb-6 backdrop-blur-md shadow-sm">
             Our Organization
           </span>
-          <h1 className="text-5xl md:text-7xl font-bold text-white font-serif tracking-tight drop-shadow-2xl">
+          <h1 className="text-5xl md:text-7xl font-bold text-[#2C1810] font-serif tracking-tight drop-shadow-sm">
             {en ? s.bannerTitle : s.bannerTitleHindi}
           </h1>
-          <p className="text-[#FFB594] text-lg md:text-xl mt-6 max-w-2xl mx-auto font-medium drop-shadow-md">
+          <p className="text-[#5C3A1E] text-lg md:text-xl mt-6 max-w-2xl mx-auto font-medium">
             {s.bannerTagline}
           </p>
         </motion.div>
