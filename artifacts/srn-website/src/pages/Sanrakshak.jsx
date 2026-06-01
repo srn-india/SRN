@@ -31,47 +31,34 @@ function FadeSection({ children, className = "", delay = 0 }) {
   );
 }
 
-// Custom styled card for empty gallery image placeholders
-function GalleryImageFrame({ src, alt, caption, fileName }) {
+// Custom styled card for sleek photo gallery
+function GalleryImageFrame({ src, alt, className = "", onClick }) {
   const [hasError, setHasError] = useState(false);
 
   return (
-    <div className="bg-white border border-[#F0D5B8] rounded-2xl overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full card-shimmer group">
+    <div 
+      onClick={onClick}
+      className={`relative group overflow-hidden rounded-3xl shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500 bg-[#FDF5EC]/50 border border-[#F0D5B8]/80 cursor-zoom-in break-inside-avoid mb-5 w-full inline-block ${className}`}
+    >
+      {!hasError ? (
+        <img 
+          src={src} 
+          alt={alt} 
+          className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-[1.04] block rounded-3xl"
+          onError={() => setHasError(true)}
+        />
+      ) : (
+        <div className="w-full h-48 flex flex-col items-center justify-center p-6 bg-gradient-to-br from-[#FFF9F2] to-[#FDF5EC] rounded-3xl border border-[#F0D5B8]/40">
+          <Camera className="w-8 h-8 text-[#E8622A]/40 mb-2" />
+          <span className="text-xs font-bold text-[#E8622A]/60">Image Error</span>
+        </div>
+      )}
+
+      {/* Elegant Hover Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#1E0F05]/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
       
-      {/* Image / Placeholder Frame */}
-      <div className="relative h-64 md:h-80 bg-[#FFF9F2] overflow-hidden flex items-center justify-center border-b border-[#F0D5B8]/50">
-        {!hasError ? (
-          <img 
-            src={src} 
-            alt={alt} 
-            className="w-full h-full object-contain bg-[#FFF9F2] transition-transform duration-500 group-hover:scale-[1.02]"
-            onError={() => setHasError(true)}
-          />
-        ) : null}
-
-        {hasError && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-gradient-to-br from-[#FFF9F2] to-[#FDF5EC] text-center border-2 border-dashed border-[#E8622A]/30 m-3 rounded-xl">
-            <div className="w-12 h-12 rounded-full bg-[#E8622A]/10 flex items-center justify-center text-[#E8622A] mb-3 group-hover:scale-110 transition-transform duration-300">
-              <Camera className="w-6 h-6" />
-            </div>
-            <span className="text-xs font-bold text-[#E8622A] tracking-wider uppercase bg-[#E8622A]/10 px-2 py-0.5 rounded-full mb-1">
-              Place Image
-            </span>
-            <span className="text-[10px] text-[#7A5C45] font-mono leading-none bg-white border border-[#F0D5B8] px-1.5 py-0.5 rounded">
-              {fileName}
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Caption Content */}
-      <div className="p-4 flex-1 flex flex-col justify-between bg-white text-left">
-        <p className="text-sm font-bold text-[#1E0F05] leading-snug group-hover:text-[#5C1010] transition-colors duration-300">
-          {caption}
-        </p>
-        <div className="h-0.5 w-8 bg-[#E8622A] mt-3 group-hover:w-16 transition-all duration-300 rounded-full" />
-      </div>
-
+      {/* Sleek inner glowing border */}
+      <div className="absolute inset-0 border border-transparent group-hover:border-white/30 rounded-3xl transition-all duration-500 pointer-events-none" />
     </div>
   );
 }
@@ -339,6 +326,7 @@ export default function Sansrakshak() {
   const [activeTab, setActiveTab] = useState("education");
   const [profileImageError, setProfileImageError] = useState(false);
   const [bgIndex, setBgIndex] = useState(0);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -599,64 +587,78 @@ export default function Sansrakshak() {
             <div className="h-1 bg-gradient-to-r from-transparent via-[#E8622A] to-transparent mt-4 mx-auto w-32 rounded-full" />
           </div>
 
-          {/* Gallery Cards Grid (Empty sections pointing to files you can add) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Refined Photographic Gallery: Masonry Bento Layout */}
+          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-5 space-y-5">
             
-            <GalleryImageFrame 
-              src="/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-indias-prime-minister-narendra-modi.jpg"
-              alt="Swami Yatindranand Giri Maharaj with PM Narendra Modi"
-              caption={en 
-                ? "Mahamandaleshwar Swami Yatindranand Giri Maharaj in dialogue with the Prime Minister of India, Shri Narendra Modi."
-                : "भारत के माननीय प्रधानमंत्री श्री नरेन्द्र मोदी जी के साथ राष्ट्र-निर्माण पर गंभीर चर्चा करते महामंडलेश्वर स्वामी यतीन्द्रानन्द गिरि महाराज।"}
-              fileName="Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-indias-prime-minister-narendra-modi.jpg"
-            />
-
-            <GalleryImageFrame 
-              src="/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-cm-of-Uttrakhaand-Pushkar-Dhami-1024x934.jpg"
-              alt="Swami Yatindranand Giri Maharaj blessing Uttarakhand CM Pushkar Dhami"
-              caption={en 
-                ? "Swami Yatindranand Giri Maharaj bestowing blessings upon the Honorable Chief Minister of Uttarakhand, Shri Pushkar Singh Dhami."
-                : "उत्तराखंड के यशस्वी मुख्यमंत्री श्री पुष्कर सिंह धामी जी को देवभूमि के कल्याण हेतु आशीर्वाद प्रदान करते हुए महाराज जी।"}
-              fileName="Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-cm-of-Uttrakhaand-Pushkar-Dhami-1024x934.jpg"
-            />
-
-            <GalleryImageFrame 
-              src="/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-doing-rituals-at-holy-haridwar.jpg"
-              alt="Swami Yatindranand Giri Maharaj rituals Haridwar"
-              caption={en 
-                ? "Maharaj Ji performing sacred Vedic rituals on the holy banks of the Ganges in Haridwar, preserving ancient Sanatana traditions."
-                : "मोक्षदायिनी गंगा के तट पर हरिद्वार में वैदिक रीति-रिवाज, हवन एवं अनुष्ठान संपन्न करते महामंडलेश्वर स्वामी जी।"}
-              fileName="Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-doing-rituals-at-holy-haridwar.jpg"
-            />
-
-            <GalleryImageFrame 
-              src="/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-uttar-pradesh-cheif-minister-manik-yogi-adityanath.-jpg.jpg"
-              alt="Swami Yatindranand Giri Maharaj with UP CM Yogi Adityanath"
-              caption={en 
-                ? "Swami Yatindranand Giri Maharaj sharing spiritual insights with the Honorable Chief Minister of Uttar Pradesh, Yogi Adityanath."
-                : "उत्तर प्रदेश के पूज्य मुख्यमंत्री योगी आदित्यनाथ जी के साथ सांस्कृतिक संवर्धन और गौरक्षा विषयों पर संवाद।"}
-              fileName="Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-uttar-pradesh-cheif-minister-manik-yogi-adityanath.-jpg.jpg"
-            />
-
-            <GalleryImageFrame 
-              src="/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-Acharya-Mahamandaleshwar-Swami-Avdheshanand-Giri-of-Juna-Akhara.jpg"
-              alt="Swami Yatindranand Giri Maharaj with Acharya Swami Avdheshanand Giri of Juna Akhara"
-              caption={en 
-                ? "Mahamandaleshwar Swami Yatindranand Giri Maharaj in dialogue with Acharya Mahamandaleshwar Swami Avdheshanand Giri Ji of Juna Akhara."
-                : "श्री पंचदशनाम जूना अखाड़े के आचार्य महामंडलेश्वर स्वामी अवधेशानंद गिरि जी महाराज के साथ विचार-विमर्श करते स्वामी यतीन्द्रानन्द गिरि महाराज।"}
-              fileName="Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-Acharya-Mahamandaleshwar-Swami-Avdheshanand-Giri-of-Juna-Akhara.jpg"
-            />
-
-            <GalleryImageFrame 
-              src="/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-tripura-cheif-minister-manik-shah.jpg"
-              alt="Swami Yatindranand Giri Maharaj with Tripura Chief Minister Manik Saha"
-              caption={en 
-                ? "Swami Yatindranand Giri Maharaj in dialogue with the Honorable Chief Minister of Tripura, Dr. Manik Saha."
-                : "त्रिपुरा के माननीय मुख्यमंत्री डॉ. माणिक साहा जी के साथ लोक-कल्याण और सनातन संस्कृति के संवर्धन पर संवाद।"}
-              fileName="Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-tripura-cheif-minister-manik-shah.jpg"
-            />
-
+            {[
+              "/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-indias-prime-minister-narendra-modi.jpg",
+              "/WhatsApp Image 2026-06-01 at 22.34.07.jpeg",
+              "/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-cm-of-Uttrakhaand-Pushkar-Dhami-1024x934.jpg",
+              "/WhatsApp Image 2026-06-01 at 22.34.08 (1).jpeg",
+              "/WhatsApp Image 2026-06-01 at 22.34.08 (2).jpeg",
+              "/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-doing-rituals-at-holy-haridwar.jpg",
+              "/WhatsApp Image 2026-06-01 at 22.34.08 (3).jpeg",
+              "/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-uttar-pradesh-cheif-minister-manik-yogi-adityanath.-jpg.jpg",
+              "/WhatsApp Image 2026-06-01 at 22.34.08.jpeg",
+              "/WhatsApp Image 2026-06-01 at 22.34.09 (1).jpeg",
+              "/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-Acharya-Mahamandaleshwar-Swami-Avdheshanand-Giri-of-Juna-Akhara.jpg",
+              "/WhatsApp Image 2026-06-01 at 22.34.09 (2).jpeg",
+              "/WhatsApp Image 2026-06-01 at 22.34.09.jpeg",
+              "/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-tripura-cheif-minister-manik-shah.jpg",
+              "/WhatsApp Image 2026-06-01 at 22.34.10.jpeg",
+              "/WhatsApp Image 2026-06-01 at 22.34.10 (1).jpeg",
+              "/WhatsApp Image 2026-06-01 at 22.34.10 (2).jpeg",
+              "/WhatsApp Image 2026-06-01 at 22.34.11.jpeg",
+              "/WhatsApp Image 2026-06-01 at 22.34.11 (1).jpeg",
+              "/WhatsApp Image 2026-06-01 at 22.34.11 (2).jpeg",
+              "/WhatsApp Image 2026-06-01 at 22.34.12.jpeg",
+              "/WhatsApp Image 2026-06-01 at 22.34.12 (1).jpeg"
+            ].map((src, index) => (
+              <GalleryImageFrame 
+                key={index}
+                src={src} 
+                alt={`Gallery Moment ${index + 1}`} 
+                onClick={() => setSelectedImage(src)}
+              />
+            ))}
+            
           </div>
+
+          {/* Lightbox Modal */}
+          <AnimatePresence>
+            {selectedImage && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 md:p-8 backdrop-blur-md cursor-zoom-out"
+                onClick={() => setSelectedImage(null)}
+              >
+                <motion.button 
+                  className="absolute top-6 right-6 text-white/75 hover:text-white bg-white/10 hover:bg-white/20 p-3.5 rounded-full transition-all duration-300 z-50 shadow-lg hover:scale-105"
+                  onClick={() => setSelectedImage(null)}
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </motion.button>
+                <motion.div 
+                  initial={{ scale: 0.95, y: 15 }}
+                  animate={{ scale: 1, y: 0 }}
+                  exit={{ scale: 0.95, y: 15 }}
+                  transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                  className="relative max-w-5xl max-h-[85vh] flex items-center justify-center rounded-2xl overflow-hidden shadow-2xl"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <img 
+                    src={selectedImage} 
+                    alt="Enlarged gallery view" 
+                    className="max-w-full max-h-[85vh] object-contain rounded-2xl border border-white/10"
+                  />
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
         </div>
       </section>
