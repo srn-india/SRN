@@ -1,21 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useSyncExternalStore, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, User, MapPin } from "lucide-react";
 import India from "@react-map/india";
 
 export default function StateBearersMap({ lang }) {
   const [hoveredState, setHoveredState] = useState(null);
-  const [mapSize, setMapSize] = useState(576);
-
-  useEffect(() => {
-    const updateSize = () => {
-      const newSize = Math.min(window.innerWidth - 32, 576);
-      setMapSize(newSize);
-    };
-    updateSize();
-    window.addEventListener("resize", updateSize);
-    return () => window.removeEventListener("resize", updateSize);
-  }, []);
+  const mapSize = useSyncExternalStore(
+    useCallback((callback) => {
+      window.addEventListener("resize", callback);
+      return () => window.removeEventListener("resize", callback);
+    }, []),
+    () => Math.min(window.innerWidth - 32, 576),
+    () => 576
+  );
 
   const handleSelect = (stateName) => {
     // No action on click

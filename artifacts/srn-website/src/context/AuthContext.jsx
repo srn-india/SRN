@@ -8,15 +8,25 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const checkAuth = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/me`, { credentials: "include" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.data?.user) {
+          setUser(data.data.user);
+          return data.data.user;
+        }
+      }
+    } catch (err) {
+      console.error("Auth check failed:", err);
+    }
+    return null;
+  };
+
   useEffect(() => {
     // On mount, check if user is already logged in via cookie
-    fetch(`${API_BASE}/api/auth/me`, { credentials: "include" })
-      .then((res) => res.ok ? res.json() : null)
-      .then((data) => {
-        if (data?.data?.user) setUser(data.data.user);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    checkAuth().finally(() => setLoading(false));
   }, []);
 
   const login = async (email, password) => {
@@ -90,22 +100,6 @@ export function AuthProvider({ children }) {
     } catch(err) {
       console.log("Failed to persist profile update:", err);
     }
-  };
-
-  const checkAuth = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/api/auth/me`, { credentials: "include" });
-      if (res.ok) {
-        const data = await res.json();
-        if (data?.data?.user) {
-          setUser(data.data.user);
-          return data.data.user;
-        }
-      }
-    } catch (err) {
-      console.error("Auth check failed:", err);
-    }
-    return null;
   };
 
   return (

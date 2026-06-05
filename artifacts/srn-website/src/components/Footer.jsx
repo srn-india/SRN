@@ -130,8 +130,8 @@ export default function Footer() {
                 { to: "/sangathan", label: en ? "Sangathan" : "संगठन" },
                 { to: "/uddeshya", label: en ? "Objectives" : "उद्देश्य" },
                 { to: "/contact", label: en ? "Contact Us" : "संपर्क" },
-              ].map((link, idx) => (
-                <li key={idx}>
+              ].map((link) => (
+                <li key={link.to}>
                   <Link to={link.to} className="group flex items-center text-[#7A5C45] hover:text-[#E8622A] font-medium transition-colors duration-300">
                     <span className="relative">
                       {link.label}

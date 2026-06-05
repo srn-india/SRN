@@ -22,14 +22,21 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [membership, setMembership] = useState(null);
 
+  const fetchMembership = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/users/membership`, { credentials: "include" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.data) setMembership(data.data);
+      }
+    } catch (err) {
+      // ignore
+    }
+  };
+
   useEffect(() => {
     if (user && API_BASE) {
-      fetch(`${API_BASE}/api/users/membership`, { credentials: "include" })
-        .then(res => res.ok ? res.json() : null)
-        .then(data => {
-          if (data?.data) setMembership(data.data);
-        })
-        .catch(() => {});
+      fetchMembership();
     }
   }, [user, API_BASE]);
 
@@ -193,8 +200,8 @@ export default function Dashboard() {
                   { icon: Calendar, label: "Events", desc: "Join rallies", to: "/events", gradient: "from-blue-400 to-blue-600" },
                   { icon: MessageSquare, label: "Forums", desc: "Discussions", to: "/forums", gradient: "from-emerald-400 to-emerald-600" },
                   { icon: Activity, label: "Initiatives", desc: "Our work", to: "/initiatives", gradient: "from-amber-400 to-orange-500" },
-                ].map((action, i) => (
-                  <Link key={i} to={action.to} className="group relative bg-white/60 backdrop-blur-md rounded-[1.5rem] p-5 border border-white/80 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+                ].map((action) => (
+                  <Link key={action.to} to={action.to} className="group relative bg-white/60 backdrop-blur-md rounded-[1.5rem] p-5 border border-white/80 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden">
                     <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                       <action.icon className="w-16 h-16 text-gray-900" />
                     </div>
@@ -283,8 +290,8 @@ export default function Dashboard() {
                   { title: "National Rally Announced", date: "Today, 10:00 AM", isNew: true },
                   { title: "Membership Drive 2026", date: "Yesterday, 2:30 PM", isNew: false },
                   { title: "New Initiative: Clean India", date: "May 25, 2026", isNew: false },
-                ].map((item, i) => (
-                  <div key={i} className="flex gap-4 p-4 rounded-xl bg-white/50 border border-white hover:bg-white transition-colors cursor-pointer group">
+                ].map((item) => (
+                  <div key={item.title} className="flex gap-4 p-4 rounded-xl bg-white/50 border border-white hover:bg-white transition-colors cursor-pointer group">
                     <div className="flex-1">
                       <h4 className={`text-sm font-bold ${item.isNew ? 'text-[#2C1810]' : 'text-[#5C3A1E]'} group-hover:text-[#E8622A] transition-colors`}>
                         {item.title}

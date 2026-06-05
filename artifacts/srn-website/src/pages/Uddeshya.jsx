@@ -106,7 +106,7 @@ export default function Uddeshya() {
 
           <div className="space-y-3">
             {u.objectives.map((obj, i) => (
-              <FadeSection key={i} delay={i * 55}>
+              <FadeSection key={obj.number} delay={i * 55}>
                 <AccordionItem
                   number={obj.number}
                   titleHindi={obj.titleHindi}
@@ -135,7 +135,7 @@ export default function Uddeshya() {
           </FadeSection>
           <div className="mt-8 grid grid-cols-1 gap-4">
             {u.missionPoints.map((point, i) => (
-              <MissionPoint key={i} number={i} text={point} delay={i * 75} />
+              <MissionPoint key={point} number={i} text={point} delay={i * 75} />
             ))}
           </div>
         </div>
@@ -184,7 +184,7 @@ export default function Uddeshya() {
             <div className="flex flex-wrap gap-3 justify-center mt-10">
               {u.legalBadges.map((badge, i) => (
                 <motion.span
-                  key={i}
+                  key={badge}
                   initial={{ opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
