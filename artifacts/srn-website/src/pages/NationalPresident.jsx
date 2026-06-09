@@ -31,47 +31,35 @@ function FadeSection({ children, className = "", delay = 0 }) {
   );
 }
 
-// Custom styled card for gallery images
-function GalleryImageFrame({ src, alt, caption, fileName }) {
+// Custom styled card for sleek photo gallery
+function GalleryImageFrame({ src, alt, className = "", onClick, ratio }) {
   const [hasError, setHasError] = useState(false);
 
   return (
-    <div className="bg-white border border-[#F0D5B8] rounded-2xl overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full card-shimmer group">
+    <div 
+      onClick={onClick}
+      className={`relative group overflow-hidden rounded-3xl shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500 bg-[#FDF5EC]/50 border border-[#F0D5B8]/80 cursor-zoom-in w-full ${className}`}
+      style={{ aspectRatio: ratio }}
+    >
+      {!hasError ? (
+        <img 
+          src={src} 
+          alt={alt} 
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04] block"
+          onError={() => setHasError(true)}
+        />
+      ) : (
+        <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-gradient-to-br from-[#FFF9F2] to-[#FDF5EC] rounded-3xl border border-[#F0D5B8]/40">
+          <Camera className="w-8 h-8 text-[#E8622A]/40 mb-2" />
+          <span className="text-xs font-bold text-[#E8622A]/60">Image Error</span>
+        </div>
+      )}
 
-      {/* Image / Placeholder Frame */}
-      <div className="relative h-64 md:h-80 bg-[#FFF9F2] overflow-hidden flex items-center justify-center border-b border-[#F0D5B8]/50">
-        {!hasError ? (
-          <img
-            src={src}
-            alt={alt}
-            className="w-full h-full object-contain bg-[#FFF9F2] transition-transform duration-500 group-hover:scale-[1.02]"
-            onError={() => setHasError(true)}
-          />
-        ) : null}
-
-        {hasError && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-gradient-to-br from-[#FFF9F2] to-[#FDF5EC] text-center border-2 border-dashed border-[#E8622A]/30 m-3 rounded-xl">
-            <div className="w-12 h-12 rounded-full bg-[#E8622A]/10 flex items-center justify-center text-[#E8622A] mb-3 group-hover:scale-110 transition-transform duration-300">
-              <Camera className="w-6 h-6" />
-            </div>
-            <span className="text-xs font-bold text-[#E8622A] tracking-wider uppercase bg-[#E8622A]/10 px-2 py-0.5 rounded-full mb-1">
-              Place Image
-            </span>
-            <span className="text-[10px] text-[#7A5C45] font-mono leading-none bg-white border border-[#F0D5B8] px-1.5 py-0.5 rounded">
-              {fileName}
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Caption Content */}
-      <div className="p-4 flex-1 flex flex-col justify-between bg-white text-left">
-        <p className="text-sm font-bold text-[#1E0F05] leading-snug group-hover:text-[#5C1010] transition-colors duration-300">
-          {caption}
-        </p>
-        <div className="h-0.5 w-8 bg-[#E8622A] mt-3 group-hover:w-16 transition-all duration-300 rounded-full" />
-      </div>
-
+      {/* Elegant Hover Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#1E0F05]/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+      
+      {/* Sleek inner glowing border */}
+      <div className="absolute inset-0 border border-transparent group-hover:border-white/30 rounded-3xl transition-all duration-500 pointer-events-none" />
     </div>
   );
 }
@@ -379,6 +367,7 @@ export default function NationalPresident() {
   const [activeTab, setActiveTab] = useState("responsibility");
   const [profileImageError, setProfileImageError] = useState(false);
   const [bgIndex, setBgIndex] = useState(0);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -640,64 +629,88 @@ export default function NationalPresident() {
             <div className="h-1 bg-gradient-to-r from-transparent via-[#E8622A] to-transparent mt-4 mx-auto w-32 rounded-full" />
           </div>
 
-          {/* Gallery Cards Grid (Empty sections pointing to files you can add) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
-            <GalleryImageFrame
-              src="/Dr. Manoj Kumar Shukla with swami yatindranand ji maharaj.jpeg"
-              alt="Dr. Manoj Kumar Shukla with Swami Yatindranand Giri Maharaj"
-              caption={en
-                ? "Dr. Manoj Kumar Shukla in spiritual discussion and seeking blessings from the revered Patron, Swami Yatindranand Giri Maharaj."
-                : "परम श्रद्धेय संरक्षक स्वामी यतीन्द्रानन्द गिरि महाराज जी से शुभाशीष प्राप्त करते और गंभीर चर्चा करते डॉ. मनोज कुमार शुक्ला।"}
-              fileName="Dr. Manoj Kumar Shukla with swami yatindranand ji maharaj.jpeg"
-            />
-
-            <GalleryImageFrame
-              src="/Dr.-Manoj-Kumar-Shukla-at-kedarrnath.jpeg"
-              alt="Dr. Manoj Kumar Shukla at Kedarnath Temple"
-              caption={en
-                ? "Dr. Manoj Kumar Shukla visiting the sacred Kedarnath Temple in Devbhumi Uttarakhand, seeking divine blessings."
-                : "देवभूमि उत्तराखंड में बाबा केदारनाथ धाम की पवित्र यात्रा के दौरान दर्शन पूजन एवं देव आराधना करते डॉ. शुक्ला।"}
-              fileName="Dr.-Manoj-Kumar-Shukla-at-kedarrnath.jpeg"
-            />
-
-            <GalleryImageFrame
-              src="/Dr.-Manoj-Kumar-Shukla-giving-speech.jpeg"
-              alt="Dr. Manoj Kumar Shukla delivering speech"
-              caption={en
-                ? "Dr. Manoj Kumar Shukla addressing a prestigious conclave, presenting frameworks for educational technology and policy."
-                : "उच्च शिक्षा, राष्ट्रनीति और अत्याधुनिक तकनीक पर एक गरिमामयी राष्ट्रीय मंच को संबोधित करते डॉ. मनोज कुमार शुक्ला।"}
-              fileName="Dr.-Manoj-Kumar-Shukla-giving-speech.jpeg"
-            />
-
-            <GalleryImageFrame
-              src="/Dr.-Manoj-Kumar-Shukla-in-devotion.jpeg"
-              alt="Dr. Manoj Kumar Shukla in Devotion"
-              caption={en
-                ? "Dr. Manoj Kumar Shukla engaged in quiet prayer and reflection, embodying deep connection with spiritual values."
-                : "अटूट आस्था और श्रद्धा भाव से देव आराधना और साधना में लीन प्रखर शिक्षाविद् डॉ. शुक्ला।"}
-              fileName="Dr.-Manoj-Kumar-Shukla-in-devotion.jpeg"
-            />
-
-            <GalleryImageFrame
-              src="/dr. manoj kumar shukla performing hindu rituals .jpeg"
-              alt="Dr. Manoj Kumar Shukla performing Hindu rituals"
-              caption={en
-                ? "Dr. Manoj Kumar Shukla performing traditional Hindu rituals, preserving Vedic cultural heritage and spiritual legacy."
-                : "भारतीय वैदिक परंपराओं के संवर्धन हेतु पारंपरिक हिंदू यज्ञ, पूजन एवं अनुष्ठान संपन्न करते डॉ. मनोज कुमार शुक्ला।"}
-              fileName="dr. manoj kumar shukla performing hindu rituals .jpeg"
-            />
-
-            <GalleryImageFrame
-              src="/Dr.-Manoj-Kumar-Shukla-constitution.jpeg"
-              alt="Dr. Manoj Kumar Shukla studying Constitution"
-              caption={en
-                ? "Dr. Manoj Kumar Shukla studying the Constitution of India, reflecting his commitment to public welfare and policy frameworks."
-                : "भारत के संविधान का अध्ययन और देश की प्रशासनिक प्रणालियों पर चिंतन करते कुशल नीति-विशेषज्ञ डॉ. शुक्ला।"}
-              fileName="Dr.-Manoj-Kumar-Shukla-constitution.jpeg"
-            />
-
+          {/* Refined Photographic Gallery: Mathematically-Balanced Bento Grid Layout */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-start">
+            {[
+              // Column 1
+              [
+                { src: "/WhatsApp Image 2026-06-03 at 19.54.52 (2).jpeg", ratio: 853/1280 },
+                { src: "/dr. manoj kumar shukla performing hindu rituals .jpeg", ratio: 1280/960 },
+                { src: "/Dr. Manoj Kumar Shukla with swami yatindranand ji maharaj.jpeg", ratio: 960/720 },
+                { src: "/WhatsApp Image 2026-06-03 at 19.54.53 (1).jpeg", ratio: 1280/960 },
+                { src: "/WhatsApp Image 2026-06-03 at 19.54.52.jpeg", ratio: 1280/852 }
+              ],
+              // Column 2
+              [
+                { src: "/Dr.-Manoj-Kumar-Shukla-at-kedarrnath.jpeg", ratio: 720/960 },
+                { src: "/WhatsApp Image 2026-06-03 at 19.54.54.jpeg", ratio: 960/1280 },
+                { src: "/WhatsApp Image 2026-06-03 at 19.54.52 (1).jpeg", ratio: 1280/960 },
+                { src: "/Dr.-Manoj-Kumar-Shukla-giving-speech.jpeg", ratio: 1280/853 }
+              ],
+              // Column 3
+              [
+                { src: "/WhatsApp Image 2026-06-03 at 19.54.53 (2).jpeg", ratio: 960/1280 },
+                { src: "/WhatsApp Image 2026-06-03 at 19.54.54 (2).jpeg", ratio: 1178/1280 },
+                { src: "/WhatsApp Image 2026-06-03 at 19.54.51.jpeg", ratio: 1280/960 },
+                { src: "/Dr.-Manoj-Kumar-Shukla-constitution.jpeg", ratio: 1280/853 }
+              ],
+              // Column 4
+              [
+                { src: "/WhatsApp Image 2026-06-03 at 19.54.54 (1).jpeg", ratio: 1200/1600 },
+                { src: "/WhatsApp Image 2026-06-03 at 19.54.53 (3).jpeg", ratio: 1216/1280 },
+                { src: "/Dr.-Manoj-Kumar-Shukla-in-devotion.jpeg", ratio: 1024/768 },
+                { src: "/WhatsApp Image 2026-06-03 at 19.54.53.jpeg", ratio: 1280/960 }
+              ]
+            ].map((column, colIdx) => (
+              <div key={colIdx} className="flex flex-col gap-5">
+                {column.map((item, imgIdx) => (
+                  <GalleryImageFrame 
+                    key={imgIdx}
+                    src={item.src} 
+                    ratio={item.ratio}
+                    alt={`President Gallery Moment ${colIdx + 1}-${imgIdx + 1}`} 
+                    onClick={() => setSelectedImage(item.src)}
+                  />
+                ))}
+              </div>
+            ))}
           </div>
+
+          {/* Lightbox Modal */}
+          <AnimatePresence>
+            {selectedImage && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 md:p-8 backdrop-blur-md cursor-zoom-out"
+                onClick={() => setSelectedImage(null)}
+              >
+                <motion.button 
+                  className="absolute top-6 right-6 text-white/75 hover:text-white bg-white/10 hover:bg-white/20 p-3.5 rounded-full transition-all duration-300 z-50 shadow-lg hover:scale-105"
+                  onClick={() => setSelectedImage(null)}
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </motion.button>
+                <motion.div 
+                  initial={{ scale: 0.95, y: 15 }}
+                  animate={{ scale: 1, y: 0 }}
+                  exit={{ scale: 0.95, y: 15 }}
+                  transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                  className="relative max-w-5xl max-h-[85vh] flex items-center justify-center rounded-2xl overflow-hidden shadow-2xl"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <img 
+                    src={selectedImage} 
+                    alt="Enlarged gallery view" 
+                    className="max-w-full max-h-[85vh] object-contain rounded-2xl border border-white/10"
+                  />
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
         </div>
       </section>
