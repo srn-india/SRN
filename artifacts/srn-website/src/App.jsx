@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, MotionConfig } from "framer-motion";
 import { Analytics } from "@vercel/analytics/react";
 import { LanguageProvider } from "./context/LanguageContext";
 import Navbar from "./components/Navbar";
@@ -67,7 +67,8 @@ export default function App() {
   });
 
   return (
-    <>
+    <MotionConfig reducedMotion="user">
+      <>
       {/* Splash screen — shown on fresh load */}
       <AnimatePresence>
         {!splashDone && (
@@ -140,6 +141,7 @@ export default function App() {
         </AuthProvider>
       </LanguageProvider>
       <Analytics />
-    </>
+      </>
+    </MotionConfig>
   );
 }
