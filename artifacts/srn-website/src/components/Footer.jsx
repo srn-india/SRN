@@ -41,8 +41,8 @@ export default function Footer() {
         className="max-w-7xl mx-auto px-6 relative z-10"
       >
         {/* Contact Banner (Glassmorphic Light) */}
-        <motion.div variants={itemVariants} className="mb-20">
-          <div className="bg-white/70 backdrop-blur-xl border border-white rounded-3xl p-8 md:p-10 shadow-[0_8px_32px_rgba(0,0,0,0.05)] flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
+        <motion.div variants={itemVariants} className="mb-12 md:mb-20">
+          <div className="bg-white/70 backdrop-blur-xl border border-white rounded-3xl p-5 md:p-10 shadow-[0_8px_32px_rgba(0,0,0,0.05)] flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8 relative overflow-hidden">
             <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#E8622A]/10 blur-[60px] rounded-full" />
             
             <div className="relative z-10 text-center md:text-left">
@@ -54,31 +54,31 @@ export default function Footer() {
               </p>
             </div>
 
-            <div className="relative z-10 flex flex-col sm:flex-row gap-6">
+            <div className="relative z-10 flex flex-col sm:flex-row gap-3 sm:gap-6 w-full md:w-auto">
               <a
                 href="tel:+917652012487"
-                className="flex items-center gap-3 bg-white hover:bg-[#FDF5EC] border border-[#E8D5B8]/50 px-6 py-3 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-1 group"
+                className="flex items-center justify-center md:justify-start gap-2 md:gap-3 bg-white hover:bg-[#FDF5EC] border border-[#E8D5B8]/50 px-4 md:px-6 py-3 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-1 group w-full sm:w-auto overflow-hidden"
               >
-                <div className="w-10 h-10 rounded-full bg-[#FFF9F2] border border-[#E8D5B8]/50 flex items-center justify-center group-hover:bg-[#E8622A] group-hover:border-[#E8622A] transition-colors">
-                  <Phone className="w-4 h-4 text-[#E8622A] group-hover:text-white transition-colors" />
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#FFF9F2] border border-[#E8D5B8]/50 flex items-center justify-center group-hover:bg-[#E8622A] group-hover:border-[#E8622A] transition-colors shrink-0">
+                  <Phone className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#E8622A] group-hover:text-white transition-colors" />
                 </div>
-                <span className="font-semibold tracking-wide text-[#5C3A1E]">+91 76520 12487</span>
+                <span className="font-semibold tracking-wide text-[#5C3A1E] text-sm md:text-base whitespace-nowrap truncate">+91 76520 12487</span>
               </a>
               <a
                 href="mailto:srnindia@yahoo.com"
-                className="flex items-center gap-3 bg-white hover:bg-[#FDF5EC] border border-[#E8D5B8]/50 px-6 py-3 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-1 group"
+                className="flex items-center justify-center md:justify-start gap-2 md:gap-3 bg-white hover:bg-[#FDF5EC] border border-[#E8D5B8]/50 px-4 md:px-6 py-3 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-1 group w-full sm:w-auto overflow-hidden"
               >
-                <div className="w-10 h-10 rounded-full bg-[#FFF9F2] border border-[#E8D5B8]/50 flex items-center justify-center group-hover:bg-[#E8622A] group-hover:border-[#E8622A] transition-colors">
-                  <Mail className="w-4 h-4 text-[#E8622A] group-hover:text-white transition-colors" />
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#FFF9F2] border border-[#E8D5B8]/50 flex items-center justify-center group-hover:bg-[#E8622A] group-hover:border-[#E8622A] transition-colors shrink-0">
+                  <Mail className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#E8622A] group-hover:text-white transition-colors" />
                 </div>
-                <span className="font-semibold tracking-wide text-[#5C3A1E]">srnindia@yahoo.com</span>
+                <span className="font-semibold tracking-wide text-[#5C3A1E] text-sm md:text-base whitespace-nowrap truncate">srnindia@yahoo.com</span>
               </a>
             </div>
           </div>
         </motion.div>
 
         {/* Main Footer Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 mb-12 md:mb-16">
           {/* Brand Column */}
           <motion.div variants={itemVariants} className="md:col-span-5">
             <div className="flex items-center gap-4 mb-6">
@@ -151,9 +151,11 @@ export default function Footer() {
               {f.contact} {en ? "& Info" : "और जानकारी"}
             </h3>
             <div className="space-y-6">
-              <div className="bg-white/60 rounded-2xl p-5 border border-[#E8D5B8]/50 shadow-sm">
-                <p className="text-[#B89070] text-xs uppercase tracking-wider mb-1 font-bold">{en ? "Registration" : "पंजीकरण"}</p>
-                <p className="text-[#5C3A1E] font-medium font-mono text-sm">{f.npoId}</p>
+              <div className="bg-white/60 rounded-2xl p-5 border border-[#E8D5B8]/50 shadow-sm hover:shadow-md hover:bg-white/80 transition-all duration-300">
+                <p className="text-[#B89070] text-sm font-bold mb-2">{en ? "Support Our Cause" : "हमारे उद्देश्य का समर्थन करें"}</p>
+                <Link to="/donate" className="inline-flex items-center text-[#2C1810] text-sm font-bold hover:text-[#E8622A] transition-colors">
+                  {en ? "Make a Donation" : "दान करें"} <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
               </div>
               <div className="bg-gradient-to-r from-[#E8622A]/5 to-transparent rounded-2xl p-5 border border-[#E8622A]/20">
                 <p className="text-[#E8622A] text-sm font-bold mb-2">{en ? "Join the Movement" : "आंदोलन में शामिल हों"}</p>
@@ -166,9 +168,9 @@ export default function Footer() {
         </div>
 
         {/* Copyright */}
-        <motion.div variants={itemVariants} className="pt-8 border-t border-[#5C3A1E]/30 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-[#B89070] text-sm font-medium">{f.copyright}</p>
-          <div className="flex gap-6 text-sm font-medium text-[#B89070]">
+        <motion.div variants={itemVariants} className="pt-8 border-t border-[#5C3A1E]/30 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+          <p className="text-[#B89070] text-xs sm:text-sm font-medium px-4">{f.copyright}</p>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 text-xs sm:text-sm font-medium text-[#B89070]">
             <Link to="#" className="hover:text-[#E8622A] transition-colors">{en ? "Privacy Policy" : "गोपनीयता नीति"}</Link>
             <Link to="#" className="hover:text-[#E8622A] transition-colors">{en ? "Terms of Service" : "सेवा की शर्तें"}</Link>
           </div>

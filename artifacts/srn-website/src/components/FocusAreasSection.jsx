@@ -1,9 +1,8 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowDownCircle, CheckCircle2, MinusCircle } from "lucide-react";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { ArrowRight, Heart, Users, BookOpen, Shield } from "lucide-react";
 import SectionHeader from "./SectionHeader";
 import { useLanguage } from "../context/LanguageContext";
-import { focusAreasData } from "../data/focusAreas";
 import { useFadeIn } from "../hooks/useFadeIn";
 
 function FadeSection({ children, className = "", delay = 0 }) {
@@ -19,25 +18,47 @@ function FadeSection({ children, className = "", delay = 0 }) {
   );
 }
 
+const pillars = [
+  {
+    id: 1,
+    icon: Heart,
+    enTitle: "Social Welfare & Antyodaya",
+    hiTitle: "समाज कल्याण एवं अंत्योदय",
+    enDesc: "Dedicated to the upliftment of the underprivileged and ensuring welfare schemes reach the last person.",
+    hiDesc: "वंचितों के उत्थान और यह सुनिश्चित करने के लिए समर्पित कि कल्याणकारी योजनाएं अंतिम व्यक्ति तक पहुंचें।"
+  },
+  {
+    id: 2,
+    icon: Users,
+    enTitle: "Youth Empowerment",
+    hiTitle: "युवा सशक्तिकरण",
+    enDesc: "Fostering leadership, physical development, and self-reliance among the youth for nation-building.",
+    hiDesc: "राष्ट्र निर्माण के लिए युवाओं में नेतृत्व, शारीरिक विकास और आत्मनिर्भरता को बढ़ावा देना।"
+  },
+  {
+    id: 3,
+    icon: BookOpen,
+    enTitle: "Education & Policy",
+    hiTitle: "शिक्षा एवं नीति",
+    enDesc: "Contributing to the formulation and transparent execution of national policies and educational reforms.",
+    hiDesc: "राष्ट्रीय नीतियों और शैक्षिक सुधारों के निर्माण और पारदर्शी निष्पादन में योगदान देना।"
+  },
+  {
+    id: 4,
+    icon: Shield,
+    enTitle: "Cultural Heritage",
+    hiTitle: "सांस्कृतिक विरासत",
+    enDesc: "Preserving and nurturing Indian cultural values, traditions, and national integrity.",
+    hiDesc: "भारतीय सांस्कृतिक मूल्यों, परंपराओं और राष्ट्रीय अखंडता का संरक्षण और संवर्धन।"
+  }
+];
+
 export default function FocusAreasSection({ titleEn, titleHi }) {
   const { lang } = useLanguage();
-  const [visibleCount, setVisibleCount] = useState(10);
-
-  const handleViewMore = () => {
-    setVisibleCount(prev => {
-      if (prev === 10) return 30;
-      return focusAreasData.length;
-    });
-  };
-
-  const handleViewLess = () => {
-    setVisibleCount(10);
-  };
-
-  const visibleData = focusAreasData.slice(0, visibleCount);
+  const en = lang === "en";
 
   return (
-    <section className="py-16 px-6 bg-[#FDF5EC] border-t border-[#F0D5B8]/30">
+    <section className="py-20 px-6 bg-[#FDF5EC] border-t border-[#F0D5B8]/30">
       <div className="max-w-6xl mx-auto">
         <FadeSection>
           <SectionHeader
@@ -46,50 +67,41 @@ export default function FocusAreasSection({ titleEn, titleHi }) {
           />
         </FadeSection>
 
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 relative">
-          <AnimatePresence>
-            {visibleData.map((item, index) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.3, delay: index > 9 ? (index % 10) * 0.05 : 0 }}
-                className="bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-white hover:bg-white hover:border-[#E8622A]/30 shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-300 flex gap-3.5 group relative overflow-hidden"
-              >
-                <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#E8622A] to-[#D4880C] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="shrink-0 mt-0.5 relative z-10">
-                  <div className="w-7 h-7 rounded-lg bg-orange-50 border border-orange-100 flex items-center justify-center text-[#E8622A] group-hover:bg-gradient-to-br group-hover:from-[#E8622A] group-hover:to-[#C04A18] group-hover:text-white group-hover:border-transparent transition-all duration-300 shadow-inner group-hover:shadow-md">
-                    <span className="font-bold text-xs">{item.id}</span>
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {pillars.map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <FadeSection key={item.id} delay={index * 100} className="h-full">
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-[#F0D5B8] hover:bg-white hover:border-[#E8622A]/40 shadow-sm hover:shadow-[0_8px_30px_rgb(232,98,42,0.08)] transition-all duration-500 flex flex-col items-center text-center group h-full relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#E8622A] to-[#D4880C] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FFF9F2] to-[#FDF5EC] border border-[#F0D5B8] flex items-center justify-center text-[#E8622A] group-hover:scale-110 group-hover:bg-[#E8622A]/10 group-hover:border-[#E8622A]/30 transition-all duration-500 mb-5 shadow-inner">
+                    <Icon className="w-7 h-7" />
                   </div>
+                  
+                  <h3 className="text-[#5C1010] font-bold text-lg mb-3 font-serif leading-tight">
+                    {en ? item.enTitle : item.hiTitle}
+                  </h3>
+                  
+                  <p className="text-[#7A5C45] text-sm leading-relaxed text-justify mt-auto">
+                    {en ? item.enDesc : item.hiDesc}
+                  </p>
                 </div>
-                <p className="text-[#5C4535] text-xs md:text-sm leading-relaxed relative z-10 group-hover:text-[#2C1810] transition-colors">
-                  {lang === "en" ? item.en : item.hi}
-                </p>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+              </FadeSection>
+            );
+          })}
         </div>
 
-        <FadeSection delay={100}>
-          <div className="mt-8 flex justify-center lg:justify-end">
-            {visibleCount < focusAreasData.length ? (
-              <button
-                onClick={handleViewMore}
-                className="group flex items-center gap-2 bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white px-6 py-2.5 rounded-full font-bold shadow-lg shadow-orange-900/20 hover:shadow-orange-900/40 hover:-translate-y-0.5 transition-all duration-300 text-sm"
-              >
-                {lang === "en" ? "View More" : "और देखें"}
-                <ArrowDownCircle className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
-              </button>
-            ) : (
-              <button
-                onClick={handleViewLess}
-                className="group flex items-center gap-2 bg-white border border-[#E8622A] text-[#E8622A] px-6 py-2.5 rounded-full font-bold shadow-sm hover:bg-[#E8622A]/5 hover:-translate-y-0.5 transition-all duration-300 text-sm"
-              >
-                {lang === "en" ? "View Less" : "कम देखें"}
-                <MinusCircle className="w-5 h-5 group-hover:-translate-y-1 transition-transform" />
-              </button>
-            )}
+        <FadeSection delay={400}>
+          <div className="mt-14 flex justify-center">
+            {/* We will wire this link to the new 48-points page later */}
+            <Link
+              to="/uddeshya"
+              className="group inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white font-semibold shadow-lg shadow-black/20 hover:shadow-orange-900/40 hover:-translate-y-1 transition-all duration-300 text-sm"
+            >
+              {en ? "Explore All 48 Focus Areas" : "सभी 48 कार्यक्षेत्र देखें"}
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
         </FadeSection>
       </div>

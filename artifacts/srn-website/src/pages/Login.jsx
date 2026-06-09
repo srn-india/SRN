@@ -170,7 +170,7 @@ export default function Login() {
 
   return (
     <div 
-      className="min-h-screen relative flex items-center px-6 md:px-16 overflow-hidden bg-cover bg-center"
+      className="min-h-screen relative flex flex-col justify-center items-center px-4 sm:px-6 md:px-16 pt-24 pb-12 overflow-y-auto overflow-x-hidden bg-cover bg-center"
       style={{ backgroundImage: "url('/hero-bg-2.png')" }}
     >
       {/* Dark gradient overlay for extreme contrast and premium feel */}
@@ -249,7 +249,7 @@ export default function Login() {
                       onChange={(e) => handleChangeOtp(idx, e.target.value)}
                       onKeyDown={(e) => handleKeyDownOtp(idx, e)}
                       onPaste={handlePasteOtp}
-                      className="w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold bg-white/10 border border-white/20 rounded-xl text-white focus:bg-white/20 focus:ring-2 focus:ring-[#E8622A]/50 focus:border-[#E8622A] outline-none transition-all shadow-sm backdrop-blur-md"
+                      className="w-10 h-12 sm:w-14 sm:h-16 text-center text-xl sm:text-2xl font-bold bg-white/10 border border-white/20 rounded-xl text-white focus:bg-white/20 focus:ring-2 focus:ring-[#E8622A]/50 focus:border-[#E8622A] outline-none transition-all shadow-sm backdrop-blur-md"
                     />
                   ))}
                 </div>
@@ -342,7 +342,7 @@ export default function Login() {
         <motion.button
           type="button"
           onClick={handleGoogleLogin}
-          className="w-full py-3.5 px-6 rounded-xl font-semibold border border-white/20 bg-white/10 text-white text-sm hover:bg-white/20 active:bg-white/30 flex items-center justify-center gap-3 shadow-lg backdrop-blur-md transition-all duration-300"
+          className="w-full py-2.5 sm:py-3.5 px-6 rounded-xl font-semibold border border-white/20 bg-white/10 text-white text-xs sm:text-sm hover:bg-white/20 active:bg-white/30 flex items-center justify-center gap-2 sm:gap-3 shadow-lg backdrop-blur-md transition-all duration-300"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.4 }}
@@ -356,7 +356,7 @@ export default function Login() {
           {lc.googleBtn}
         </motion.button>
 
-        <motion.p className="mt-8 text-center text-sm text-white/60 font-light relative z-20 pointer-events-auto" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, delay: 0.45 }}>
+        <motion.p className="mt-8 text-center text-xs sm:text-sm text-white/60 font-light relative z-20 pointer-events-auto" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, delay: 0.45 }}>
           <Link to="/signup" className="font-semibold text-[#FF9D72] hover:text-[#FFB594] transition-colors duration-200 cursor-pointer pointer-events-auto">
             {lc.noAccount}
           </Link>

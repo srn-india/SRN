@@ -58,6 +58,7 @@ export default function Navbar({ isOpen, setIsOpen }) {
   const { user } = useAuth();
   const en = lang === "en";
   const [showMoreOrg, setShowMoreOrg] = useState(false);
+  const [showPhonePopup, setShowPhonePopup] = useState(false);
   
   const isHome = location.pathname === "/";
   const isDashboard = location.pathname === "/dashboard";
@@ -128,12 +129,11 @@ export default function Navbar({ isOpen, setIsOpen }) {
   return (
     <>
       {/* ── Global Header ─────────────────────────────────────── */}
-      {isHome ? (
-      <div className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-3 bg-[#1E0F05]/65 backdrop-blur-md border-b border-white/10 pointer-events-auto shadow-md transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
+      <div className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-3 bg-[#1E0F05]/80 backdrop-blur-md border-b border-white/10 pointer-events-auto shadow-md transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
         
         {/* Top Left: Logo & Name */}
-        <Link to="/" className="flex items-center gap-3 group">
-          <img src="/logo.PNG" alt="SRN Logo" className="w-[52px] h-[52px] object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md" />
+        <Link to="/" className="flex items-center gap-2 sm:gap-3 group">
+          <img src="/logo.PNG" alt="SRN Logo" className="w-[56px] h-[56px] md:w-[52px] md:h-[52px] object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md" />
           <div className="hidden sm:block">
             <h1 className="text-white font-bold text-lg font-serif leading-tight drop-shadow-md">
               {en ? "Sashakt Rashtra Nirman" : "सशक्त राष्ट्र निर्माण"}
@@ -145,59 +145,91 @@ export default function Navbar({ isOpen, setIsOpen }) {
         </Link>
 
         {/* Top Right: Buttons & Hamburger */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
 
           {user ? (
             !isDashboard && (
-              <Link to="/dashboard" className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-all">
-                <User className="w-4 h-4" />
+              <Link to="/dashboard" className="flex items-center justify-center sm:justify-start gap-2 w-8 h-8 sm:w-auto sm:h-auto sm:px-3 sm:py-2 rounded-lg bg-white/10 sm:bg-transparent hover:bg-white/20 sm:hover:bg-white/10 backdrop-blur-sm sm:backdrop-blur-none border border-white/5 sm:border-transparent text-white sm:text-white/80 hover:text-white transition-all duration-300">
+                <User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 <span className="text-sm font-medium hidden sm:block">{en ? "Dashboard" : "डैशबोर्ड"}</span>
               </Link>
             )
           ) : (
-            <Link to="/login" className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-all">
-              <User className="w-4 h-4" />
-              <span className="text-sm font-medium">{en ? "Login" : "लॉगिन"}</span>
+            <Link to="/login" className="flex items-center justify-center sm:justify-start gap-2 w-8 h-8 sm:w-auto sm:h-auto sm:px-3 sm:py-2 rounded-lg bg-white/10 sm:bg-transparent hover:bg-white/20 sm:hover:bg-white/10 backdrop-blur-sm sm:backdrop-blur-none border border-white/5 sm:border-transparent text-white sm:text-white/80 hover:text-white transition-all duration-300">
+              <User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="text-sm font-medium hidden sm:block">{en ? "Login" : "लॉगिन"}</span>
             </Link>
           )}
+
+          {/* Phone button */}
+          <button
+            onClick={() => setShowPhonePopup(true)}
+            className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/5 text-white transition-all duration-300"
+            aria-label="Contact Phone"
+          >
+            <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          </button>
 
           {/* Hamburger button (Changes to X when open inside overlay) */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="w-10 h-10 shrink-0 relative rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/5 text-white transition-all duration-300 z-50 flex items-center justify-center"
+            className="w-8 h-8 sm:w-10 sm:h-10 shrink-0 relative rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/5 text-white transition-all duration-300 z-50 flex items-center justify-center"
             aria-label="Toggle menu"
           >
-            <span className={`absolute left-1/2 -translate-x-1/2 w-5 h-0.5 bg-white rounded-full transition-all duration-300 origin-center ${isOpen ? "top-1/2 -translate-y-1/2 rotate-45" : "top-[14px]"}`} />
-            <span className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-5 h-0.5 bg-white rounded-full transition-all duration-300 ${isOpen ? "opacity-0 scale-x-0" : ""}`} />
-            <span className={`absolute left-1/2 -translate-x-1/2 w-5 h-0.5 bg-white rounded-full transition-all duration-300 origin-center ${isOpen ? "top-1/2 -translate-y-1/2 -rotate-45" : "bottom-[14px]"}`} />
+            <span className={`absolute left-1/2 -translate-x-1/2 w-4 sm:w-5 h-0.5 bg-white rounded-full transition-all duration-300 origin-center ${isOpen ? "top-1/2 -translate-y-1/2 rotate-45" : "top-[12px] sm:top-[14px]"}`} />
+            <span className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-4 sm:w-5 h-0.5 bg-white rounded-full transition-all duration-300 ${isOpen ? "opacity-0 scale-x-0" : ""}`} />
+            <span className={`absolute left-1/2 -translate-x-1/2 w-4 sm:w-5 h-0.5 bg-white rounded-full transition-all duration-300 origin-center ${isOpen ? "top-1/2 -translate-y-1/2 -rotate-45" : "bottom-[12px] sm:bottom-[14px]"}`} />
           </button>
         </div>
       </div>
-      ) : (
-        <>
-          <button 
-            onClick={() => navigate(-1)} 
-            className={`fixed top-6 left-6 z-50 w-12 h-12 bg-white hover:bg-gray-50 border border-gray-200 rounded-full flex items-center justify-center text-[#2C1810] shadow-xl hover:shadow-2xl transition-all duration-300 group ${isOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
-            aria-label="Go Back"
+
+      {/* ── Phone Popup Overlay ─────────────────────────────────────── */}
+      <AnimatePresence>
+        {showPhonePopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] flex items-center justify-center px-4 bg-[#1E0F05]/80 backdrop-blur-sm"
+            onClick={() => setShowPhonePopup(false)}
           >
-            <ArrowLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
-          </button>
-          
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className={`fixed top-6 right-6 z-50 w-12 h-12 rounded-full border text-white shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center ${
-              isOpen 
-                ? 'bg-transparent border-transparent text-white w-10 h-10' 
-                : 'bg-[#E8622A] hover:bg-[#C04A18] border-transparent'
-            }`}
-            aria-label="Toggle menu"
-          >
-            <span className={`absolute left-1/2 -translate-x-1/2 w-5 h-0.5 bg-current rounded-full transition-all duration-300 origin-center ${isOpen ? "top-1/2 -translate-y-1/2 rotate-45" : "top-[14px]"}`} />
-            <span className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-5 h-0.5 bg-current rounded-full transition-all duration-300 ${isOpen ? "opacity-0 scale-x-0" : ""}`} />
-            <span className={`absolute left-1/2 -translate-x-1/2 w-5 h-0.5 bg-current rounded-full transition-all duration-300 origin-center ${isOpen ? "top-1/2 -translate-y-1/2 -rotate-45" : "bottom-[14px]"}`} />
-          </button>
-        </>
-      )}
+            <motion.div
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-[#FDF5EC] rounded-2xl p-6 md:p-8 w-full max-w-sm shadow-2xl relative border border-[#E8D5B8]"
+            >
+              <button
+                onClick={() => setShowPhonePopup(false)}
+                className="absolute top-4 right-4 text-[#5C3A1E] hover:text-[#E8622A] bg-[#FFF9F2] p-1.5 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              
+              <div className="flex flex-col items-center text-center mt-2">
+                <div className="w-16 h-16 rounded-full bg-[#E8622A]/10 flex items-center justify-center mb-4">
+                  <Phone className="w-8 h-8 text-[#E8622A]" />
+                </div>
+                <h3 className="text-xl font-bold font-serif text-[#2C1810] mb-2">
+                  {en ? "Call Us" : "हमें कॉल करें"}
+                </h3>
+                <p className="text-[#7A5C45] text-sm mb-6">
+                  {en ? "Reach out to us for any inquiries or support." : "किसी भी पूछताछ या सहायता के लिए हमसे संपर्क करें।"}
+                </p>
+                
+                <a
+                  href="tel:+917652012487"
+                  className="w-full py-3.5 bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white rounded-xl font-semibold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 text-lg flex items-center justify-center gap-2"
+                >
+                  <Phone className="w-5 h-5" />
+                  +91 76520 12487
+                </a>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── Full-screen Mega Menu Overlay ───────────────────────────── */}
       <AnimatePresence>
@@ -226,7 +258,7 @@ export default function Navbar({ isOpen, setIsOpen }) {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="relative z-10 w-full h-full flex flex-col pt-28 pb-8 px-6 md:px-12 overflow-y-auto overscroll-contain"
+              className="relative z-10 w-full h-[100dvh] flex flex-col pt-28 pb-8 px-6 md:px-12 overflow-y-auto overscroll-y-contain touch-pan-y"
               data-lenis-prevent="true"
             >
               
@@ -260,7 +292,7 @@ export default function Navbar({ isOpen, setIsOpen }) {
                             <Link
                               to={link.path}
                               onClick={handleLinkClick}
-                              className="flex items-center justify-center w-full px-3 py-2 mt-1 rounded-xl bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white font-semibold shadow-lg hover:shadow-orange-900/50 hover:scale-[1.02] transition-all duration-300 border border-[#F47A3A]/30 text-base"
+                              className="flex items-center justify-center w-full px-3 py-2.5 md:py-2 mt-1 rounded-xl bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white font-semibold shadow-lg hover:shadow-orange-900/50 hover:scale-[1.02] transition-all duration-300 border border-[#F47A3A]/30 text-base"
                             >
                               {en ? link.englishName : link.hindiName}
                             </Link>
@@ -272,7 +304,7 @@ export default function Navbar({ isOpen, setIsOpen }) {
                         return (
                           <motion.li key={link.path} {...animationProps}>
                             <div
-                              className="block w-full px-3 py-1.5 rounded-xl border border-white/5 bg-white/5 backdrop-blur-md text-white/40 cursor-not-allowed select-none relative group"
+                              className="block w-full px-3 py-2 md:py-1.5 rounded-xl border border-white/5 bg-white/5 backdrop-blur-md text-white/40 cursor-not-allowed select-none relative group"
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex flex-col">
@@ -295,7 +327,7 @@ export default function Navbar({ isOpen, setIsOpen }) {
                           <Link
                             to={link.path}
                             onClick={handleLinkClick}
-                            className={`block w-full px-3 py-1.5 rounded-xl border backdrop-blur-md transition-all duration-300 group ${
+                            className={`block w-full px-3 py-2 md:py-1.5 rounded-xl border backdrop-blur-md transition-all duration-300 group ${
                               isActive 
                                 ? "bg-[#E8622A]/20 border-[#E8622A]/50 shadow-[0_0_15px_rgba(232,98,42,0.15)] text-white" 
                                 : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 hover:-translate-y-px text-white/70 hover:text-white"

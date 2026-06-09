@@ -47,14 +47,14 @@ function Counter({ target, suffix, label, labelHindi, lang }) {
   }, [target]);
 
   return (
-    <div ref={ref} className="group relative bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-8 hover:bg-white/10 hover:-translate-y-2 hover:border-[#E8622A]/50 transition-all duration-500 shadow-2xl overflow-hidden flex flex-col items-center justify-center min-h-[160px]">
+    <div ref={ref} className="group relative bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl md:rounded-3xl p-4 md:p-8 hover:bg-white/10 hover:-translate-y-2 hover:border-[#E8622A]/50 transition-all duration-500 shadow-2xl overflow-hidden flex flex-col items-center justify-center min-h-[110px] md:min-h-[160px]">
       <div className="absolute inset-0 bg-gradient-to-br from-[#E8622A]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#E8622A] to-[#D4880C] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       <div className="relative z-10 flex flex-col items-center text-center">
-        <p className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#F47A3A] to-[#FFC5A8] bg-clip-text text-transparent mb-3 drop-shadow-lg filter group-hover:brightness-110 transition-all">
+        <p className="text-2xl sm:text-3xl md:text-5xl font-bold bg-gradient-to-r from-[#F47A3A] to-[#FFC5A8] bg-clip-text text-transparent mb-1 md:mb-3 drop-shadow-lg filter group-hover:brightness-110 transition-all">
           {count.toLocaleString()}{suffix}
         </p>
-        <p className="text-white/80 text-xs font-bold tracking-widest uppercase group-hover:text-white transition-colors">
+        <p className="text-white/80 text-[10px] sm:text-xs font-bold tracking-widest uppercase group-hover:text-white transition-colors leading-tight">
           {lang === "hi" ? labelHindi : label}
         </p>
       </div>
@@ -134,7 +134,7 @@ export default function Home() {
             initial={{ scale: 0.7, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.6, type: "spring" }}
-            className="block mx-auto mb-2 w-44 h-44 object-contain drop-shadow-2xl float-badge"
+            className="block mx-auto mb-2 w-32 h-32 md:w-44 md:h-44 object-contain drop-shadow-2xl float-badge"
           />
 
           {/* Trust name — primary language on top, secondary below */}
@@ -143,7 +143,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.7 }}
           >
-            <h1 className="text-5xl md:text-6xl font-bold text-white font-serif leading-tight tracking-tight drop-shadow-lg">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white font-serif leading-tight tracking-tight drop-shadow-lg">
               {lang === "en" ? "Sashakt Rashtra Nirman" : "सशक्त राष्ट्र निर्माण"}
             </h1>
 
@@ -157,20 +157,13 @@ export default function Home() {
             transition={{ delay: 0.55, duration: 0.45 }}
             className="mt-5"
           >
-            <span className="inline-block bg-gradient-to-r from-[#E8622A] to-[#D4880C] text-white text-xl font-semibold py-2.5 px-8 rounded-full shadow-lg shadow-black/30">
-              {h.slogan}
+            <span className="inline-block bg-gradient-to-r from-[#E8622A] to-[#D4880C] text-white text-sm sm:text-base md:text-xl font-semibold italic py-1.5 px-4 md:py-2.5 md:px-8 rounded-full shadow-lg shadow-black/30">
+              सेवा, शक्ति और संकल्प | हर कदम राष्ट्र निर्माण की ओर।
             </span>
           </motion.div>
 
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.82 }}
-            className="text-white/35 text-xs mt-1"
-          >
-            {h.npoId}&nbsp;|&nbsp;{h.regNo}
-          </motion.p>
+
 
           {/* CTA Buttons */}
           <motion.div
@@ -181,14 +174,14 @@ export default function Home() {
           >
             <Link
               to="/uddeshya"
-              className="group inline-flex items-center gap-2 px-7 py-3 rounded-full bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white font-semibold shadow-lg shadow-black/30 hover:shadow-orange-800/40 hover:-translate-y-0.5 transition-all duration-300 text-sm"
+              className="group inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white font-semibold shadow-lg shadow-black/30 hover:shadow-orange-800/40 hover:-translate-y-0.5 transition-all duration-300 text-sm w-full sm:w-auto"
             >
               {lang === "en" ? h.ctaKnowMore : h.ctaKnowMoreHindi}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
               to="/become-member"
-              className="inline-flex items-center gap-2 px-7 py-3 rounded-full border-2 border-white/40 text-white font-semibold backdrop-blur-sm hover:bg-white/10 hover:border-[#F47A3A] hover:-translate-y-0.5 transition-all duration-300 text-sm"
+              className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full border-2 border-white/40 text-white font-semibold backdrop-blur-sm hover:bg-white/10 hover:border-[#F47A3A] hover:-translate-y-0.5 transition-all duration-300 text-sm w-full sm:w-auto"
             >
               {lang === "en" ? h.ctaJoin : h.ctaJoinHindi}
             </Link>
@@ -209,11 +202,11 @@ export default function Home() {
           </FadeSection>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
             <FadeSection delay={100}>
-              <p className="text-[#1E0F05] text-base leading-relaxed">{h.aboutText}</p>
+              <p className="text-[#1E0F05] text-sm md:text-base leading-relaxed text-justify">{h.aboutText}</p>
             </FadeSection>
             <FadeSection delay={200}>
-              <blockquote className="border-l-4 border-[#E8622A] bg-gradient-to-br from-[#FFF9F2] to-[#FDF5EC] p-6 rounded-r-xl shadow-sm">
-                <p className="italic text-xl text-[#5C1010] leading-relaxed font-serif">
+              <blockquote className="border-l-4 border-[#E8622A] bg-gradient-to-br from-[#FFF9F2] to-[#FDF5EC] p-4 md:p-6 rounded-xl md:rounded-l-none md:rounded-r-xl shadow-sm">
+                <p className="italic text-base md:text-xl text-[#5C1010] leading-relaxed font-serif text-justify">
                   "{lang === "en" ? h.aboutQuote : h.aboutQuoteHindi}"
                 </p>
               </blockquote>
@@ -222,44 +215,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Vision & Mission ─────────────────────────────────────────── */}
-      <section className="py-16 px-6 bg-[#FFF9F2]">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FadeSection delay={0}>
-            <div className="bg-white border-l-4 border-[#E8622A] rounded-xl shadow-sm p-6 h-full card-shimmer hover:shadow-md transition-shadow duration-300">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-lg bg-[#E8622A]/10 flex items-center justify-center">
-                  <Eye className="w-5 h-5 text-[#E8622A]" />
-                </div>
-                <h3 className="font-bold text-[#5C1010] text-xl font-serif">
-                  {lang === "en" ? h.visionTitle : h.visionTitleHindi}
-                </h3>
-              </div>
-              <p className="text-[#7A5C45] text-base leading-relaxed">{h.visionText}</p>
-            </div>
-          </FadeSection>
-          <FadeSection delay={150}>
-            <div className="bg-white border-l-4 border-[#5C1010] rounded-xl shadow-sm p-6 h-full card-shimmer hover:shadow-md transition-shadow duration-300">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-lg bg-[#5C1010]/10 flex items-center justify-center">
-                  <Target className="w-5 h-5 text-[#5C1010]" />
-                </div>
-                <h3 className="font-bold text-[#5C1010] text-xl font-serif">
-                  {lang === "en" ? h.missionTitle : h.missionTitleHindi}
-                </h3>
-              </div>
-              <ul className="space-y-2">
-                {h.missionPoints.map((point, i) => (
-                  <li key={i} className="flex items-start gap-2 text-base text-[#7A5C45]">
-                    <span className="text-[#E8622A] mt-0.5 shrink-0">▸</span>
-                    <span>{point}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </FadeSection>
-        </div>
-      </section>
+
 
       {/* ── Legal Legitimacy ─────────────────────────────────────────── */}
       <section className="py-24 px-6 relative bg-[url('/hero-bg-2.png')] bg-fixed bg-cover bg-center overflow-hidden">
@@ -320,7 +276,7 @@ export default function Home() {
 
         <div className="relative max-w-6xl mx-auto z-10">
           <FadeSection>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
               {h.impactCounters.map((item, i) => (
                 <Counter
                   key={i}
@@ -336,12 +292,12 @@ export default function Home() {
 
           <FadeSection delay={200}>
             <div className="mt-16 text-center">
-              <div className="inline-block relative">
-                <span className="absolute -top-6 -left-8 text-6xl text-[#E8622A]/40 font-serif leading-none">"</span>
-                <p className="text-xl md:text-2xl italic font-serif text-white/95 leading-relaxed max-w-3xl mx-auto drop-shadow-lg">
+              <div className="inline-block relative px-4 sm:px-0">
+                <span className="absolute -top-6 -left-2 md:-left-8 text-6xl text-[#E8622A]/40 font-serif leading-none">"</span>
+                <p className="text-lg md:text-2xl italic font-serif text-white/95 leading-relaxed max-w-3xl mx-auto drop-shadow-lg text-justify">
                   {lang === "en" ? h.impactQuote : h.impactQuoteHindi}
                 </p>
-                <span className="absolute -bottom-10 -right-8 text-6xl text-[#E8622A]/40 font-serif leading-none rotate-180">"</span>
+                <span className="absolute -bottom-10 -right-2 md:-right-8 text-6xl text-[#E8622A]/40 font-serif leading-none rotate-180">"</span>
               </div>
             </div>
           </FadeSection>
