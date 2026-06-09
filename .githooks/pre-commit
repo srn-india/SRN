@@ -1,0 +1,3 @@
+
+#!/bin/sh
+npx react-doctor --staged --blocking none
