@@ -36,7 +36,7 @@ router.get('/membership', userController.getMembership);
  *       - bearerAuth: []
  *     requestBody:
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             properties:
@@ -47,7 +47,7 @@ router.get('/membership', userController.getMembership);
  *               district: { type: string }
  *               gender: { type: string }
  *               dateOfBirth: { type: string, format: date }
- *               avatar: { type: string, format: binary }
+ *               profilePicture: { type: string, description: "Base64 encoded image string" }
  *     responses:
  *       200:
  *         description: Profile updated successfully
