@@ -27,8 +27,6 @@
 # ============================================================================
 minimumReleaseAge: 1440
 
-minimumReleaseAgeExclude:
-
 packages:
   - artifacts/*
   - lib/*
@@ -71,3 +69,12 @@ overrides:
   # drizzle-kit uses esbuild internally on an older version that's vulnerable, this overrides it
   "@esbuild-kit/esm-loader": "npm:tsx@^4.21.0"
   esbuild: "0.27.3"
+
+allowBuilds:
+  '@prisma/engines': set this to true or false
+  '@scarf/scarf': set this to true or false
+  bcrypt: set this to true or false
+  canvas: set this to true or false
+  esbuild: set this to true or false
+  prisma: set this to true or false
+  unrs-resolver: set this to true or false

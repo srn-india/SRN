@@ -1,4 +1,5 @@
 import { prisma } from '../../lib/prisma';
+import { getCache, setCache } from '../../lib/cache';
 
 export const createEvent = async (data: any) => {
   return await prisma.event.create({
@@ -12,9 +13,31 @@ export const createEvent = async (data: any) => {
 };
 
 export const getEvents = async () => {
-  return await prisma.event.findMany({
+  const CACHE_KEY = 'events:all';
+  
+  // 1. Try to get events from Redis cache
+  const cachedEvents = await getCache(CACHE_KEY);
+  if (cachedEvents) {
+    return cachedEvents;
+  }
+
+  // 2. If not in cache, hit PostgreSQL
+  const events = await prisma.event.findMany({
     orderBy: { date: 'asc' },
+    take: 50, // Pagination limits the amount of data fetched
+    select: {
+      id: true,
+      title: true,
+      date: true,
+      location: true,
+      // intentionally excluding 'description' as it might be large
+    }
   });
+
+  // 3. Store the result in Redis for 60 seconds
+  await setCache(CACHE_KEY, events, 60);
+
+  return events;
 };
 
 export const getEventById = async (id: string) => {

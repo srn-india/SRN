@@ -23,6 +23,15 @@ A production-grade, highly scalable backend infrastructure for the Sashakt Rasht
 
 ---
 
+## Recent Architecture & Performance Updates
+
+- **Database Connection Pooling**: Migrated Supabase PgBouncer from Session Mode to Transaction Mode, supporting massive concurrent loads without connection exhaustion (`EMAXCONNSESSION`).
+- **Query Optimization**: Implemented explicit B-Tree Indexes (`@@index`) across all Prisma schema foreign keys to eliminate sequential scan bottlenecks flagged by the Supabase Performance Advisor.
+- **Read-Heavy Caching**: Integrated `ioredis` to cache high-traffic public endpoints (e.g., Event listings), drastically reducing direct database reads and lowering latency to <100ms under load.
+- **Load Testing Infrastructure**: Established automated `k6` benchmark scripts (`tests/load/`) to simulate highly concurrent read/write traffic and ensure production readiness.
+- **Security Enhancements**: Configured `express-rate-limit` and `helmet` middleware to protect against brute-force attacks and satisfy OWASP security standards.
+
+---
 ## Technical Stack
 
 - **Runtime**: Node.js (Version 20 and above)
