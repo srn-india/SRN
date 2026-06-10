@@ -2,8 +2,28 @@ import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, AlertCircle } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { useLanguage } from "../context/LanguageContext";
 import { useAuth } from "../context/AuthContext";
+
+const phoneRegex = new RegExp(/^[6-9]\d{9}$/);
+
+const signupSchema = z.object({
+  firstName: z.string().min(2, "First name must be at least 2 characters").regex(/^[A-Za-z]+$/, "Only alphabetic characters allowed"),
+  lastName: z.string().min(2, "Last name must be at least 2 characters").regex(/^[A-Za-z]+$/, "Only alphabetic characters allowed"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().regex(phoneRegex, "Must be a valid 10-digit Indian phone number"),
+  state: z.string().min(1, "Please select a state"),
+  district: z.string().min(2, "District is required"),
+  gender: z.string().min(1, "Please select a gender"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirm: z.string()
+}).refine((data) => data.password === data.confirm, {
+  message: "Passwords do not match",
+  path: ["confirm"],
+});
 
 // ── Indian states and Union Territories ──────────────────────────────────────
 export const INDIAN_STATES = [
@@ -32,50 +52,49 @@ export default function Signup() {
   const inputRefs = useRef([]);
   const [registeredEmail, setRegisteredEmail] = useState("");
 
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    state: "",
-    district: "",
-    gender: "",
-    password: "",
-    confirm: ""
+  const {
+    register: formRegister,
+    handleSubmit,
+    formState: { errors }
+  } = useForm({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      state: "",
+      district: "",
+      gender: "",
+      password: "",
+      confirm: ""
+    }
   });
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const handleChange = (e) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
 
   const handleGoogleLogin = () => {
     window.location.href = `${API_BASE}/api/auth/google`;
   };
 
-  async function handleSubmit(e) {
-    e.preventDefault();
+  async function onSubmit(data) {
     setError("");
-    if (formData.password !== formData.confirm) {
-      setError("Passwords do not match");
-      return;
-    }
     setLoading(true);
     try {
       const result = await register({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        phone: formData.phone,
-        state: formData.state,
-        district: formData.district,
-        gender: formData.gender,
-        password: formData.password
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        state: data.state,
+        district: data.district,
+        gender: data.gender,
+        password: data.password
       });
 
       if (result?.requiresOtp) {
-        setRegisteredEmail(result.email || formData.email);
+        setRegisteredEmail(result.email || data.email);
         setShowOtp(true);
       } else {
         navigate("/dashboard");
@@ -297,65 +316,74 @@ export default function Signup() {
               </motion.div>
             </form>
           ) : (
-            <form onSubmit={handleSubmit} noValidate>
+            <form onSubmit={handleSubmit(onSubmit)} noValidate>
               <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-4">
                 
                 <div className="grid grid-cols-2 gap-3">
                   <motion.div variants={itemVariants}>
                     <label htmlFor="firstName" className={labelClass}>First Name</label>
-                    <input id="firstName" name="firstName" type="text" placeholder="First Name" className={inputClass} value={formData.firstName} onChange={handleChange} required />
+                    <input id="firstName" type="text" placeholder="First Name" className={inputClass} {...formRegister("firstName")} />
+                    {errors.firstName && <p className="text-red-400 text-xs mt-1">{errors.firstName.message}</p>}
                   </motion.div>
                   <motion.div variants={itemVariants}>
                     <label htmlFor="lastName" className={labelClass}>Last Name</label>
-                    <input id="lastName" name="lastName" type="text" placeholder="Last Name" className={inputClass} value={formData.lastName} onChange={handleChange} required />
+                    <input id="lastName" type="text" placeholder="Last Name" className={inputClass} {...formRegister("lastName")} />
+                    {errors.lastName && <p className="text-red-400 text-xs mt-1">{errors.lastName.message}</p>}
                   </motion.div>
                 </div>
 
                 <motion.div variants={itemVariants}>
                   <label htmlFor="signup-email" className={labelClass}>{sc.emailLabel}</label>
-                  <input id="signup-email" name="email" type="email" placeholder={sc.emailPlaceholder} autoComplete="email" className={inputClass} value={formData.email} onChange={handleChange} required />
+                  <input id="signup-email" type="email" placeholder={sc.emailPlaceholder} autoComplete="email" className={inputClass} {...formRegister("email")} />
+                  {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>}
                 </motion.div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <motion.div variants={itemVariants}>
                     <label htmlFor="signup-phone" className={labelClass}>{sc.phoneLabel}</label>
-                    <input id="signup-phone" name="phone" type="tel" placeholder={sc.phonePlaceholder} autoComplete="tel" className={inputClass} value={formData.phone} onChange={handleChange} required />
+                    <input id="signup-phone" type="tel" placeholder={sc.phonePlaceholder} autoComplete="tel" className={inputClass} {...formRegister("phone")} />
+                    {errors.phone && <p className="text-red-400 text-xs mt-1">{errors.phone.message}</p>}
                   </motion.div>
                   <motion.div variants={itemVariants}>
                     <label htmlFor="gender" className={labelClass}>Gender</label>
-                    <select id="gender" name="gender" className={selectClass} value={formData.gender} onChange={handleChange} required style={selectStyle}>
+                    <select id="gender" className={selectClass} {...formRegister("gender")} style={selectStyle}>
                       <option value="" disabled className="text-black">Select Gender</option>
                       <option value="Male" className="text-black">Male</option>
                       <option value="Female" className="text-black">Female</option>
                       <option value="Other" className="text-black">Other</option>
                     </select>
+                    {errors.gender && <p className="text-red-400 text-xs mt-1">{errors.gender.message}</p>}
                   </motion.div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <motion.div variants={itemVariants}>
                     <label htmlFor="signup-state" className={labelClass}>{sc.stateLabel}</label>
-                    <select id="signup-state" name="state" value={formData.state} onChange={handleChange} className={selectClass} style={selectStyle} required>
+                    <select id="signup-state" {...formRegister("state")} className={selectClass} style={selectStyle}>
                       <option value="" disabled className="text-black">{sc.stateDefault}</option>
                       {INDIAN_STATES.map((state) => (
                         <option key={state} value={state} className="text-black">{state}</option>
                       ))}
                     </select>
+                    {errors.state && <p className="text-red-400 text-xs mt-1">{errors.state.message}</p>}
                   </motion.div>
                   <motion.div variants={itemVariants}>
                     <label htmlFor="district" className={labelClass}>District</label>
-                    <input id="district" name="district" type="text" placeholder="District" className={inputClass} value={formData.district} onChange={handleChange} required />
+                    <input id="district" type="text" placeholder="District" className={inputClass} {...formRegister("district")} />
+                    {errors.district && <p className="text-red-400 text-xs mt-1">{errors.district.message}</p>}
                   </motion.div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <motion.div variants={itemVariants}>
                     <label htmlFor="signup-password" className={labelClass}>{sc.passwordLabel}</label>
-                    <input id="signup-password" name="password" type="password" placeholder={sc.passwordPlaceholder} autoComplete="new-password" className={inputClass} value={formData.password} onChange={handleChange} required />
+                    <input id="signup-password" type="password" placeholder={sc.passwordPlaceholder} autoComplete="new-password" className={inputClass} {...formRegister("password")} />
+                    {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password.message}</p>}
                   </motion.div>
                   <motion.div variants={itemVariants}>
                     <label htmlFor="signup-confirm" className={labelClass}>{sc.confirmLabel}</label>
-                    <input id="signup-confirm" name="confirm" type="password" placeholder={sc.confirmPlaceholder} autoComplete="new-password" className={inputClass} value={formData.confirm} onChange={handleChange} required />
+                    <input id="signup-confirm" type="password" placeholder={sc.confirmPlaceholder} autoComplete="new-password" className={inputClass} {...formRegister("confirm")} />
+                    {errors.confirm && <p className="text-red-400 text-xs mt-1">{errors.confirm.message}</p>}
                   </motion.div>
                 </div>
 

@@ -118,7 +118,7 @@ export default function Dashboard() {
               <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#E8622A]/10 to-transparent rounded-bl-full pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
               
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-8 relative z-10">
-                <div className="relative group/avatar cursor-pointer">
+                <Link to="/profile" className="relative group/avatar cursor-pointer block">
                   <div className="absolute inset-0 bg-[#E8622A] rounded-full blur-md opacity-20 group-hover/avatar:opacity-40 group-hover/avatar:scale-110 transition-all duration-300" />
                   <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-br from-[#E8622A] to-[#C04A18] flex items-center justify-center text-white shadow-xl overflow-hidden border-[4px] border-white relative z-10">
                     {user.profilePicture ? (
@@ -127,10 +127,10 @@ export default function Dashboard() {
                       <span className="text-4xl sm:text-5xl font-bold font-serif">{user.firstName?.charAt(0) || 'U'}</span>
                     )}
                   </div>
-                  <Link to="/profile" className="absolute -bottom-2 -right-2 bg-white p-2 rounded-full shadow-lg border border-[#E8D5B8] text-[#E8622A] hover:bg-[#E8622A] hover:text-white transition-colors z-20">
+                  <div className="absolute -bottom-2 -right-2 bg-white p-2 rounded-full shadow-lg border border-[#E8D5B8] text-[#E8622A] group-hover/avatar:bg-[#E8622A] group-hover/avatar:text-white transition-colors z-20">
                     <Settings className="w-4 h-4" />
-                  </Link>
-                </div>
+                  </div>
+                </Link>
                 
                 <div>
                   <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-50 border border-green-100 text-green-700 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
@@ -234,7 +234,11 @@ export default function Dashboard() {
                 <div className="relative z-10">
                   <h4 className="text-[#E8D5B8]/60 text-xs font-bold uppercase tracking-widest mb-1">SRN Member ID</h4>
                   <p className="text-2xl font-bold font-serif text-white tracking-widest mb-8">
-                    {membership ? `**** **** ${membership.id.slice(-4).toUpperCase()}` : '**** **** ----'}
+                    {membership ? (
+                      membership.id.split('-')[0].length >= 6 
+                        ? membership.id.split('-')[0].toUpperCase().slice(0, 2) + '****' + membership.id.split('-')[0].toUpperCase().slice(-2)
+                        : membership.id.split('-')[0].toUpperCase()
+                    ) : '**** **** ----'}
                   </p>
                   
                   <div className="flex justify-between items-end">

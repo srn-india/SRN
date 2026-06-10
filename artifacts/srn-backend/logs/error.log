@@ -64,3 +64,25 @@
 [31m    at processParams (C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\router@2.2.0\node_modules\router\index.js:582:12)[39m
 [31m    at next (C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\router@2.2.0\node_modules\router\index.js:291:5)[39m
 [31m    at cors (C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\cors@2.8.6\node_modules\cors\lib\index.js:188:7)[39m
+2026-06-10 03:00:59:059 [31merror[39m: [31mTypeError: Cannot read properties of undefined (reading 'client_id')[39m
+[31m    at OAuth2Client.getTokenAsync (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/google-auth-library/build/src/auth/oauth2client.js:184:32)[39m
+[31m    at OAuth2Client.getToken (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/google-auth-library/build/src/auth/oauth2client.js:177:25)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/src/modules/auth/auth.controller.ts:126:35[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/src/utils/catchAsync.ts:5:21[39m
+[31m    at Layer.handleRequest (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/router/lib/layer.js:152:17)[39m
+[31m    at next (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/router/lib/route.js:157:13)[39m
+[31m    at Route.dispatch (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/router/lib/route.js:117:3)[39m
+[31m    at handle (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/router/index.js:435:11)[39m
+[31m    at Layer.handleRequest (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/router/lib/layer.js:152:17)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/router/index.js:295:15[39m
+2026-06-10 04:56:31:5631 [31merror[39m: [31mPayloadTooLargeError: request entity too large[39m
+[31m    at readStream (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/raw-body/index.js:163:17)[39m
+[31m    at getRawBody (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/raw-body/index.js:116:12)[39m
+[31m    at read (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/body-parser/lib/read.js:113:3)[39m
+[31m    at jsonParser (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/body-parser/lib/types/json.js:88:5)[39m
+[31m    at Layer.handleRequest (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/router/lib/layer.js:152:17)[39m
+[31m    at trimPrefix (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/router/index.js:342:13)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/router/index.js:297:9[39m
+[31m    at processParams (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/router/index.js:582:12)[39m
+[31m    at next (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/router/index.js:291:5)[39m
+[31m    at cors (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:188:7)[39m

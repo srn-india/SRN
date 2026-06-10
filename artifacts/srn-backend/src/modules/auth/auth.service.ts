@@ -4,6 +4,9 @@ import { prisma } from '../../lib/prisma';
 import { redis } from '../../lib/cache';
 import { generateAccessToken, generateRefreshToken } from '../../utils/jwt';
 import { sendEmail } from '../../utils/email.service';
+import { authenticator } from 'otplib';
+import QRCode from 'qrcode';
+import jwt from 'jsonwebtoken';
 
 export const registerUser = async (data: any) => {
   const existingUser = await prisma.user.findUnique({
@@ -73,6 +76,15 @@ export const loginUser = async (data: any) => {
     await sendOTPEmail(user.email, otpCode);
 
     return { user, requiresOtp: true };
+  }
+
+  if (user.isTwoFactorEnabled) {
+    const tempAuthToken = jwt.sign(
+      { id: user.id, role: user.role, type: '2FA_TEMP' },
+      process.env.JWT_ACCESS_SECRET || 'fallback_secret',
+      { expiresIn: '5m' }
+    );
+    return { user, requires2FA: true, tempAuthToken };
   }
 
   const accessToken = generateAccessToken({ id: user.id, role: user.role });
@@ -214,4 +226,61 @@ export const verifyEmail = async (token: string) => {
 
   await redis.del(`verifyEmail:${hashedToken}`);
   return { message: 'Email verified successfully' };
+};
+
+export const setup2FA = async (userId: string) => {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new Error('User not found');
+
+  const secret = authenticator.generateSecret();
+  await prisma.user.update({
+    where: { id: userId },
+    data: { twoFactorSecret: secret }
+  });
+
+  const otpauthUrl = authenticator.keyuri(user.email, 'SRN Admin', secret);
+  const qrCodeUrl = await QRCode.toDataURL(otpauthUrl);
+
+  return { secret, qrCodeUrl };
+};
+
+export const verifyAndEnable2FA = async (userId: string, token: string) => {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user || !user.twoFactorSecret) throw new Error('2FA not set up');
+
+  const isValid = authenticator.verify({ token, secret: user.twoFactorSecret });
+  if (!isValid) throw new Error('Invalid 2FA token');
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { isTwoFactorEnabled: true }
+  });
+
+  return { message: '2FA successfully enabled' };
+};
+
+export const verify2FALogin = async (tempToken: string, token: string) => {
+  let decoded: any;
+  try {
+    decoded = jwt.verify(tempToken, process.env.JWT_ACCESS_SECRET || 'fallback_secret');
+  } catch (err) {
+    throw new Error('Invalid or expired temporary token');
+  }
+
+  if (decoded.type !== '2FA_TEMP') {
+    throw new Error('Invalid token type');
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: decoded.id } });
+  if (!user || !user.twoFactorSecret || !user.isTwoFactorEnabled) {
+    throw new Error('2FA is not enabled for this user');
+  }
+
+  const isValid = authenticator.verify({ token, secret: user.twoFactorSecret });
+  if (!isValid) throw new Error('Invalid 2FA token');
+
+  const accessToken = generateAccessToken({ id: user.id, role: user.role });
+  const refreshToken = generateRefreshToken({ id: user.id, role: user.role });
+
+  return { user, accessToken, refreshToken };
 };

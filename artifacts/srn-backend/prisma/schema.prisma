@@ -42,6 +42,8 @@ model User {
   dateOfBirth   DateTime?
   password      String?
   avatar        String?
+  twoFactorSecret String?
+  isTwoFactorEnabled Boolean @default(false)
   role          Role           @default(USER)
   provider      AuthProvider   @default(LOCAL)
   isVerified    Boolean        @default(false)

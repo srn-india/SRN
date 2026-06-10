@@ -23,6 +23,26 @@ router.get('/me', membershipController.getMyMembership);
 
 /**
  * @swagger
+ * /api/memberships/me/id-card:
+ *   get:
+ *     summary: Download ID card
+ *     tags: [Memberships]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: ID Card image
+ *         content:
+ *           image/png:
+ *             schema:
+ *               type: string
+ *               format: binary
+ */
+router.get('/me/id-card', membershipController.generateIdCard);
+
+
+/**
+ * @swagger
  * /api/memberships/{id}/cancel:
  *   patch:
  *     summary: Cancel current user's membership

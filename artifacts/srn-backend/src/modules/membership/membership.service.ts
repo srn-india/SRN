@@ -1,4 +1,6 @@
 import { prisma } from '../../lib/prisma';
+import { generateAndUploadIdCard } from './idcard.service';
+import { sendMembershipEmail } from '../../utils/email';
 
 export const subscribeUser = async (userId: string, plan: string, durationInMonths: number, txClient?: any) => {
   const startDate = new Date();
@@ -23,6 +25,18 @@ export const subscribeUser = async (userId: string, plan: string, durationInMont
     where: { id: userId },
     data: { role: 'MEMBER' },
   });
+
+  // 3. Asynchronously generate and upload the ID card
+  generateAndUploadIdCard(membership.id)
+    .then(async (url) => {
+      if (url) {
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (user) {
+          await sendMembershipEmail(user.email, user.firstName, url);
+        }
+      }
+    })
+    .catch(console.error);
 
   return membership;
 };

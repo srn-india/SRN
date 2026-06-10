@@ -4,6 +4,14 @@ import { motion } from "framer-motion";
 import { ArrowLeft, AlertCircle } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 import { useAuth } from "../context/AuthContext";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+const loginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
+});
 
 const containerVariants = {
   hidden: {},
@@ -17,7 +25,7 @@ const itemVariants = {
 
 export default function Login() {
   const { t } = useLanguage();
-  const { login, verifyOtp, API_BASE } = useAuth();
+  const { login, verifyOtp, verify2FA, API_BASE } = useAuth();
   const navigate = useNavigate();
   const lc = t.login;
 
@@ -25,8 +33,18 @@ export default function Login() {
     window.location.href = `${API_BASE}/api/auth/google`;
   };
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const {
+    register: formRegister,
+    handleSubmit,
+    formState: { errors }
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: ""
+    }
+  });
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -34,18 +52,27 @@ export default function Login() {
   const [showOtp, setShowOtp] = useState(false);
   const [otpArray, setOtpArray] = useState(["", "", "", "", "", ""]);
   const [registeredEmail, setRegisteredEmail] = useState("");
+  
+  // 2FA state
+  const [show2FA, setShow2FA] = useState(false);
+  const [twoFaArray, setTwoFaArray] = useState(["", "", "", "", "", ""]);
+  const [tempAuthToken, setTempAuthToken] = useState("");
+  
   const inputRefs = useRef([]);
+  const twoFaInputRefs = useRef([]);
 
-  async function handleSubmit(e) {
-    e.preventDefault();
+  async function onSubmit(data) {
     setError("");
     setLoading(true);
     try {
-      const result = await login(email, password);
+      const result = await login(data.email, data.password);
       if (result?.requiresOtp) {
         // Unverified manual account — show OTP screen
-        setRegisteredEmail(result.email || email);
+        setRegisteredEmail(result.email || data.email);
         setShowOtp(true);
+      } else if (result?.requires2FA) {
+        setTempAuthToken(result.tempAuthToken);
+        setShow2FA(true);
       } else {
         navigate("/dashboard");
       }
@@ -65,6 +92,22 @@ export default function Login() {
     try {
       await verifyOtp(registeredEmail, otpValue);
       navigate("/dashboard");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleVerify2FA(e) {
+    e.preventDefault();
+    const totpValue = twoFaArray.join("");
+    if (totpValue.length !== 6) return;
+    setError("");
+    setLoading(true);
+    try {
+      await verify2FA(tempAuthToken, totpValue);
+      navigate("/admin-dashboard");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -95,6 +138,31 @@ export default function Login() {
     });
     setOtpArray(newOtp);
     inputRefs.current[Math.min(pastedData.length, 5)]?.focus();
+  };
+
+  const handleChange2FA = (index, value) => {
+    if (!/^[0-9]?$/.test(value)) return;
+    const newOtp = [...twoFaArray];
+    newOtp[index] = value;
+    setTwoFaArray(newOtp);
+    if (value && index < 5) twoFaInputRefs.current[index + 1]?.focus();
+  };
+
+  const handleKeyDown2FA = (index, e) => {
+    if (e.key === "Backspace" && !twoFaArray[index] && index > 0) {
+      twoFaInputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePaste2FA = (e) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData("text").slice(0, 6).split("");
+    const newOtp = [...twoFaArray];
+    pastedData.forEach((char, i) => {
+      if (/^[0-9]$/.test(char) && i < 6) newOtp[i] = char;
+    });
+    setTwoFaArray(newOtp);
+    twoFaInputRefs.current[Math.min(pastedData.length, 5)]?.focus();
   };
 
   const inputClass = "w-full px-4 py-3 rounded-xl bg-white/20 border border-white/30 focus:outline-none focus:border-white focus:bg-white/30 focus:ring-2 focus:ring-white/20 text-white placeholder-white/60 transition-all duration-300 text-sm backdrop-blur-md";
@@ -147,12 +215,14 @@ export default function Login() {
         </Link>
 
         <motion.h2 className="text-3xl font-bold font-serif text-white mb-2" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-          {showOtp ? "Verify Your Email" : lc.title}
+          {showOtp ? "Verify Your Email" : show2FA ? "Two-Factor Auth" : lc.title}
         </motion.h2>
         <motion.p className="text-sm text-white/60 mb-8 font-light" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, delay: 0.05 }}>
           {showOtp
             ? `Enter the 6-digit code sent to ${registeredEmail}`
-            : "Welcome back — please sign in to continue."}
+            : show2FA 
+              ? "Enter the 6-digit code from your authenticator app"
+              : "Welcome back — please sign in to continue."}
         </motion.p>
 
         {error && (
@@ -193,13 +263,45 @@ export default function Login() {
               </button>
             </div>
           </form>
+        ) : show2FA ? (
+          /* ── 2FA screen ─────────────────────────────────────────── */
+          <form onSubmit={handleVerify2FA} noValidate>
+            <div className="space-y-6">
+              <div>
+                <label className="block text-xs font-medium text-white/90 mb-3">6-Digit Authenticator Code</label>
+                <div className="flex gap-2 justify-between">
+                  {twoFaArray.map((digit, idx) => (
+                    <input
+                      key={idx}
+                      ref={(el) => (twoFaInputRefs.current[idx] = el)}
+                      type="text"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleChange2FA(idx, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown2FA(idx, e)}
+                      onPaste={handlePaste2FA}
+                      className="w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold bg-white/10 border border-white/20 rounded-xl text-white focus:bg-white/20 focus:ring-2 focus:ring-[#E8622A]/50 focus:border-[#E8622A] outline-none transition-all shadow-sm backdrop-blur-md"
+                    />
+                  ))}
+                </div>
+              </div>
+              <button
+                type="submit"
+                disabled={loading || twoFaArray.join("").length !== 6}
+                className="w-full py-3.5 px-6 rounded-xl font-bold text-white text-sm bg-gradient-to-r from-[#E8622A] to-[#C04A18] hover:from-[#F47A3A] hover:to-[#D45A28] shadow-[0_0_20px_rgba(232,98,42,0.4)] hover:shadow-[0_0_30px_rgba(232,98,42,0.6)] active:scale-[0.98] transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {loading ? "Verifying..." : "Verify 2FA & Sign In"}
+              </button>
+            </div>
+          </form>
         ) : (
           /* ── Login form ─────────────────────────────────────────── */
-          <form onSubmit={handleSubmit} noValidate>
+          <form onSubmit={handleSubmit(onSubmit)} noValidate>
             <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-5">
               <motion.div variants={itemVariants}>
                 <label htmlFor="login-email" className={labelClass}>{lc.emailLabel}</label>
-                <input id="login-email" type="email" placeholder={lc.emailPlaceholder} autoComplete="email" className={inputClass} value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <input id="email" type="email" placeholder={lc.emailPlaceholder} autoComplete="email" className={inputClass} {...formRegister("email")} />
+                {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>}
               </motion.div>
 
               <motion.div variants={itemVariants}>
@@ -209,7 +311,8 @@ export default function Login() {
                     {lc.forgotPassword}
                   </Link>
                 </div>
-                <input id="login-password" type="password" placeholder={lc.passwordPlaceholder} autoComplete="current-password" className={inputClass} value={password} onChange={(e) => setPassword(e.target.value)} required />
+                <input id="password" type="password" placeholder={lc.passwordPlaceholder} autoComplete="current-password" className={inputClass} {...formRegister("password")} />
+                {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password.message}</p>}
               </motion.div>
 
               <motion.div variants={itemVariants} className="pt-4">

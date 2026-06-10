@@ -138,4 +138,9 @@ router.get('/verify-email', authController.verifyEmail);
 router.get('/google', authController.googleLogin);
 router.get('/google/callback', authController.googleCallback);
 
+// 2FA Routes
+router.post('/2fa/setup', protect, authController.setup2FA);
+router.post('/2fa/enable', protect, authController.enable2FA);
+router.post('/login/2fa', authController.verify2FALogin);
+
 export default router;

@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, User, ShieldCheck, Mail, Phone, MapPin, CheckCircle2, Camera } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import imageCompression from "browser-image-compression";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -67,14 +68,34 @@ export default function Profile() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setFormData((prev) => ({ ...prev, profilePicture: event.target.result }));
-      };
-      reader.readAsDataURL(file);
+      // Hard limit check (5MB) before compression
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Image is too large! Please upload a file smaller than 5MB.");
+        e.target.value = '';
+        return;
+      }
+
+      try {
+        const options = {
+          maxSizeMB: 1, // Compress down to 1MB max
+          maxWidthOrHeight: 512, // Best size for avatars
+          useWebWorker: true,
+        };
+        
+        const compressedFile = await imageCompression(file, options);
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          setFormData((prev) => ({ ...prev, profilePicture: event.target.result }));
+        };
+        reader.readAsDataURL(compressedFile);
+      } catch (error) {
+        console.error("Error compressing image:", error);
+        alert("Failed to process image.");
+      }
     }
     // Clear input so same file can be selected again
     e.target.value = '';

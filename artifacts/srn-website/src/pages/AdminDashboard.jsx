@@ -28,8 +28,56 @@ const fadeVariants = {
 };
 
 export default function AdminDashboard() {
-  const { user, logout } = useAuth();
+  const { user, logout, API_BASE, checkAuth } = useAuth();
   const [activeTab, setActiveTab] = useState("profile");
+  
+  // 2FA Setup State
+  const [qrCodeUrl, setQrCodeUrl] = useState(null);
+  const [tokenInput, setTokenInput] = useState("");
+  const [setupLoading, setSetupLoading] = useState(false);
+  const [setupError, setSetupError] = useState("");
+  const [setupSuccess, setSetupSuccess] = useState("");
+
+  const handleSetup2FA = async () => {
+    setSetupLoading(true);
+    setSetupError("");
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/2fa/setup`, {
+        method: "POST",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to initiate 2FA setup");
+      setQrCodeUrl(data.data.qrCodeUrl);
+    } catch (err) {
+      setSetupError(err.message);
+    } finally {
+      setSetupLoading(false);
+    }
+  };
+
+  const handleEnable2FA = async () => {
+    if (tokenInput.length !== 6) return;
+    setSetupLoading(true);
+    setSetupError("");
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/2fa/enable`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ token: tokenInput }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Invalid token");
+      setSetupSuccess("2FA enabled successfully!");
+      setQrCodeUrl(null);
+      await checkAuth(); // Refresh user data to update `isTwoFactorEnabled`
+    } catch (err) {
+      setSetupError(err.message);
+    } finally {
+      setSetupLoading(false);
+    }
+  };
 
   // --- MOCK DATA ---
   const [events, setEvents] = useState([
@@ -382,15 +430,57 @@ export default function AdminDashboard() {
                         <Key className="w-5 h-5 text-gray-400" /> Security & Access
                       </h3>
                       <div className="bg-white/50 p-6 rounded-2xl border border-white space-y-6 shadow-sm">
-                        <div className="flex justify-between items-center group">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 group">
                           <div>
                             <h4 className="font-semibold text-[#2C1810] group-hover:text-[#E8622A] transition-colors">Two-Factor Authentication</h4>
-                            <p className="text-xs text-[#7A5C45] mt-0.5">Require 2FA for all admin accounts</p>
+                            <p className="text-xs text-[#7A5C45] mt-0.5">Protect your admin account with an authenticator app</p>
                           </div>
-                          <div className="w-12 h-6 bg-gradient-to-r from-[#E8622A] to-[#C04A18] rounded-full relative cursor-pointer shadow-inner transition-transform hover:scale-105">
-                            <div className="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5 shadow-md" />
-                          </div>
+                          
+                          {user?.isTwoFactorEnabled ? (
+                            <div className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold border border-emerald-200 flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3" /> Enabled
+                            </div>
+                          ) : (
+                            <button 
+                              onClick={handleSetup2FA}
+                              disabled={setupLoading}
+                              className="px-4 py-2 bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white rounded-lg text-sm font-bold shadow-md hover:shadow-lg transition-all"
+                            >
+                              Setup 2FA
+                            </button>
+                          )}
                         </div>
+
+                        {/* 2FA Setup Flow */}
+                        {qrCodeUrl && !user?.isTwoFactorEnabled && (
+                          <div className="mt-4 p-5 bg-orange-50 border border-orange-100 rounded-xl">
+                            <h5 className="font-bold text-[#2C1810] mb-2">Scan QR Code</h5>
+                            <p className="text-xs text-[#7A5C45] mb-4">Open Google Authenticator or Authy and scan this code:</p>
+                            <img src={qrCodeUrl} alt="2FA QR Code" className="w-32 h-32 rounded-lg border border-gray-200 mb-4" />
+                            
+                            <label className="block text-xs font-bold text-[#2C1810] mb-1">Enter 6-digit code</label>
+                            <div className="flex gap-2">
+                              <input 
+                                type="text" 
+                                value={tokenInput} 
+                                onChange={e => setTokenInput(e.target.value)}
+                                maxLength={6}
+                                className="w-32 px-3 py-2 rounded-lg border border-gray-300 focus:border-[#E8622A] outline-none"
+                                placeholder="123456"
+                              />
+                              <button 
+                                onClick={handleEnable2FA}
+                                disabled={setupLoading || tokenInput.length !== 6}
+                                className="px-4 py-2 bg-black text-white rounded-lg text-sm font-bold disabled:opacity-50"
+                              >
+                                {setupLoading ? "Verifying..." : "Verify & Enable"}
+                              </button>
+                            </div>
+                            {setupError && <p className="text-xs text-red-500 mt-2 font-bold">{setupError}</p>}
+                          </div>
+                        )}
+                        {setupSuccess && <p className="text-sm text-emerald-600 font-bold mt-2">{setupSuccess}</p>}
+                        
                         <div className="w-full h-px bg-gray-100" />
                         <div className="flex justify-between items-center group">
                           <div>

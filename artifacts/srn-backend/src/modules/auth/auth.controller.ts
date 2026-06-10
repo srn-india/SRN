@@ -39,7 +39,12 @@ export const register = catchAsync(async (req: Request, res: Response) => {
         firstName: (result as any).user.firstName, 
         lastName: (result as any).user.lastName, 
         email: (result as any).user.email, 
-        role: (result as any).user.role 
+        role: (result as any).user.role,
+        phone: (result as any).user.phone,
+        state: (result as any).user.state,
+        district: (result as any).user.district,
+        gender: (result as any).user.gender,
+        profilePicture: (result as any).user.avatar
       },
       accessToken: accessToken
     }, 'Registration successful', 201);
@@ -56,6 +61,12 @@ export const login = catchAsync(async (req: Request, res: Response) => {
         requiresOtp: true,
         email: result.user.email
       }, 'Account not verified. OTP sent to email', 200);
+    }
+    if ('requires2FA' in result) {
+      return sendSuccess(res, {
+        requires2FA: true,
+        tempAuthToken: result.tempAuthToken
+      }, '2FA token required', 200);
     }
 
     const accessToken = (result as any).accessToken;
@@ -79,7 +90,12 @@ export const login = catchAsync(async (req: Request, res: Response) => {
         firstName: (result as any).user.firstName, 
         lastName: (result as any).user.lastName, 
         email: (result as any).user.email, 
-        role: (result as any).user.role 
+        role: (result as any).user.role,
+        phone: (result as any).user.phone,
+        state: (result as any).user.state,
+        district: (result as any).user.district,
+        gender: (result as any).user.gender,
+        profilePicture: (result as any).user.avatar
       },
       accessToken: accessToken
     }, 'Login successful');
@@ -102,8 +118,9 @@ export const logout = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const getMe = catchAsync(async (req: Request, res: Response) => {
-  const user = { ...req.user };
+  const user = { ...req.user, profilePicture: req.user.avatar };
   delete user.password;
+  delete user.avatar;
   sendSuccess(res, { user }, 'User profile retrieved successfully');
 });
 
@@ -198,7 +215,68 @@ export const verifyOtp = catchAsync(async (req: Request, res: Response) => {
   });
 
   sendSuccess(res, {
-    user: { id: result.user.id, firstName: result.user.firstName, lastName: result.user.lastName, email: result.user.email, role: result.user.role },
+    user: { 
+      id: result.user.id, 
+      firstName: result.user.firstName, 
+      lastName: result.user.lastName, 
+      email: result.user.email, 
+      role: result.user.role,
+      phone: result.user.phone,
+      state: result.user.state,
+      district: result.user.district,
+      gender: result.user.gender,
+      profilePicture: result.user.avatar
+    },
     accessToken: result.accessToken
   }, 'Email verified and logged in successfully');
+});
+
+export const setup2FA = catchAsync(async (req: Request, res: Response) => {
+  const result = await authService.setup2FA(req.user.id);
+  sendSuccess(res, result, '2FA setup initiated');
+});
+
+export const enable2FA = catchAsync(async (req: Request, res: Response) => {
+  const { token } = req.body;
+  if (!token) return sendError(res, '2FA token is required', null, 400);
+
+  const result = await authService.verifyAndEnable2FA(req.user.id, token);
+  sendSuccess(res, result, '2FA successfully enabled');
+});
+
+export const verify2FALogin = catchAsync(async (req: Request, res: Response) => {
+  const { tempAuthToken, totpToken } = req.body;
+  if (!tempAuthToken || !totpToken) {
+    return sendError(res, 'Temporary token and 2FA token are required', null, 400);
+  }
+
+  const result = await authService.verify2FALogin(tempAuthToken, totpToken);
+
+  res.cookie('accessToken', result.accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 15 * 60 * 1000
+  });
+
+  res.cookie('refreshToken', result.refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 7 * 24 * 60 * 60 * 1000
+  });
+
+  sendSuccess(res, {
+    user: { 
+      id: result.user.id, 
+      firstName: result.user.firstName, 
+      lastName: result.user.lastName, 
+      email: result.user.email, 
+      role: result.user.role,
+      phone: result.user.phone,
+      state: result.user.state,
+      district: result.user.district,
+      gender: result.user.gender,
+      profilePicture: result.user.avatar
+    },
+    accessToken: result.accessToken
+  }, '2FA verified and login successful');
 });

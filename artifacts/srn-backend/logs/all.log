@@ -104,4 +104,40 @@
 [31m    at cors (C:\Users\Siddhant\Documents\Coding\Sashakt-rashtra-nirman\SRN-Draft2\node_modules\.pnpm\cors@2.8.6\node_modules\cors\lib\index.js:188:7)[39m
 2026-05-29 10:34:50:3450 [34minfo[39m: [34mServer is running on port 3000[39m
 2026-06-01 01:44:48:4448 [34minfo[39m: [34mServer is running on port 3000[39m
-2026-06-01 03:13:10:1310 [34minfo[39m: [34mServer is running on port 3000[39m
+2026-06-10 02:53:20:5320 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 03:00:59:059 [31merror[39m: [31mTypeError: Cannot read properties of undefined (reading 'client_id')[39m
+[31m    at OAuth2Client.getTokenAsync (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/google-auth-library/build/src/auth/oauth2client.js:184:32)[39m
+[31m    at OAuth2Client.getToken (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/google-auth-library/build/src/auth/oauth2client.js:177:25)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/src/modules/auth/auth.controller.ts:126:35[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/src/utils/catchAsync.ts:5:21[39m
+[31m    at Layer.handleRequest (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/router/lib/layer.js:152:17)[39m
+[31m    at next (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/router/lib/route.js:157:13)[39m
+[31m    at Route.dispatch (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/router/lib/route.js:117:3)[39m
+[31m    at handle (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/router/index.js:435:11)[39m
+[31m    at Layer.handleRequest (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/router/lib/layer.js:152:17)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/router/index.js:295:15[39m
+2026-06-10 03:05:15:515 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 03:13:59:1359 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 03:24:05:245 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 03:32:49:3249 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 03:38:05:385 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 03:38:26:3826 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 04:13:25:1325 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 04:13:40:1340 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 04:38:59:3859 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 04:58:35:5835 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 05:13:05:135 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 05:13:22:1322 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 05:13:54:1354 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 05:24:10:2410 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 05:27:58:2758 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 05:30:43:3043 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 05:36:42:3642 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 05:39:34:3934 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 05:51:12:5112 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 05:51:22:5122 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 05:51:30:5130 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 05:58:38:5838 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 06:04:19:419 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 06:13:35:1335 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-06-10 06:14:01:141 [34minfo[39m: [34mServer is running on port 4000[39m

@@ -43,6 +43,10 @@ export function AuthProvider({ children }) {
       return data.data; // { requiresOtp: true, email: ... }
     }
     
+    if (data.data?.requires2FA) {
+      return data.data; // { requires2FA: true, tempAuthToken: ... }
+    }
+    
     setUser(data.data.user);
     return data.data.user;
   };
@@ -102,8 +106,22 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const verify2FA = async (tempAuthToken, totpToken) => {
+    const res = await fetch(`${API_BASE}/api/auth/login/2fa`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ tempAuthToken, totpToken }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Invalid 2FA token");
+    
+    setUser(data.data.user);
+    return data.data.user;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, checkAuth, updateProfile, verifyOtp, API_BASE }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, checkAuth, updateProfile, verifyOtp, verify2FA, API_BASE }}>
       {children}
     </AuthContext.Provider>
   );

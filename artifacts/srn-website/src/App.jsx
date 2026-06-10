@@ -17,6 +17,7 @@ import { AuthProvider } from "./context/AuthContext";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import Profile from "./pages/Profile";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Placeholder from "./pages/Placeholder";
 import Events from "./pages/Events";
 import Forums from "./pages/Forums";
@@ -107,22 +108,36 @@ export default function App() {
               <Route path="/auth/success" element={<NoNavLayout><AuthSuccess /></NoNavLayout>} />
 
               {/* Dashboard pages — with Navbar, no Footer */}
-        <Route 
-          path="/dashboard" 
-          element={
-            <AuthLayout>
-              <Dashboard />
-            </AuthLayout>
-          } 
-        />
-        <Route 
-          path="/admin-dashboard" 
-          element={
-            <AuthLayout>
-              <AdminDashboard />
-            </AuthLayout>
-          } 
-        /><Route path="/profile" element={<AuthLayout><Profile /></AuthLayout>} />
+              <Route 
+                path="/dashboard" 
+                element={
+                  <ProtectedRoute>
+                    <AuthLayout>
+                      <Dashboard />
+                    </AuthLayout>
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin-dashboard" 
+                element={
+                  <ProtectedRoute requireRole="ADMIN">
+                    <AuthLayout>
+                      <AdminDashboard />
+                    </AuthLayout>
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/profile" 
+                element={
+                  <ProtectedRoute>
+                    <AuthLayout>
+                      <Profile />
+                    </AuthLayout>
+                  </ProtectedRoute>
+                } 
+              />
 
               {/* 404 */}
             <Route path="*" element={
