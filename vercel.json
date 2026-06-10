@@ -3,5 +3,8 @@
   "buildCommand": "pnpm --filter @workspace/srn-website run build",
   "outputDirectory": "artifacts/srn-website/dist/public",
   "framework": "vite",
-  "installCommand": "pnpm install"
+  "installCommand": "pnpm install",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
