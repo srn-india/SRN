@@ -1,6 +1,16 @@
 # Build stage
 FROM node:22-alpine AS builder
 
+# Install build dependencies for canvas
+RUN apk add --no-cache \
+    build-base \
+    g++ \
+    cairo-dev \
+    jpeg-dev \
+    pango-dev \
+    giflib-dev \
+    python3
+
 WORKDIR /app
 
 COPY package*.json prisma.config.js ./
@@ -15,6 +25,16 @@ RUN npm run build
 
 # Production stage
 FROM node:22-alpine
+
+# Install runtime and build dependencies for canvas
+RUN apk add --no-cache \
+    build-base \
+    g++ \
+    cairo-dev \
+    jpeg-dev \
+    pango-dev \
+    giflib-dev \
+    python3
 
 WORKDIR /app
 
