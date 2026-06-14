@@ -68,7 +68,7 @@ export default function AboutTeam() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    document.title = "Sashakt Rashtra Nirman – About the Members";
+    document.title = "Sashakt Rashtra Nirman – Founding Members";
   }, []);
 
   return (
@@ -81,8 +81,8 @@ export default function AboutTeam() {
         
         {/* Photographic Background */}
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-60 mix-blend-multiply"
-          style={{ backgroundImage: `url('/team_hero_bg_3d.png')` }}
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 mix-blend-multiply"
+          style={{ backgroundImage: `url('/team_hero_monochrome.png')` }}
         />
 
         {/* Subtle patterned overlay */}
@@ -103,10 +103,10 @@ export default function AboutTeam() {
             </div>
           </div>
           <span className="inline-block px-5 py-2 rounded-full bg-white/60 border border-[#E8622A]/20 text-[#C04A18] text-xs font-bold uppercase tracking-widest mb-6 backdrop-blur-md shadow-sm">
-            {en ? "The Core Team" : "कोर टीम"}
+            {en ? "Founding Members" : "संस्थापक सदस्य"}
           </span>
           <h1 className="text-5xl md:text-7xl font-bold text-[#2C1810] font-serif tracking-tight drop-shadow-sm mb-6">
-            {en ? "About the Members" : "सदस्य परिचय"}
+            {en ? "Founding Members" : "संस्थापक सदस्य"}
           </h1>
           <p className="text-[#5C3A1E] text-lg md:text-xl max-w-2xl mx-auto font-medium leading-relaxed">
             {en 

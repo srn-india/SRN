@@ -30,6 +30,8 @@ import Contact from "./pages/Contact";
 import NationalPresident from "./pages/NationalPresident";
 import Sansrakshak from "./pages/Sanrakshak";
 import AboutTeam from "./pages/AboutTeam";
+import Complaints from "./pages/Complaints";
+import RequestPosting from "./pages/RequestPosting";
 
 function Layout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -101,6 +103,9 @@ export default function App() {
               <Route path="/media" element={<Layout><Media /></Layout>} />
               <Route path="/volunteer" element={<Layout><Placeholder title="Volunteer" /></Layout>} />
               <Route path="/contact" element={<Layout><Contact /></Layout>} />
+              <Route path="/complaints" element={<Layout><Complaints /></Layout>} />
+              <Route path="/request-posting" element={<Layout><RequestPosting /></Layout>} />
+              <Route path="/jan-samwad" element={<Layout><Placeholder title="Jan Samwad (जन संवाद)" /></Layout>} />
 
               {/* Auth pages — no Navbar, no Footer */}
               <Route path="/login" element={<NoNavLayout><Login /></NoNavLayout>} />

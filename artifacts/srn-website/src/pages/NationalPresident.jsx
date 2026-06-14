@@ -69,11 +69,11 @@ const bioData = {
     name: "Dr. Manoj Kumar Shukla",
     degrees: "B.Tech (CSE), M.Tech (CSE), & Ph.D (CSE) from IIT (ISM) Dhanbad",
     subtitles: [
-      "Popular Social Servant",
+      "Popular Social Activist",
       "Strong Nationalist Thinker",
       "Eminent Educationist",
       "Computer Scientist",
-      "Adept Policy Expert"
+      "Adapt Policy Expert"
     ],
     aboutText: "Dr. Manoj Kumar Shukla is a versatile and eminent personality who simultaneously embodies academic excellence, strategic thinking, cutting-edge technological innovation, and grassroots social service. Inspired by the development vision of India's illustrious Prime Minister, Shri Narendra Modi—which integrates Good Governance, Nation Building, and Antyodaya (upliftment of the last person)—Dr. Shukla has materialized this philosophy in every field of his work. His working style reflects the strategic clarity of a true think-tank, where analysis is deep, decisions are resolute, and direction is assured.",
 
@@ -357,8 +357,6 @@ const bioData = {
   }
 };
 
-const bannerImages = ['/president_banner_1.png', '/president_banner_2.png'];
-
 export default function NationalPresident() {
   const { lang } = useLanguage();
   const en = lang === "en";
@@ -366,15 +364,7 @@ export default function NationalPresident() {
 
   const [activeTab, setActiveTab] = useState("responsibility");
   const [profileImageError, setProfileImageError] = useState(false);
-  const [bgIndex, setBgIndex] = useState(0);
   const [selectedImage, setSelectedImage] = useState(null);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setBgIndex((prev) => (prev + 1) % 2);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -390,20 +380,13 @@ export default function NationalPresident() {
     <div className="bg-[#FDF5EC] min-h-screen pb-20">
 
       {/* ── Banner ─────────────────────────────────────────────────── */}
-      <section className="relative bg-gradient-to-br from-[#FFF9F2] via-[#FDF5EC] to-[#FFF5EB] py-28 text-center px-6 overflow-hidden min-h-[38vh] flex items-center justify-center border-b border-[#F0D5B8]/40">
+      <section className="relative bg-gradient-to-br from-[#FFF9F2] via-[#FDF5EC] to-[#FFF5EB] py-36 text-center px-6 overflow-hidden min-h-[44vh] flex items-center justify-center border-b border-[#F0D5B8]/40">
 
-        {/* Autoplay background cross-fade slideshow */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={bgIndex}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.3 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.2, ease: "easeInOut" }}
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat mix-blend-multiply"
-            style={{ backgroundImage: `url('${bannerImages[bgIndex]}')` }}
-          />
-        </AnimatePresence>
+        {/* Static background hero */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat mix-blend-multiply opacity-30"
+          style={{ backgroundImage: "url('/president_monochrome_bg.png')" }}
+        />
 
         <div
           className="absolute inset-0 opacity-[0.06] mix-blend-overlay"
@@ -422,10 +405,6 @@ export default function NationalPresident() {
           transition={{ duration: 0.7, ease: "easeOut" }}
           className="relative max-w-4xl mx-auto"
         >
-          <span className="inline-block bg-[#E8622A]/10 border border-[#E8622A]/30 text-[#E8622A] text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5 shadow-sm">
-            {en ? "Leadership" : "नेतृत्व"}
-          </span>
-
           <h1 className="text-4xl md:text-6xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
             {en ? "National President" : "राष्ट्रीय अध्यक्ष"}
           </h1>

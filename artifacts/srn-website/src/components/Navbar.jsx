@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, Mail, Languages, User, Calendar, MessageSquare, X, Lock, ArrowLeft } from "lucide-react";
+import { Phone, Mail, Languages, User, Calendar, MessageSquare, X, Lock, ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 import { useAuth } from "../context/AuthContext";
 
@@ -12,14 +12,15 @@ const menuCategories = [
     links: [
       { path: "/", hindiName: "मुखपृष्ठ", englishName: "Home" },
       { path: "/uddeshya", hindiName: "उद्देश्य", englishName: "Our Aim & Objectives" },
-      { path: "/about-team", hindiName: "टीम परिचय", englishName: "About the Team" },
+      { path: "/about-team", hindiName: "संस्थापक सदस्य", englishName: "Founding Members" },
       { path: "/initiatives", hindiName: "हमारी पहल", englishName: "Our Initiatives" },
     ],
   },
   {
     titleEn: "Organisation",
     titleHi: "संगठन",
-    links: [
+    isOrgCategory: true,
+    dropdownLinks: [
       { path: "/sangathan", hindiName: "संगठन", englishName: "Sangathan" },
       { path: "/organisation/sansrakshak", hindiName: "संरक्षक", englishName: "Sanrakshak" },
       { path: "/organisation/national-president", hindiName: "राष्ट्रीय अध्यक्ष", englishName: "National President" },
@@ -28,8 +29,12 @@ const menuCategories = [
       { path: "/organisation/morcha", hindiName: "मोर्चा", englishName: "Morcha", isLocked: true },
       { path: "/organisation/department", hindiName: "विभाग/प्रभारी", englishName: "Department/Prabhari", isLocked: true },
       { path: "/organisation/state-bearers", hindiName: "राज्य पदाधिकारी", englishName: "State bearers", isLocked: true },
-
     ],
+    standaloneLinks: [
+      { path: "/complaints", hindiName: "जन याचिका दर्ज करें", englishName: "Jan Yachika/Complaints" },
+      { path: "/jan-samwad", hindiName: "जन संवाद", englishName: "Jan Samwad" },
+      { path: "/request-posting", hindiName: "पद के लिए आवेदन करें", englishName: "Request for Posting" },
+    ]
   },
   {
     titleEn: "Media & Resources",
@@ -57,7 +62,7 @@ export default function Navbar({ isOpen, setIsOpen }) {
   const { lang, toggleLang } = useLanguage();
   const { user } = useAuth();
   const en = lang === "en";
-  const [showMoreOrg, setShowMoreOrg] = useState(false);
+  const [showOrgDropdown, setShowOrgDropdown] = useState(false);
   const [showPhonePopup, setShowPhonePopup] = useState(false);
   
   const isHome = location.pathname === "/";
@@ -107,20 +112,35 @@ export default function Navbar({ isOpen, setIsOpen }) {
   const handleLinkClick = () => setTimeout(() => setIsOpen(false), 200);
 
   const overlayVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.35 } },
-    exit:   { opacity: 0, transition: { duration: 0.25 } },
+    hidden: { 
+      clipPath: "circle(0px at calc(100% - 44px) 44px)" 
+    },
+    visible: { 
+      clipPath: "circle(150% at calc(100% - 44px) 44px)",
+      transition: { 
+        type: "spring", 
+        stiffness: 85, 
+        damping: 22 
+      } 
+    },
+    exit: { 
+      clipPath: "circle(0px at calc(100% - 44px) 44px)",
+      transition: { 
+        duration: 0.35, 
+        ease: "easeInOut" 
+      } 
+    }
   };
 
   const panelVariants = {
-    hidden:   { opacity: 0, y: -24, scale: 0.97 },
-    visible:  { opacity: 1, y: 0,   scale: 1, transition: { duration: 0.45, ease: [0.32, 0.72, 0, 1], delay: 0.05 } },
-    exit:     { opacity: 0, y: -16, scale: 0.97, transition: { duration: 0.25 } },
+    hidden:   { opacity: 0 },
+    visible:  { opacity: 1, transition: { duration: 0.25, delay: 0.1 } },
+    exit:     { opacity: 0, transition: { duration: 0.2 } },
   };
 
   const linkVariants = {
-    hidden:  { opacity: 0, x: -20 },
-    visible: (i) => ({ opacity: 1, x: 0, transition: { duration: 0.35, ease: "easeOut", delay: 0.15 + i * 0.05 } }),
+    hidden:  { opacity: 1 },
+    visible: { opacity: 1 },
   };
 
   const isProfile = location.pathname === "/profile";
@@ -220,7 +240,7 @@ export default function Navbar({ isOpen, setIsOpen }) {
                 
                 <a
                   href="tel:+917652012487"
-                  className="w-full py-3.5 bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white rounded-xl font-semibold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 text-lg flex items-center justify-center gap-2"
+                  className="w-full py-3.5 bg-[#E8622A]/10 hover:bg-[#E8622A]/20 border border-[#E8622A]/30 hover:border-[#E8622A]/50 text-[#E8622A] rounded-xl font-semibold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 text-lg flex items-center justify-center gap-2"
                 >
                   <Phone className="w-5 h-5" />
                   +91 76520 12487
@@ -275,34 +295,30 @@ export default function Navbar({ isOpen, setIsOpen }) {
                         ...category.links
                       ];
                     }
-                    let baseLinks = linksToRender;
-                    let extraLinks = [];
-                    if (category.titleEn === "Organisation") {
-                      baseLinks = linksToRender.slice(0, 3);
-                      extraLinks = linksToRender.slice(3);
-                    }
-
-                    const renderLink = (link, linkIdx, isExtra = false) => {
+                    const renderLink = (link, linkIdx) => {
                       const isActive = location.pathname === link.path;
-                      const animationProps = isExtra ? {} : { custom: colIdx + linkIdx, variants: linkVariants };
                       
                       if (link.isButton) {
                         return (
-                          <motion.li key={link.path} {...animationProps}>
+                          <li key={link.path}>
                             <Link
                               to={link.path}
                               onClick={handleLinkClick}
-                              className="flex items-center justify-center w-full px-3 py-2.5 md:py-2 mt-1 rounded-xl bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white font-semibold shadow-lg hover:shadow-orange-900/50 hover:scale-[1.02] transition-all duration-300 border border-[#F47A3A]/30 text-base"
+                              className={`flex items-center justify-center w-full px-3 py-2.5 md:py-2 mt-1 rounded-xl font-semibold backdrop-blur-md transition-all duration-300 border hover:scale-[1.02] text-base ${
+                                isActive
+                                  ? "bg-[#E8622A]/25 border-[#E8622A]/60 text-white shadow-[0_0_15px_rgba(232,98,42,0.2)]"
+                                  : "bg-[#E8622A]/10 border-[#E8622A]/30 text-[#F47A3A] hover:bg-[#E8622A]/20 hover:border-[#E8622A]/50 hover:text-white"
+                              }`}
                             >
                               {en ? link.englishName : link.hindiName}
                             </Link>
-                          </motion.li>
+                          </li>
                         );
                       }
 
                       if (link.isLocked) {
                         return (
-                          <motion.li key={link.path} {...animationProps}>
+                          <li key={link.path}>
                             <div
                               className="block w-full px-3 py-2 md:py-1.5 rounded-xl border border-white/5 bg-white/5 backdrop-blur-md text-white/40 cursor-not-allowed select-none relative group"
                             >
@@ -318,12 +334,12 @@ export default function Navbar({ isOpen, setIsOpen }) {
                                 <Lock className="w-3.5 h-3.5 text-[#E8622A]/70" />
                               </div>
                             </div>
-                          </motion.li>
+                          </li>
                         );
                       }
 
                       return (
-                        <motion.li key={link.path} {...animationProps}>
+                        <li key={link.path}>
                           <Link
                             to={link.path}
                             onClick={handleLinkClick}
@@ -342,71 +358,64 @@ export default function Navbar({ isOpen, setIsOpen }) {
                               </span>
                             </div>
                           </Link>
-                        </motion.li>
+                        </li>
                       );
                     };
                     
                     return (
-                    <div key={category.titleEn} className="flex flex-col">
-                      <motion.h2 
-                        custom={colIdx}
-                        variants={linkVariants}
-                        className="text-[#E8622A] font-bold text-2xl font-serif mb-5 pb-2 border-b border-white/10"
-                      >
-                        {en ? category.titleEn : category.titleHi}
-                      </motion.h2>
-                      
-                      <ul className="flex flex-col gap-1.5">
-                        {baseLinks.map((link, linkIdx) => renderLink(link, linkIdx))}
+                      <div key={category.titleEn} className="flex flex-col">
+                        <h2 
+                          className="text-[#E8622A] font-bold text-2xl font-serif mb-5 pb-2 border-b border-white/10"
+                        >
+                          {en ? category.titleEn : category.titleHi}
+                        </h2>
+                        
+                        <ul className="flex flex-col gap-1.5">
+                          {category.isOrgCategory ? (
+                            <>
+                              <li>
+                                <button
+                                  onClick={() => setShowOrgDropdown(!showOrgDropdown)}
+                                  className="flex items-center justify-between w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-[#E8622A]/50 hover:shadow-lg transition-all duration-300 font-semibold text-white text-base"
+                                >
+                                  <span>{en ? "Sangathan" : "संगठन"}</span>
+                                  {showOrgDropdown ? (
+                                    <ChevronUp className="w-5 h-5 text-[#E8622A]" />
+                                  ) : (
+                                    <ChevronDown className="w-5 h-5 text-[#E8622A]" />
+                                  )}
+                                </button>
+                              </li>
+                              
+                              <AnimatePresence initial={false}>
+                                {showOrgDropdown && (
+                                  <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                                    className="flex flex-col gap-1.5 overflow-hidden pl-3 mt-1.5 border-l-2 border-[#E8622A]/40 mb-3"
+                                  >
+                                    {category.dropdownLinks.map((link, linkIdx) => renderLink(link, linkIdx))}
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
 
-                        {extraLinks.length > 0 && (
-                          <AnimatePresence>
-                            {showMoreOrg && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.3 }}
-                                className="flex flex-col gap-1.5 overflow-hidden"
-                              >
-                                {extraLinks.map((link, linkIdx) => renderLink(link, linkIdx + 3, true))}
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        )}
-
-                        {extraLinks.length > 0 && !showMoreOrg && (
-                          <motion.li variants={linkVariants}>
-                            <button
-                              onClick={() => setShowMoreOrg(true)}
-                              className="block w-full px-3 py-2 mt-2 rounded-xl border border-[#E8622A]/30 bg-[#E8622A]/10 text-[#E8622A] hover:bg-[#E8622A]/20 transition-all font-semibold text-center text-sm"
-                            >
-                              {en ? "View more ↓" : "और देखें ↓"}
-                            </button>
-                          </motion.li>
-                        )}
-                        {extraLinks.length > 0 && showMoreOrg && (
-                          <motion.li variants={linkVariants}>
-                            <button
-                              onClick={() => setShowMoreOrg(false)}
-                              className="block w-full px-3 py-2 mt-2 rounded-xl border border-white/20 bg-white/5 text-white/50 hover:bg-white/10 hover:text-white transition-all font-semibold text-center text-sm"
-                            >
-                              {en ? "View less ↑" : "कम देखें ↑"}
-                            </button>
-                          </motion.li>
-                        )}
-                      </ul>
-                    </div>
-                  );
-                })}
+                              {category.standaloneLinks.map((link, linkIdx) => renderLink(link, linkIdx))}
+                            </>
+                          ) : (
+                            linksToRender.map((link, linkIdx) => renderLink(link, linkIdx))
+                          )}
+                        </ul>
+                      </div>
+                    );
+                  })}
 
                 </div>
               </div>
 
               {/* Bottom Footer Area within Menu */}
-              <motion.div 
-                custom={10} 
-                variants={linkVariants}
+              <div 
                 className="mt-auto max-w-7xl mx-auto w-full border-t border-white/10 pt-6 flex flex-col md:flex-row items-center justify-between gap-6"
               >
                 {/* Language Toggle */}
@@ -443,7 +452,7 @@ export default function Navbar({ isOpen, setIsOpen }) {
                     srnindia@yahoo.com
                   </a>
                 </div>
-              </motion.div>
+              </div>
 
             </motion.div>
           </motion.div>
