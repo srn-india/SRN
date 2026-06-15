@@ -31,8 +31,16 @@ const pillarsData = [
     icon: HeartPulse,
     titleEn: "Health & Family Welfare",
     titleHi: "स्वास्थ्य और परिवार कल्याण",
-    descEn: "Ensuring access to essential healthcare, maternal health, and family welfare programs for all demographics, extending our care to animal welfare and sustainable agriculture. This comprehensive welfare umbrella addresses nutrition programs to fight malnutrition, active HIV/AIDS awareness, prevention, and counseling campaigns (focused on combating social stigma, promoting voluntary testing, and ensuring seamless access to medical treatments and retroviral therapies), as well as support services for the aged, elderly, and differently-abled members of our society. Our compassion extends beyond human health to encompass dedicated animal welfare, veterinary care, and animal husbandry. We also champion dairying and fisheries development alongside sustainable agriculture, food processing innovations, and biotechnology research to build a healthier, food-secure future.",
-    descHi: "सभी जनसांख्यिकी के लिए आवश्यक स्वास्थ्य देखभाल, मातृ स्वास्थ्य और परिवार कल्याण कार्यक्रमों तक पहुंच सुनिश्चित करना, साथ ही पशु कल्याण और टिकाऊ कृषि तक हमारी देखभाल का विस्तार करना। यह व्यापक कल्याण छत्र कुपोषण से लड़ने के लिए पोषण कार्यक्रमों, सक्रिय एचआईवी/एड्स जागरूकता, रोकथाम और परामर्श अभियानों (सामाजिक कलंक को समाप्त करने, स्वैच्छिक जांच को बढ़ावा देने, और चिकित्सा उपचार व रेट्रोवायरल थेरेपी तक निर्बाध पहुंच सुनिश्चित करने पर केंद्रित), तथा हमारे समाज के बुजुर्गों और दिव्यांग सदस्यों के लिए सहायता सेवाओं को संबोधित करता है। हमारी करुणा मानव स्वास्थ्य से आगे बढ़कर समर्पित पशु कल्याण, पशु चिकित्सा देखभाल और पशुपालन तक फैली हुई है। हम एक स्वस्थ और खाद्य-सुरक्षित भविष्य के निर्माण के लिए डेयरी और मत्स्य पालन विकास के साथ-साथ टिकाऊ कृषि, खाद्य प्रसंस्करण नवाचारों और जैव प्रौद्योगिकी अनुसंधान का भी समर्थन करते हैं।"
+    descEn: "Ensuring access to essential healthcare, maternal health, and family welfare programs for all demographics, extending our care to animal welfare and sustainable agriculture. This comprehensive welfare umbrella addresses nutrition programs to fight malnutrition, alongside support services for the aged, elderly, and differently-abled members of our society. Our compassion extends beyond human health to encompass dedicated animal welfare, veterinary care, and animal husbandry. We also champion dairying and fisheries development alongside sustainable agriculture, food processing innovations, and biotechnology research to build a healthier, food-secure future.",
+    descHi: "सभी जनसांख्यिकी के लिए आवश्यक स्वास्थ्य देखभाल, मातृ स्वास्थ्य और परिवार कल्याण कार्यक्रमों तक पहुंच सुनिश्चित करना, साथ ही पशु कल्याण और टिकाऊ कृषि तक हमारी देखभाल का विस्तार करना। यह व्यापक कल्याण छत्र कुपोषण से लड़ने के लिए पोषण कार्यक्रमों, तथा हमारे समाज के बुजुर्गों और दिव्यांग सदस्यों के लिए सहायता सेवाओं को संबोधित करता है। हमारी करुणा मानव स्वास्थ्य से आगे बढ़कर समर्पित पशु कल्याण, पशु चिकित्सा देखभाल और पशुपालन तक फैली हुई है। हम एक स्वस्थ और खाद्य-सुरक्षित भविष्य के निर्माण के लिए डेयरी और मत्स्य पालन विकास के साथ-साथ टिकाऊ कृषि, खाद्य प्रसंस्करण नवाचारों और जैव प्रौद्योगिकी अनुसंधान का भी समर्थन करते हैं।",
+    subSections: [
+      {
+        titleEn: "HIV/AIDS Awareness, Prevention & Support",
+        titleHi: "एचआईवी/एड्स जागरूकता, रोकथाम एवं सहायता",
+        descEn: "Our dedicated campaigns focus on active HIV/AIDS awareness, prevention, and counseling. We work closely with local communities and health networks to combat social stigma, promote voluntary testing, and ensure seamless access to essential medical treatments and retroviral therapies.",
+        descHi: "हमारे समर्पित अभियान सक्रिय एचआईवी/एड्स जागरूकता, रोकथाम और परामर्श पर केंद्रित हैं। हम सामाजिक कलंक को समाप्त करने, स्वैच्छिक जांच को बढ़ावा देने, और आवश्यक चिकित्सा उपचार व रेट्रोवायरल थेरेपी तक निर्बाध पहुंच सुनिश्चित करने के लिए स्थानीय समुदायों और स्वास्थ्य नेटवर्क के साथ मिलकर काम करते हैं।"
+      }
+    ]
   },
   {
     id: "women",
@@ -155,6 +163,20 @@ export default function Initiatives() {
                   <p className="text-[#1E0F05] text-base md:text-lg leading-relaxed font-sans font-normal text-justify whitespace-pre-line">
                     {en ? pillar.descEn : pillar.descHi}
                   </p>
+                  
+                  {/* Additional separate sub-sections (e.g. HIV/AIDS) */}
+                  {pillar.subSections && pillar.subSections.map((sub, sIdx) => (
+                    <div key={sIdx} className="mt-8 p-6 md:p-8 rounded-3xl bg-[#FFF9F2] border border-[#F0D5B8]/60 shadow-sm relative overflow-hidden">
+                      {/* Decorative accent */}
+                      <div className="absolute top-0 left-0 w-1.5 h-full bg-[#E8622A]" />
+                      <h3 className="text-xl font-bold font-serif text-[#C04A18] mb-3">
+                        {en ? sub.titleEn : sub.titleHi}
+                      </h3>
+                      <p className="text-[#1E0F05] text-sm md:text-base leading-relaxed text-justify font-sans">
+                        {en ? sub.descEn : sub.descHi}
+                      </p>
+                    </div>
+                  ))}
                   
                   {/* Subtle Separator line except the last item */}
                   {index < pillarsData.length - 1 && (
