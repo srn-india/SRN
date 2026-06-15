@@ -16,7 +16,8 @@ import {
   Camera,
   Image as ImageIcon,
   Flame,
-  Sun
+  Sun,
+  CheckCircle2
 } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 import { useFadeIn } from "../hooks/useFadeIn";
@@ -322,7 +323,6 @@ export default function Sansrakshak() {
   const en = lang === "en";
   const data = en ? bioData.en : bioData.hi;
 
-  const [activeTab, setActiveTab] = useState("education");
   const [profileImageError, setProfileImageError] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
@@ -332,9 +332,6 @@ export default function Sansrakshak() {
       ? "Sashakt Rashtra Nirman – Patron (Sanrakshak)" 
       : "सशक्त राष्ट्र निर्माण – संरक्षक (Sanrakshak)";
   }, [en]);
-
-  const activeSectionData = data.sections.find(s => s.id === activeTab);
-  const ActiveIcon = activeSectionData?.icon || Heart;
 
   return (
     <div className="bg-[#FDF5EC] min-h-screen pb-20">
@@ -459,90 +456,44 @@ export default function Sansrakshak() {
             <div className="h-0.5 bg-gradient-to-r from-transparent via-[#E8622A] to-transparent mt-3 mx-auto w-48 rounded-full" />
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-8 items-start">
-            
-            {/* Left Sidebar Navigation (Tabs) */}
-            <div className="w-full lg:w-1/4 flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-3 lg:pb-0 scrollbar-none shrink-0 sticky top-24 z-20">
-              {data.sections.map((sec) => {
-                const TabIcon = sec.icon;
-                const isSelected = activeTab === sec.id;
-                
-                return (
-                  <button
-                    key={sec.id}
-                    onClick={() => setActiveTab(sec.id)}
-                    className={`flex items-center gap-3 px-5 py-3.5 rounded-xl border text-[13px] font-semibold transition-all duration-300 whitespace-nowrap lg:whitespace-normal text-left shrink-0 lg:shrink w-auto lg:w-full group ${
-                      isSelected 
-                        ? "bg-[#E8622A] border-[#E8622A] text-white shadow-lg shadow-orange-700/15 -translate-y-0.5 lg:translate-x-1" 
-                        : "bg-white border-[#F0D5B8] text-[#7A5C45] hover:border-[#E8622A]/50 hover:bg-[#FFF9F2] hover:-translate-y-px"
-                    }`}
-                  >
-                    <TabIcon className={`w-4.5 h-4.5 shrink-0 transition-colors ${isSelected ? "text-white" : "text-[#E8622A] group-hover:scale-110 duration-300"}`} />
-                    <span className="truncate lg:normal-case">{sec.shortTitle}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Right Display Area */}
-            <div className="w-full lg:w-3/4 min-h-[440px]">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeTab}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.35, ease: "easeOut" }}
-                  className="bg-white border border-[#F0D5B8] rounded-3xl p-6 md:p-8 shadow-md relative overflow-hidden"
-                >
-                  <div className={`absolute -right-16 -top-16 w-48 h-48 rounded-full blur-3xl opacity-20 bg-current ${activeSectionData?.colorClass.split(' ')[2]}`} />
-
+          <div className="space-y-12">
+            {data.sections.map((sec) => {
+              const SectionIcon = sec.icon;
+              return (
+                <div key={sec.id} className="bg-white border border-[#F0D5B8] rounded-3xl p-6 md:p-8 shadow-sm relative overflow-hidden text-left">
                   {/* Section Title details */}
-                  <div className="flex items-start gap-4 mb-6 pb-4 border-b border-[#F0D5B8]/60">
-                    <div className={`p-3 rounded-2xl bg-gradient-to-br ${activeSectionData?.colorClass.split(' ')[0]} ${activeSectionData?.colorClass.split(' ')[1]} border border-white/40 shadow-sm shrink-0`}>
-                      <ActiveIcon className={`w-6 h-6 ${activeSectionData?.colorClass.split(' ')[3]}`} />
+                  <div className="flex items-center gap-4 mb-6 pb-4 border-b border-[#F0D5B8]/60">
+                    <div className={`p-3 rounded-2xl bg-gradient-to-br ${sec.colorClass.split(' ')[0]} ${sec.colorClass.split(' ')[1]} border border-white/40 shadow-sm shrink-0`}>
+                      <SectionIcon className={`w-6 h-6 ${sec.colorClass.split(' ')[3]}`} />
                     </div>
                     <div>
                       <h4 className="text-xl md:text-2xl font-bold text-[#5C1010] font-serif leading-tight">
-                        {activeSectionData?.title}
+                        {sec.title}
                       </h4>
-                      <p className="text-sm text-[#7A5C45] mt-1 font-medium leading-relaxed text-left">
-                        {activeSectionData?.subtitle}
+                      <p className="text-sm text-[#7A5C45] mt-1 font-medium leading-relaxed">
+                        {sec.subtitle}
                       </p>
                     </div>
                   </div>
 
-                  {/* Accomplishment Bullet Cards Grid */}
-                  <div className="grid grid-cols-1 gap-5">
-                    {activeSectionData?.items.map((item, idx) => (
-                      <motion.div
+                  {/* Accomplishment Bullet List (Running Text Pointers) */}
+                  <div className="space-y-4">
+                    {sec.items.map((item, idx) => (
+                      <div
                         key={idx}
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: idx * 0.07 }}
-                        className="flex gap-4 p-5 rounded-2xl bg-[#FFF9F2] border border-[#F0D5B8]/40 hover:border-[#E8622A]/30 hover:shadow-md transition-all duration-300 group"
+                        className="flex gap-3 items-start pl-2"
                       >
-                        <div className="mt-1 shrink-0">
-                          <CheckCircle2 className="w-5 h-5 text-[#E8622A] group-hover:scale-110 transition-transform duration-300" />
-                        </div>
-                        <div className="text-left">
-                          <h5 className="font-bold text-[#1E0F05] text-base leading-snug group-hover:text-[#5C1010] transition-colors">
-                            {item.title}
-                          </h5>
-                          <p className="text-[#7A5C45] text-sm leading-relaxed mt-2.5">
-                            {item.desc}
-                          </p>
-                        </div>
-                      </motion.div>
+                        <CheckCircle2 className="w-5 h-5 text-[#E8622A] shrink-0 mt-0.5" />
+                        <p className="text-[#7A5C45] text-sm md:text-base leading-relaxed">
+                          <strong className="text-[#1E0F05] font-semibold">{item.title}:</strong> {item.desc}
+                        </p>
+                      </div>
                     ))}
                   </div>
-
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
+                </div>
+              );
+            })}
           </div>
-
         </div>
       </section>
 
@@ -674,20 +625,4 @@ export default function Sansrakshak() {
   );
 }
 
-// Reusable micro-component for accomplishment bullet list checkmarks
-function CheckCircle2({ className }) {
-  return (
-    <svg 
-      className={className} 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2.5" 
-      strokeLinecap="round" 
-      strokeLinejoin="round"
-    >
-      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-      <polyline points="22 4 12 14.01 9 11.01" />
-    </svg>
-  );
-}
+

@@ -9,7 +9,7 @@ export default function RequestPosting() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    document.title = en ? "Request for Posting – SRN" : "पद के लिए आवेदन करें – SRN";
+    document.title = en ? "Pad ke liye Awedan Kare – SRN" : "पद के लिए आवेदन करें – SRN";
   }, [en]);
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -147,7 +147,7 @@ export default function RequestPosting() {
             {en ? "Join the Executive Committee" : "कार्यकारिणी में शामिल हों"}
           </motion.span>
           <h1 className="text-4xl md:text-6xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
-            {en ? "Request For Posting" : "पद के लिए आवेदन करें"}
+            {en ? "Pad ke liye Awedan Kare" : "पद के लिए आवेदन करें"}
           </h1>
           <p className="text-[#7A5C45] text-base md:text-lg mt-4 max-w-2xl mx-auto font-medium leading-relaxed">
             {en 

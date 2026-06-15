@@ -35,14 +35,14 @@ const menuCategories = [
     titleEn: "Media & Resources",
     titleHi: "मीडिया और संसाधन",
     links: [
-      { path: "/media", hindiName: "मीडिया और गैलरी", englishName: "Media & Gallery" },
-      { path: "/events", hindiName: "कार्यक्रम", englishName: "Events" },
-      { path: "/forums", hindiName: "मंच", englishName: "Forums" },
       { path: "/jan-samwad", hindiName: "जन संवाद", englishName: "Jan Samwad" },
       { path: "/complaints", hindiName: "जन शिकायत दर्ज करें", englishName: "Jan Shikayat Darj Kare" },
       { path: "/janmant-aap-ki-aawaz", hindiName: "जनमत आपकी आवाज़", englishName: "Janmant Aap Ki Aawaz" },
       { path: "/jan-yachikaye", hindiName: "जन याचिकाएं (निस्तारित)", englishName: "Jan Yachikaye (Solved)" },
-      { path: "/request-posting", hindiName: "पद के लिए आवेदन करें", englishName: "Apply for Posting" },
+      { path: "/request-posting", hindiName: "पद के लिए आवेदन करें", englishName: "Pad ke liye Awedan Kare" },
+      { path: "/media", hindiName: "मीडिया और गैलरी", englishName: "Media & Gallery" },
+      { path: "/events", hindiName: "कार्यक्रम", englishName: "Events" },
+      { path: "/forums", hindiName: "मंच", englishName: "Forums" },
     ],
   },
   {
@@ -56,14 +56,13 @@ const menuCategories = [
   },
 ];
 
-export default function Navbar({ isOpen, setIsOpen }) {
+export default function Navbar({ isOpen, setIsOpen, onPhoneClick }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { lang, toggleLang } = useLanguage();
   const { user } = useAuth();
   const en = lang === "en";
   const [showOrgDropdown, setShowOrgDropdown] = useState(false);
-  const [showPhonePopup, setShowPhonePopup] = useState(false);
   
   const isHome = location.pathname === "/";
   const isDashboard = location.pathname === "/dashboard";
@@ -183,7 +182,7 @@ export default function Navbar({ isOpen, setIsOpen }) {
 
           {/* Phone button */}
           <button
-            onClick={() => setShowPhonePopup(true)}
+            onClick={() => onPhoneClick && onPhoneClick()}
             className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/5 text-white transition-all duration-300"
             aria-label="Contact Phone"
           >
@@ -202,54 +201,6 @@ export default function Navbar({ isOpen, setIsOpen }) {
           </button>
         </div>
       </div>
-
-      {/* ── Phone Popup Overlay ─────────────────────────────────────── */}
-      <AnimatePresence>
-        {showPhonePopup && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] flex items-center justify-center px-4 bg-[#1E0F05]/80 backdrop-blur-sm"
-            onClick={() => setShowPhonePopup(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: 20 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-[#FDF5EC] rounded-2xl p-6 md:p-8 w-full max-w-sm shadow-2xl relative border border-[#E8D5B8]"
-            >
-              <button
-                onClick={() => setShowPhonePopup(false)}
-                className="absolute top-4 right-4 text-[#5C3A1E] hover:text-[#E8622A] bg-[#FFF9F2] p-1.5 rounded-full transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-              
-              <div className="flex flex-col items-center text-center mt-2">
-                <div className="w-16 h-16 rounded-full bg-[#E8622A]/10 flex items-center justify-center mb-4">
-                  <Phone className="w-8 h-8 text-[#E8622A]" />
-                </div>
-                <h3 className="text-xl font-bold font-serif text-[#2C1810] mb-2">
-                  {en ? "Call Us" : "हमें कॉल करें"}
-                </h3>
-                <p className="text-[#7A5C45] text-sm mb-6">
-                  {en ? "Reach out to us for any inquiries or support." : "किसी भी पूछताछ या सहायता के लिए हमसे संपर्क करें।"}
-                </p>
-                
-                <a
-                  href="tel:+917652012487"
-                  className="w-full py-3.5 bg-[#E8622A]/10 hover:bg-[#E8622A]/20 border border-[#E8622A]/30 hover:border-[#E8622A]/50 text-[#E8622A] rounded-xl font-semibold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 text-lg flex items-center justify-center gap-2"
-                >
-                  <Phone className="w-5 h-5" />
-                  +91 76520 12487
-                </a>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* ── Full-screen Mega Menu Overlay ───────────────────────────── */}
       <AnimatePresence>
