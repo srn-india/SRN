@@ -39,13 +39,13 @@ function GalleryImageFrame({ src, alt, className = "", onClick, ratio }) {
     <div 
       onClick={onClick}
       className={`relative group overflow-hidden rounded-3xl shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500 bg-[#FDF5EC]/50 border border-[#F0D5B8]/80 cursor-zoom-in w-full ${className}`}
-      style={{ aspectRatio: ratio }}
+      style={{ aspectRatio: 1 }}
     >
       {!hasError ? (
         <img 
           src={src} 
           alt={alt} 
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04] block"
+          className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-[1.04] block"
           onError={() => setHasError(true)}
         />
       ) : (
@@ -608,50 +608,33 @@ export default function NationalPresident() {
             <div className="h-1 bg-gradient-to-r from-transparent via-[#E8622A] to-transparent mt-4 mx-auto w-32 rounded-full" />
           </div>
 
-          {/* Refined Photographic Gallery: Mathematically-Balanced Bento Grid Layout */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-start">
+          {/* Refined Photographic Gallery: Aligned Row & Column Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             {[
-              // Column 1
-              [
-                { src: "/WhatsApp Image 2026-06-03 at 19.54.52 (2).jpeg", ratio: 853/1280 },
-                { src: "/dr. manoj kumar shukla performing hindu rituals .jpeg", ratio: 1280/960 },
-                { src: "/Dr. Manoj Kumar Shukla with swami yatindranand ji maharaj.jpeg", ratio: 960/720 },
-                { src: "/WhatsApp Image 2026-06-03 at 19.54.53 (1).jpeg", ratio: 1280/960 },
-                { src: "/WhatsApp Image 2026-06-03 at 19.54.52.jpeg", ratio: 1280/852 }
-              ],
-              // Column 2
-              [
-                { src: "/Dr.-Manoj-Kumar-Shukla-at-kedarrnath.jpeg", ratio: 720/960 },
-                { src: "/WhatsApp Image 2026-06-03 at 19.54.54.jpeg", ratio: 960/1280 },
-                { src: "/WhatsApp Image 2026-06-03 at 19.54.52 (1).jpeg", ratio: 1280/960 },
-                { src: "/Dr.-Manoj-Kumar-Shukla-giving-speech.jpeg", ratio: 1280/853 }
-              ],
-              // Column 3
-              [
-                { src: "/WhatsApp Image 2026-06-03 at 19.54.53 (2).jpeg", ratio: 960/1280 },
-                { src: "/WhatsApp Image 2026-06-03 at 19.54.54 (2).jpeg", ratio: 1178/1280 },
-                { src: "/WhatsApp Image 2026-06-03 at 19.54.51.jpeg", ratio: 1280/960 },
-                { src: "/Dr.-Manoj-Kumar-Shukla-constitution.jpeg", ratio: 1280/853 }
-              ],
-              // Column 4
-              [
-                { src: "/WhatsApp Image 2026-06-03 at 19.54.54 (1).jpeg", ratio: 1200/1600 },
-                { src: "/WhatsApp Image 2026-06-03 at 19.54.53 (3).jpeg", ratio: 1216/1280 },
-                { src: "/Dr.-Manoj-Kumar-Shukla-in-devotion.jpeg", ratio: 1024/768 },
-                { src: "/WhatsApp Image 2026-06-03 at 19.54.53.jpeg", ratio: 1280/960 }
-              ]
-            ].map((column, colIdx) => (
-              <div key={colIdx} className="flex flex-col gap-5">
-                {column.map((item, imgIdx) => (
-                  <GalleryImageFrame 
-                    key={imgIdx}
-                    src={item.src} 
-                    ratio={item.ratio}
-                    alt={`President Gallery Moment ${colIdx + 1}-${imgIdx + 1}`} 
-                    onClick={() => setSelectedImage(item.src)}
-                  />
-                ))}
-              </div>
+              "/WhatsApp Image 2026-06-03 at 19.54.52 (2).jpeg",
+              "/dr. manoj kumar shukla performing hindu rituals .jpeg",
+              "/Dr. Manoj Kumar Shukla with swami yatindranand ji maharaj.jpeg",
+              "/WhatsApp Image 2026-06-03 at 19.54.53 (1).jpeg",
+              "/WhatsApp Image 2026-06-03 at 19.54.52.jpeg",
+              "/Dr.-Manoj-Kumar-Shukla-at-kedarrnath.jpeg",
+              "/WhatsApp Image 2026-06-03 at 19.54.54.jpeg",
+              "/WhatsApp Image 2026-06-03 at 19.54.52 (1).jpeg",
+              "/Dr.-Manoj-Kumar-Shukla-giving-speech.jpeg",
+              "/WhatsApp Image 2026-06-03 at 19.54.53 (2).jpeg",
+              "/WhatsApp Image 2026-06-03 at 19.54.54 (2).jpeg",
+              "/WhatsApp Image 2026-06-03 at 19.54.51.jpeg",
+              "/Dr.-Manoj-Kumar-Shukla-constitution.jpeg",
+              "/WhatsApp Image 2026-06-03 at 19.54.54 (1).jpeg",
+              "/WhatsApp Image 2026-06-03 at 19.54.53 (3).jpeg",
+              "/Dr.-Manoj-Kumar-Shukla-in-devotion.jpeg",
+              "/WhatsApp Image 2026-06-03 at 19.54.53.jpeg"
+            ].map((src, idx) => (
+              <GalleryImageFrame 
+                key={idx}
+                src={src} 
+                alt={`President Gallery Moment ${idx + 1}`} 
+                onClick={() => setSelectedImage(src)}
+              />
             ))}
           </div>
 

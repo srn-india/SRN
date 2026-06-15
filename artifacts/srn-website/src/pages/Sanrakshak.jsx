@@ -39,13 +39,13 @@ function GalleryImageFrame({ src, alt, className = "", onClick, ratio }) {
     <div 
       onClick={onClick}
       className={`relative group overflow-hidden rounded-3xl shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500 bg-[#FDF5EC]/50 border border-[#F0D5B8]/80 cursor-zoom-in w-full ${className}`}
-      style={{ aspectRatio: ratio }}
+      style={{ aspectRatio: 1 }}
     >
       {!hasError ? (
         <img 
           src={src} 
           alt={alt} 
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04] block"
+          className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-[1.04] block"
           onError={() => setHasError(true)}
         />
       ) : (
@@ -567,55 +567,36 @@ export default function Sansrakshak() {
             <div className="h-1 bg-gradient-to-r from-transparent via-[#E8622A] to-transparent mt-4 mx-auto w-32 rounded-full" />
           </div>
 
-          {/* Refined Photographic Gallery: Mathematically-Balanced Bento Grid Layout */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-start">
+          {/* Refined Photographic Gallery: Aligned Row & Column Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             {[
-              // Column 1
-              [
-                { src: "/WhatsApp Image 2026-06-01 at 22.34.10 (2).jpeg", ratio: 784/1280 },
-                { src: "/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-cm-of-Uttrakhaand-Pushkar-Dhami-1024x934.jpg", ratio: 1024/934 },
-                { src: "/WhatsApp Image 2026-06-01 at 22.34.12 (1).jpeg", ratio: 1170/909 },
-                { src: "/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-indias-prime-minister-narendra-modi.jpg", ratio: 1280/885 },
-                { src: "/WhatsApp Image 2026-06-01 at 22.34.09 (1).jpeg", ratio: 1280/853 },
-                { src: "/WhatsApp Image 2026-06-01 at 22.34.08.jpeg", ratio: 1002/576 }
-              ],
-              // Column 2
-              [
-                { src: "/WhatsApp Image 2026-06-01 at 22.34.10.jpeg", ratio: 788/1280 },
-                { src: "/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-uttar-pradesh-cheif-minister-manik-yogi-adityanath.-jpg.jpg", ratio: 909/899 },
-                { src: "/WhatsApp Image 2026-06-01 at 22.34.09.jpeg", ratio: 1280/960 },
-                { src: "/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-tripura-cheif-minister-manik-shah.jpg", ratio: 1600/1067 },
-                { src: "/WhatsApp Image 2026-06-01 at 22.34.11 (1).jpeg", ratio: 1280/853 },
-                { src: "/WhatsApp Image 2026-06-01 at 22.34.09 (2).jpeg", ratio: 1280/591 }
-              ],
-              // Column 3
-              [
-                { src: "/WhatsApp Image 2026-06-01 at 22.34.08 (1).jpeg", ratio: 768/1024 },
-                { src: "/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-doing-rituals-at-holy-haridwar.jpg", ratio: 1042/1250 },
-                { src: "/WhatsApp Image 2026-06-01 at 22.34.11.jpeg", ratio: 876/752 },
-                { src: "/WhatsApp Image 2026-06-01 at 22.34.08 (3).jpeg", ratio: 960/640 },
-                { src: "/WhatsApp Image 2026-06-01 at 22.34.10 (1).jpeg", ratio: 1280/824 }
-              ],
-              // Column 4
-              [
-                { src: "/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-Acharya-Mahamandaleshwar-Swami-Avdheshanand-Giri-of-Juna-Akhara.jpg", ratio: 1208/1600 },
-                { src: "/WhatsApp Image 2026-06-01 at 22.34.07.jpeg", ratio: 720/934 },
-                { src: "/WhatsApp Image 2026-06-01 at 22.34.11 (2).jpeg", ratio: 960/720 },
-                { src: "/WhatsApp Image 2026-06-01 at 22.34.08 (2).jpeg", ratio: 960/640 },
-                { src: "/WhatsApp Image 2026-06-01 at 22.34.12.jpeg", ratio: 1280/853 }
-              ]
-            ].map((column, colIdx) => (
-              <div key={colIdx} className="flex flex-col gap-5">
-                {column.map((item, imgIdx) => (
-                  <GalleryImageFrame 
-                    key={imgIdx}
-                    src={item.src} 
-                    ratio={item.ratio}
-                    alt={`Gallery Moment ${colIdx + 1}-${imgIdx + 1}`} 
-                    onClick={() => setSelectedImage(item.src)}
-                  />
-                ))}
-              </div>
+              "/Narendra_Modi1.jpg",
+              "/Narendra_Modi2.jpeg",
+              "/mohan_bhagwat.jpeg",
+              "/dattatreya_hosabale.jpeg",
+              "/amit_shah.jpeg",
+              "/rajnath_singh.jpeg",
+              "/yogi_adityanath.jpg",
+              "/yogi_adityanath2.jpeg",
+              "/rekha_gupta.jpeg",
+              "/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-doing-rituals-at-holy-haridwar.jpg",
+              "/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-Acharya-Mahamandaleshwar-Swami-Avdheshanand-Giri-of-Juna-Akhara.jpg",
+              "/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-cm-of-Uttrakhaand-Pushkar-Dhami-1024x934.jpg",
+              "/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-tripura-cheif-minister-manik-shah.jpg",
+              "/WhatsApp Image 2026-06-01 at 22.34.08 (1).jpeg",
+              "/WhatsApp Image 2026-06-01 at 22.34.08 (2).jpeg",
+              "/WhatsApp Image 2026-06-01 at 22.34.08.jpeg",
+              "/WhatsApp Image 2026-06-01 at 22.34.09 (1).jpeg",
+              "/WhatsApp Image 2026-06-01 at 22.34.09 (2).jpeg",
+              "/WhatsApp Image 2026-06-01 at 22.34.11 (1).jpeg",
+              "/WhatsApp Image 2026-06-01 at 22.34.11 (2).jpeg"
+            ].map((src, idx) => (
+              <GalleryImageFrame 
+                key={idx}
+                src={src} 
+                alt={`Gallery Moment ${idx + 1}`} 
+                onClick={() => setSelectedImage(src)}
+              />
             ))}
           </div>
 
