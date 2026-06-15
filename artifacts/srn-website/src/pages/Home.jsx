@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -6,61 +6,11 @@ import {
   Leaf, Home as HomeIcon, Eye, Target, Phone, Mail, ArrowRight,
 } from "lucide-react";
 import SectionHeader from "../components/SectionHeader";
-import LegalBadge from "../components/LegalBadge";
-import FocusAreasSection from "../components/FocusAreasSection";
 import { useLanguage } from "../context/LanguageContext";
 import { useFadeIn } from "../hooks/useFadeIn";
 
 const iconMap = { BookOpen, Heart, Users, Star, Leaf, Home: HomeIcon, Eye, Target };
 
-
-/* ─── Animated counter ────────────────────────────────────────────────── */
-function Counter({ target, suffix, label, labelHindi, lang }) {
-  const [count, setCount] = useState(0);
-  const ref = useRef(null);
-  const started = useRef(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !started.current) {
-          started.current = true;
-          const duration = 2000;
-          const steps = 60;
-          const increment = target / steps;
-          let current = 0;
-          const interval = setInterval(() => {
-            current += increment;
-            if (current >= target) {
-              setCount(target);
-              clearInterval(interval);
-            } else {
-              setCount(Math.floor(current));
-            }
-          }, duration / steps);
-        }
-      },
-      { threshold: 0.3 }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [target]);
-
-  return (
-    <div ref={ref} className="group relative bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl md:rounded-3xl p-4 md:p-8 hover:bg-white/10 hover:-translate-y-2 hover:border-[#E8622A]/50 transition-all duration-500 shadow-2xl overflow-hidden flex flex-col items-center justify-center min-h-[110px] md:min-h-[160px]">
-      <div className="absolute inset-0 bg-gradient-to-br from-[#E8622A]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#E8622A] to-[#D4880C] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      <div className="relative z-10 flex flex-col items-center text-center">
-        <p className="text-2xl sm:text-3xl md:text-5xl font-bold bg-gradient-to-r from-[#F47A3A] to-[#FFC5A8] bg-clip-text text-transparent mb-1 md:mb-3 drop-shadow-lg filter group-hover:brightness-110 transition-all">
-          {count.toLocaleString()}{suffix}
-        </p>
-        <p className="text-white/80 text-[10px] sm:text-xs font-bold tracking-widest uppercase group-hover:text-white transition-colors leading-tight">
-          {lang === "hi" ? labelHindi : label}
-        </p>
-      </div>
-    </div>
-  );
-}
 
 /* ─── Scroll-reveal section wrapper ──────────────────────────────────── */
 function FadeSection({ children, className = "", delay = 0 }) {
@@ -212,95 +162,6 @@ export default function Home() {
               </blockquote>
             </FadeSection>
           </div>
-        </div>
-      </section>
-
-
-
-      {/* ── Legal Legitimacy ─────────────────────────────────────────── */}
-      <section className="py-24 px-6 relative bg-[url('/hero-bg-2.png')] bg-fixed bg-cover bg-center overflow-hidden">
-        {/* Premium Glass Overlay */}
-        <div className="absolute inset-0 bg-[#2C1810]/75 backdrop-blur-md" />
-        
-        {/* Animated Glowing Orbs */}
-        <motion.div 
-          animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.3, 0.15] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-[#E8622A] rounded-full blur-[100px] pointer-events-none" 
-        />
-        
-        <div className="relative max-w-5xl mx-auto z-10">
-          <FadeSection>
-            <SectionHeader
-              hindi={h.legalTitleHindi}
-              english={h.legalTitle}
-              darkBg={true}
-            />
-          </FadeSection>
-          <FadeSection delay={150}>
-            <div className="flex flex-wrap gap-4 justify-center mt-12">
-              {h.legalBadges.map((badge, i) => (
-                <LegalBadge key={i} label={badge} darkBg={true} />
-              ))}
-            </div>
-          </FadeSection>
-        </div>
-      </section>
-
-
-      {/* ── Focus Areas ──────────────────────────────────────────────── */}
-      <FocusAreasSection titleEn={h.focusTitle} titleHi={h.focusTitleHindi} />
-
-      {/* ── Impact Counter ───────────────────────────────────────────── */}
-      <section className="py-24 px-6 relative bg-[url('/hero-bg-2.png')] bg-fixed bg-cover bg-center overflow-hidden">
-        {/* Premium Glass Overlay */}
-        <div className="absolute inset-0 bg-[#2C1810]/70 backdrop-blur-md" />
-        
-        {/* Animated Glowing Orbs for ambiance */}
-        <motion.div 
-          animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.3, 0.15] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-[#E8622A] rounded-full blur-[100px] pointer-events-none" 
-        />
-        <motion.div 
-          animate={{ scale: [1, 1.3, 1], opacity: [0.15, 0.3, 0.15] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          className="absolute -bottom-40 -left-20 w-[500px] h-[500px] bg-[#D4880C] rounded-full blur-[100px] pointer-events-none" 
-        />
-        
-        {/* Subtle Texture */}
-        <div 
-          className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none"
-          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='2' fill='%23ffffff' fill-rule='evenodd'/%3E%3C/svg%3E")` }}
-        />
-
-        <div className="relative max-w-6xl mx-auto z-10">
-          <FadeSection>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-              {h.impactCounters.map((item, i) => (
-                <Counter
-                  key={i}
-                  target={item.value}
-                  suffix={item.suffix}
-                  label={item.label}
-                  labelHindi={item.labelHindi}
-                  lang={lang}
-                />
-              ))}
-            </div>
-          </FadeSection>
-
-          <FadeSection delay={200}>
-            <div className="mt-16 text-center">
-              <div className="inline-block relative px-4 sm:px-0">
-                <span className="absolute -top-6 -left-2 md:-left-8 text-6xl text-[#E8622A]/40 font-serif leading-none">"</span>
-                <p className="text-lg md:text-2xl italic font-serif text-white/95 leading-relaxed max-w-3xl mx-auto drop-shadow-lg text-justify">
-                  {lang === "en" ? h.impactQuote : h.impactQuoteHindi}
-                </p>
-                <span className="absolute -bottom-10 -right-2 md:-right-8 text-6xl text-[#E8622A]/40 font-serif leading-none rotate-180">"</span>
-              </div>
-            </div>
-          </FadeSection>
         </div>
       </section>
     </div>

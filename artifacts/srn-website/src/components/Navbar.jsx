@@ -21,7 +21,6 @@ const menuCategories = [
     titleHi: "संगठन",
     isOrgCategory: true,
     dropdownLinks: [
-      { path: "/sangathan", hindiName: "संगठन", englishName: "Sangathan" },
       { path: "/organisation/sansrakshak", hindiName: "संरक्षक", englishName: "Sanrakshak" },
       { path: "/organisation/national-president", hindiName: "राष्ट्रीय अध्यक्ष", englishName: "National President" },
       { path: "/organisation/advisory-board", hindiName: "सलाहकार मंडल", englishName: "Salahkar Mandal/Advisory board", isLocked: true },

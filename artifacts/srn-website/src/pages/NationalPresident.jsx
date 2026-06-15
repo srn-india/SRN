@@ -611,9 +611,9 @@ export default function NationalPresident() {
           {/* Refined Photographic Gallery: Aligned Row & Column Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             {[
+              "/Dr. Manoj Kumar Shukla with swami yatindranand ji maharaj.jpeg",
               "/WhatsApp Image 2026-06-03 at 19.54.52 (2).jpeg",
               "/dr. manoj kumar shukla performing hindu rituals .jpeg",
-              "/Dr. Manoj Kumar Shukla with swami yatindranand ji maharaj.jpeg",
               "/WhatsApp Image 2026-06-03 at 19.54.53 (1).jpeg",
               "/WhatsApp Image 2026-06-03 at 19.54.52.jpeg",
               "/Dr.-Manoj-Kumar-Shukla-at-kedarrnath.jpeg",

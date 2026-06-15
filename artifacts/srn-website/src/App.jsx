@@ -32,6 +32,7 @@ import Sansrakshak from "./pages/Sanrakshak";
 import AboutTeam from "./pages/AboutTeam";
 import Complaints from "./pages/Complaints";
 import RequestPosting from "./pages/RequestPosting";
+import JanSamwad from "./pages/JanSamwad";
 
 function Layout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -105,7 +106,7 @@ export default function App() {
               <Route path="/contact" element={<Layout><Contact /></Layout>} />
               <Route path="/complaints" element={<Layout><Complaints /></Layout>} />
               <Route path="/request-posting" element={<Layout><RequestPosting /></Layout>} />
-              <Route path="/jan-samwad" element={<Layout><Placeholder title="Jan Samwad (जन संवाद)" /></Layout>} />
+              <Route path="/jan-samwad" element={<Layout><JanSamwad /></Layout>} />
 
               {/* Auth pages — no Navbar, no Footer */}
               <Route path="/login" element={<NoNavLayout><Login /></NoNavLayout>} />
