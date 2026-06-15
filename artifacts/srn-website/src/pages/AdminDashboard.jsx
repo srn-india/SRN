@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowLeft, LogOut, UserCircle, Calendar, MessageSquare, 
   ShieldCheck, CheckCircle2, XCircle, Plus, Trash2, ShieldAlert,
-  Settings, Sliders, Bell, LayoutDashboard, Key, TrendingUp, Download, MapPin
+  Settings, Sliders, Bell, LayoutDashboard, Key, TrendingUp, Download, MapPin,
+  BookOpen, AlertCircle, Briefcase, FileText
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -98,16 +99,55 @@ export default function AdminDashboard() {
     { id: 103, name: "Amit Kumar", email: "amit.k@example.com", date: "2026-05-29" },
   ]);
 
+  const [articles, setArticles] = useState([
+    { id: 1, title: "Importance of Clean Energy in Rural Villages", author: "Karan Johar", date: "2026-06-14", category: "Articles", status: "Pending" },
+    { id: 2, title: "Primary Education Needs in Tribal Belts", author: "Dr. Savita Sen", date: "2026-06-13", category: "Articles", status: "Approved" },
+    { id: 3, title: "Revisiting Rainwater Harvesting Systems", author: "Rajesh Mishra", date: "2026-06-10", category: "Current Affairs", status: "Pending" },
+  ]);
+
+  const [adminComplaints, setAdminComplaints] = useState([
+    { id: 1, ticket: "SRN-GRI-982041", subject: "Stagnant Water and Sanitation Leakage", applicant: "Sanjeev Gupta", date: "2026-06-15", category: "Infrastructure", status: "Pending" },
+    { id: 2, ticket: "SRN-GRI-392014", subject: "Lack of Primary School Textbooks", applicant: "Meena Devi", date: "2026-06-12", category: "Education", status: "Solved" },
+    { id: 3, ticket: "SRN-GRI-405928", subject: "Illegal Sand Mining near Riverbank", applicant: "Ramesh Negi", date: "2026-06-08", category: "Environment", status: "Pending" },
+  ]);
+
+  const [applications, setApplications] = useState([
+    { id: 1, name: "Vikas Patel", phone: "9876543211", postApplied: "District Coordinator (Dehradun)", date: "2026-06-14", status: "Under Review" },
+    { id: 2, name: "Neha Gupta", phone: "7654321098", postApplied: "Social Work Supervisor (Haridwar)", date: "2026-06-13", status: "Interview Scheduled" },
+    { id: 3, name: "Alok Dwivedi", phone: "8765432109", postApplied: "State Youth Convener", date: "2026-06-10", status: "Pending" },
+  ]);
+
   // --- HANDLERS ---
   const handleDeleteEvent = (id) => setEvents(events.filter(e => e.id !== id));
   const handleDeleteForum = (id) => setForums(forums.filter(f => f.id !== id));
   const handleApproveUser = (id) => setPendingUsers(pendingUsers.filter(u => u.id !== id));
   const handleDeclineUser = (id) => setPendingUsers(pendingUsers.filter(u => u.id !== id));
 
+  const handleApproveArticle = (id) => {
+    setArticles(articles.map(art => art.id === id ? { ...art, status: "Approved" } : art));
+  };
+  const handleDeleteArticle = (id) => setArticles(articles.filter(art => art.id !== id));
+
+  const handleSolveComplaint = (id) => {
+    setAdminComplaints(adminComplaints.map(comp => comp.id === id ? { ...comp, status: "Solved" } : comp));
+  };
+  const handleDeleteComplaint = (id) => setAdminComplaints(adminComplaints.filter(comp => comp.id !== id));
+
+  const handleScheduleInterview = (id) => {
+    setApplications(applications.map(app => app.id === id ? { ...app, status: "Interview Scheduled" } : app));
+  };
+  const handleRejectApplication = (id) => {
+    setApplications(applications.map(app => app.id === id ? { ...app, status: "Rejected" } : app));
+  };
+  const handleDeleteApplication = (id) => setApplications(applications.filter(app => app.id !== id));
+
   const TABS = [
     { id: "profile", label: "Admin Profile", icon: UserCircle },
     { id: "events", label: "Manage Events", icon: Calendar },
     { id: "forums", label: "Manage Forums", icon: MessageSquare },
+    { id: "articles", label: "Manage Articles", icon: BookOpen },
+    { id: "complaints", label: "Manage Complaints", icon: AlertCircle },
+    { id: "applications", label: "Post Applications", icon: Briefcase },
     { id: "approvals", label: "Approve IDs", icon: ShieldCheck },
     { id: "settings", label: "Platform Settings", icon: Settings },
   ];
@@ -348,6 +388,197 @@ export default function AdminDashboard() {
                     ))}
                     {forums.length === 0 && (
                       <div className="text-center py-10 text-[#7A5C45]">No active forums.</div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* MANAGE ARTICLES TAB */}
+              {activeTab === "articles" && (
+                <motion.div key="articles" variants={fadeVariants} initial="hidden" animate="visible" exit="exit" className="bg-white/70 backdrop-blur-xl p-8 rounded-[2rem] border border-white/80 shadow-sm">
+                  <div className="mb-8 pb-4 border-b border-gray-100">
+                    <h2 className="text-2xl font-bold text-[#2C1810] font-serif flex items-center gap-2">
+                      Manage Submitted Articles
+                      <span className="bg-[#E8622A] text-white text-sm px-2 py-0.5 rounded-full">{articles.length}</span>
+                    </h2>
+                    <p className="text-sm text-[#7A5C45] mt-1">Review articles submitted via the "Janmant: Aap Ki Aawaz" portal.</p>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {articles.map((art) => (
+                      <div key={art.id} className="flex flex-col md:flex-row justify-between md:items-center gap-4 bg-gradient-to-r from-white/60 to-white/30 border border-white p-5 rounded-2xl shadow-sm hover:shadow-md transition-all group relative overflow-hidden text-left">
+                        <div className="flex items-start gap-4 relative z-10">
+                          <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-[#E8622A] shrink-0 mt-1">
+                            <BookOpen className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-[#2C1810] text-base group-hover:text-[#E8622A] transition-colors">{art.title}</h4>
+                            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#7A5C45] mt-1">
+                              <span className="font-semibold text-xs text-[#1E0F05]">Author: {art.author}</span>
+                              <span>Category: {art.category}</span>
+                              <span>Date: {art.date}</span>
+                            </div>
+                            <div className="mt-2.5">
+                              <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                                art.status === "Approved" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+                              }`}>
+                                {art.status}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2.5 relative z-10 shrink-0">
+                          {art.status === "Pending" && (
+                            <button 
+                              onClick={() => handleApproveArticle(art.id)}
+                              className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl text-xs font-bold border border-emerald-400 hover:scale-105 transition-all shadow"
+                            >
+                              Approve
+                            </button>
+                          )}
+                          <button 
+                            onClick={() => handleDeleteArticle(art.id)}
+                            className="px-4 py-2 bg-white text-red-500 rounded-xl text-xs font-bold border border-red-100 hover:bg-red-50 transition-all shadow-sm flex items-center gap-1"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" /> Delete
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {articles.length === 0 && (
+                      <div className="text-center py-10 text-[#7A5C45]">No articles submitted.</div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* MANAGE COMPLAINTS TAB */}
+              {activeTab === "complaints" && (
+                <motion.div key="complaints" variants={fadeVariants} initial="hidden" animate="visible" exit="exit" className="bg-white/70 backdrop-blur-xl p-8 rounded-[2rem] border border-white/80 shadow-sm">
+                  <div className="mb-8 pb-4 border-b border-gray-100">
+                    <h2 className="text-2xl font-bold text-[#2C1810] font-serif flex items-center gap-2">
+                      Manage Complaints
+                      <span className="bg-[#E8622A] text-white text-sm px-2 py-0.5 rounded-full">{adminComplaints.length}</span>
+                    </h2>
+                    <p className="text-sm text-[#7A5C45] mt-1">Review public complaints registered via the "Jan Shikayat" portal.</p>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {adminComplaints.map((comp) => (
+                      <div key={comp.id} className="flex flex-col md:flex-row justify-between md:items-center gap-4 bg-gradient-to-r from-white/60 to-white/30 border border-white p-5 rounded-2xl shadow-sm hover:shadow-md transition-all group relative overflow-hidden text-left">
+                        <div className="flex items-start gap-4 relative z-10">
+                          <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center text-red-600 shrink-0 mt-1">
+                            <AlertCircle className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-mono font-bold bg-[#E8622A]/10 text-[#E8622A] px-2 py-0.5 rounded-md border border-[#E8622A]/20">
+                                {comp.ticket}
+                              </span>
+                              <span className="text-xs text-[#7A5C45] font-semibold">{comp.date}</span>
+                            </div>
+                            <h4 className="font-bold text-[#2C1810] text-base mt-2">{comp.subject}</h4>
+                            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#7A5C45] mt-1">
+                              <span className="font-semibold text-xs text-[#1E0F05]">Applicant: {comp.applicant}</span>
+                              <span>Category: {comp.category}</span>
+                            </div>
+                            <div className="mt-2.5">
+                              <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                                comp.status === "Solved" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+                              }`}>
+                                {comp.status}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2.5 relative z-10 shrink-0">
+                          {comp.status === "Pending" && (
+                            <button 
+                              onClick={() => handleSolveComplaint(comp.id)}
+                              className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl text-xs font-bold border border-emerald-400 hover:scale-105 transition-all shadow"
+                            >
+                              Mark Solved
+                            </button>
+                          )}
+                          <button 
+                            onClick={() => handleDeleteComplaint(comp.id)}
+                            className="px-4 py-2 bg-white text-red-500 rounded-xl text-xs font-bold border border-red-100 hover:bg-red-50 transition-all shadow-sm flex items-center gap-1"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" /> Delete
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {adminComplaints.length === 0 && (
+                      <div className="text-center py-10 text-[#7A5C45]">No complaints registered.</div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* POST APPLICATIONS TAB */}
+              {activeTab === "applications" && (
+                <motion.div key="applications" variants={fadeVariants} initial="hidden" animate="visible" exit="exit" className="bg-white/70 backdrop-blur-xl p-8 rounded-[2rem] border border-white/80 shadow-sm">
+                  <div className="mb-8 pb-4 border-b border-gray-100">
+                    <h2 className="text-2xl font-bold text-[#2C1810] font-serif flex items-center gap-2">
+                      Manage Post Applications
+                      <span className="bg-[#E8622A] text-white text-sm px-2 py-0.5 rounded-full">{applications.length}</span>
+                    </h2>
+                    <p className="text-sm text-[#7A5C45] mt-1">Review applicant submissions for organizational roles.</p>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {applications.map((app) => (
+                      <div key={app.id} className="flex flex-col md:flex-row justify-between md:items-center gap-4 bg-gradient-to-r from-white/60 to-white/30 border border-white p-5 rounded-2xl shadow-sm hover:shadow-md transition-all group relative overflow-hidden text-left">
+                        <div className="flex items-start gap-4 relative z-10">
+                          <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 shrink-0 mt-1">
+                            <Briefcase className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-[#2C1810] text-base">{app.name}</h4>
+                            <p className="text-xs text-[#E8622A] font-bold mt-0.5">{app.postApplied}</p>
+                            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#7A5C45] mt-1.5">
+                              <span>Mobile: {app.phone}</span>
+                              <span>Applied: {app.date}</span>
+                            </div>
+                            <div className="mt-2.5">
+                              <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                                app.status === "Interview Scheduled" ? "bg-emerald-100 text-emerald-700" :
+                                app.status === "Rejected" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"
+                              }`}>
+                                {app.status}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2.5 relative z-10 shrink-0">
+                          {app.status === "Pending" && (
+                            <button 
+                              onClick={() => handleScheduleInterview(app.id)}
+                              className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl text-xs font-bold border border-blue-400 hover:scale-105 transition-all shadow"
+                            >
+                              Schedule Interview
+                            </button>
+                          )}
+                          {app.status !== "Rejected" && (
+                            <button 
+                              onClick={() => handleRejectApplication(app.id)}
+                              className="px-4 py-2 bg-white text-[#7A5C45] rounded-xl text-xs font-bold border border-gray-200 hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-all shadow-sm"
+                            >
+                              Reject
+                            </button>
+                          )}
+                          <button 
+                            onClick={() => handleDeleteApplication(app.id)}
+                            className="px-4 py-2 bg-white text-red-500 rounded-xl text-xs font-bold border border-red-100 hover:bg-red-50 transition-all shadow-sm"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {applications.length === 0 && (
+                      <div className="text-center py-10 text-[#7A5C45]">No applications found.</div>
                     )}
                   </div>
                 </motion.div>
