@@ -29,11 +29,7 @@ const menuCategories = [
       { path: "/organisation/department", hindiName: "विभाग/प्रभारी", englishName: "Department/Prabhari", isLocked: true },
       { path: "/organisation/state-bearers", hindiName: "राज्य पदाधिकारी", englishName: "State bearers", isLocked: true },
     ],
-    standaloneLinks: [
-      { path: "/complaints", hindiName: "जन याचिका दर्ज करें", englishName: "Jan Yachika/Complaints" },
-      { path: "/jan-samwad", hindiName: "जन संवाद", englishName: "Jan Samwad" },
-      { path: "/request-posting", hindiName: "पद के लिए आवेदन करें", englishName: "Request for Posting" },
-    ]
+    standaloneLinks: []
   },
   {
     titleEn: "Media & Resources",
@@ -42,6 +38,11 @@ const menuCategories = [
       { path: "/media", hindiName: "मीडिया और गैलरी", englishName: "Media & Gallery" },
       { path: "/events", hindiName: "कार्यक्रम", englishName: "Events" },
       { path: "/forums", hindiName: "मंच", englishName: "Forums" },
+      { path: "/jan-samwad", hindiName: "जन संवाद", englishName: "Jan Samwad" },
+      { path: "/complaints", hindiName: "जन शिकायत दर्ज करें", englishName: "Jan Shikayat Darj Kare" },
+      { path: "/janmant-aap-ki-aawaz", hindiName: "जनमत आपकी आवाज़", englishName: "Janmant Aap Ki Aawaz" },
+      { path: "/jan-yachikaye", hindiName: "जन याचिकाएं (निस्तारित)", englishName: "Jan Yachikaye (Solved)" },
+      { path: "/request-posting", hindiName: "पद के लिए आवेदन करें", englishName: "Apply for Posting" },
     ],
   },
   {

@@ -1,51 +1,37 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "../context/LanguageContext";
-import { FileText, Send, CheckCircle, Upload, AlertCircle, Phone, Mail, MapPin } from "lucide-react";
+import { BookOpen, Send, CheckCircle, Upload, AlertCircle, FileText, User, Mail, Tag } from "lucide-react";
 
-export default function Complaints() {
+export default function JanmantAapKiAawaz() {
   const { lang } = useLanguage();
   const en = lang === "en";
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    document.title = en ? "Register Complaint – SRN" : "जन याचिका दर्ज करें – SRN";
+    document.title = en ? "Janmant Aap Ki Aawaz – SRN" : "जनमत आपकी आवाज़ – SRN";
   }, [en]);
 
   // Form State
   const [formData, setFormData] = useState({
-    fullName: "",
+    authorName: "",
     email: "",
     phone: "",
-    state: "",
-    category: "",
-    subject: "",
-    description: "",
-    file: null,
+    articleCategory: "",
+    title: "",
+    summary: "",
+    content: "",
+    coverImage: null,
   });
 
   const [errors, setErrors] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [ticketNumber, setTicketNumber] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // States of India for selection
-  const indianStates = [
-    "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat",
-    "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh",
-    "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab",
-    "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh",
-    "Uttarakhand", "West Bengal", "Delhi", "Jammu & Kashmir", "Ladakh"
-  ];
-
   const categories = [
-    { value: "educational", en: "Educational Grievances", hi: "शैक्षिक शिकायतें" },
-    { value: "social", en: "Social Welfare & Rights", hi: "सामाजिक कल्याण एवं अधिकार" },
-    { value: "corruption", en: "Eradication of Social Evils", hi: "सामाजिक बुराइयों का उन्मूलन" },
-    { value: "women", en: "Women Oppression & Safety", hi: "महिला उत्पीड़न एवं सुरक्षा" },
-    { value: "infradev", en: "Rural/Urban Infrastructure", hi: "ग्रामीण/शहरी बुनियादी ढांचा" },
-    { value: "agriculture", en: "Farmers & Agriculture Issue", hi: "किसान एवं कृषि मुद्दे" },
-    { value: "other", en: "Other Institutional Matters", hi: "अन्य संस्थागत मामले" }
+    { value: "articles", en: "Articles & Opinions", hi: "लेख एवं विचार" },
+    { value: "social", en: "Social Work Reports", hi: "सामाजिक कार्य विवरण" },
+    { value: "issues", en: "Current Affairs & Policies", hi: "सामयिक मुद्दे एवं नीतियां" }
   ];
 
   const handleInputChange = (e) => {
@@ -62,19 +48,19 @@ export default function Complaints() {
       if (file.size > 5 * 1024 * 1024) {
         setErrors((prev) => ({
           ...prev,
-          file: en ? "File size must be less than 5MB" : "फ़ाइल का आकार 5MB से कम होना चाहिए"
+          coverImage: en ? "Image size must be less than 5MB" : "छवि का आकार 5MB से कम होना चाहिए"
         }));
         return;
       }
-      setFormData((prev) => ({ ...prev, file }));
-      setErrors((prev) => ({ ...prev, file: "" }));
+      setFormData((prev) => ({ ...prev, coverImage: file }));
+      setErrors((prev) => ({ ...prev, coverImage: "" }));
     }
   };
 
   const validateForm = () => {
     const tempErrors = {};
-    if (!formData.fullName.trim()) {
-      tempErrors.fullName = en ? "Full name is required" : "पूर्ण नाम आवश्यक है";
+    if (!formData.authorName.trim()) {
+      tempErrors.authorName = en ? "Author name is required" : "लेखक का नाम आवश्यक है";
     }
     if (!formData.email.trim()) {
       tempErrors.email = en ? "Email address is required" : "ईमेल पता आवश्यक है";
@@ -86,17 +72,17 @@ export default function Complaints() {
     } else if (!/^\d{10}$/.test(formData.phone.replace(/[^0-9]/g, ""))) {
       tempErrors.phone = en ? "Please enter a valid 10-digit mobile number" : "कृपया 10 अंकों का मान्य मोबाइल नंबर दर्ज करें";
     }
-    if (!formData.state) {
-      tempErrors.state = en ? "Please select your State" : "कृपया अपना राज्य चुनें";
+    if (!formData.articleCategory) {
+      tempErrors.articleCategory = en ? "Please select a category" : "कृपया एक श्रेणी चुनें";
     }
-    if (!formData.category) {
-      tempErrors.category = en ? "Please select a category" : "कृपया श्रेणी का चयन करें";
+    if (!formData.title.trim()) {
+      tempErrors.title = en ? "Article title is required" : "लेख का शीर्षक आवश्यक है";
     }
-    if (!formData.subject.trim()) {
-      tempErrors.subject = en ? "Subject is required" : "विषय आवश्यक है";
+    if (!formData.summary.trim()) {
+      tempErrors.summary = en ? "Summary is required" : "लेख का सारांश आवश्यक है";
     }
-    if (!formData.description.trim()) {
-      tempErrors.description = en ? "Description is required" : "विवरण आवश्यक है";
+    if (!formData.content.trim()) {
+      tempErrors.content = en ? "Article content is required" : "लेख की सामग्री आवश्यक है";
     }
 
     setErrors(tempErrors);
@@ -109,11 +95,8 @@ export default function Complaints() {
 
     setIsSubmitting(true);
 
-    // Mock API Submission delay
+    // Mock submission delay
     setTimeout(() => {
-      // Generate unique ticket number
-      const randomTicket = "SRN-GRI-" + Math.floor(100000 + Math.random() * 900000);
-      setTicketNumber(randomTicket);
       setIsSubmitting(false);
       setIsSubmitted(true);
     }, 1500);
@@ -130,61 +113,119 @@ export default function Complaints() {
             animate={{ opacity: 1, scale: 1 }}
             className="inline-block bg-[#E8622A]/15 border border-[#E8622A]/30 text-[#F47A3A] text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4"
           >
-            {en ? "Public Grievance Portal" : "जन शिकायत निवारण पोर्टल"}
+            {en ? "Public Journalism Portal" : "सार्वजनिक पत्रकारिता पोर्टल"}
           </motion.span>
           <h1 className="text-3xl md:text-5xl font-bold text-[#1E0F05] font-serif leading-tight">
-            {en ? "Register Your Complaint (Jan Shikayat)" : "जन शिकायत दर्ज करें"}
+            {en ? "Janmant: Aap Ki Aawaz" : "जनमत: आपकी आवाज़"}
           </h1>
           <div className="mx-auto mt-4 h-1 w-20 rounded-full bg-gradient-to-r from-[#E8622A] to-[#D4880C]" />
-          <p className="text-[#7A5C45] text-sm md:text-base mt-4 max-w-xl mx-auto">
+          <p className="text-[#7A5C45] text-sm md:text-base mt-4 max-w-xl mx-auto leading-relaxed">
             {en 
-              ? "Submit your grievances, social problems or community concerns directly to the Sashakt Rashtra Nirman Trust administration."
-              : "अपनी समस्याओं, सामाजिक चिंताओं या सामुदायिक मुद्दों को सीधे सशक्त राष्ट्र निर्माण न्यास के प्रशासन के समक्ष प्रस्तुत करें।"}
+              ? "Share your articles, essays, reports, or opinions on national issues. Once reviewed by our editorial team, your submission will be featured on the Jan Samwad portal."
+              : "राष्ट्रीय मुद्दों पर अपने लेख, निबंध, रिपोर्ट या विचार साझा करें। हमारी संपादकीय टीम द्वारा समीक्षा किए जाने के बाद, आपका लेख जन संवाद पोर्टल पर प्रदर्शित किया जाएगा।"}
           </p>
         </div>
 
         <AnimatePresence mode="wait">
           {!isSubmitted ? (
             <motion.div
-              key="complaint-form"
+              key="article-form"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               className="bg-white rounded-2xl shadow-xl border border-[#F0D5B8] p-6 md:p-10 relative overflow-hidden"
             >
-              {/* Stripe */}
+              {/* Top accent line */}
               <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#E8622A] to-[#D4880C]" />
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 
                 {/* Section Title */}
                 <h3 className="text-lg font-bold font-serif text-[#1E0F05] border-b border-[#FDF5EC] pb-3 mb-2 flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-[#E8622A]" />
-                  {en ? "Complaint Application Details" : "शिकायत आवेदन विवरण"}
+                  <BookOpen className="w-5 h-5 text-[#E8622A]" />
+                  {en ? "Article Submission Form" : "लेख प्रविष्टि फ़ॉर्म"}
                 </h3>
 
+                {/* Author Info */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   
-                  {/* Full Name */}
+                  {/* Author Name */}
                   <div>
                     <label className="block text-sm font-semibold text-[#1E0F05] mb-2">
-                      {en ? "Applicant Full Name *" : "आवेदक का पूरा नाम *"}
+                      {en ? "Author Full Name *" : "लेखक का पूरा नाम *"}
                     </label>
                     <input
                       type="text"
-                      name="fullName"
-                      value={formData.fullName}
+                      name="authorName"
+                      value={formData.authorName}
                       onChange={handleInputChange}
-                      placeholder={en ? "Enter full name" : "अपना पूरा नाम लिखें"}
+                      placeholder={en ? "Enter author name" : "लेखक का नाम लिखें"}
                       className={`w-full px-4 py-3 bg-[#FDF5EC]/30 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
-                        errors.fullName 
+                        errors.authorName 
                           ? "border-red-500 focus:ring-red-200 focus:border-red-500" 
                           : "border-[#F0D5B8] focus:ring-[#E8622A]/20 focus:border-[#E8622A]"
                       }`}
                     />
-                    {errors.fullName && (
+                    {errors.authorName && (
                       <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" /> {errors.fullName}
+                        <AlertCircle className="w-3 h-3" /> {errors.authorName}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Category Selection */}
+                  <div>
+                    <label className="block text-sm font-semibold text-[#1E0F05] mb-2">
+                      {en ? "Article Category *" : "लेख की श्रेणी *"}
+                    </label>
+                    <select
+                      name="articleCategory"
+                      value={formData.articleCategory}
+                      onChange={handleInputChange}
+                      className={`w-full px-4 py-3 bg-[#FDF5EC]/30 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                        errors.articleCategory 
+                          ? "border-red-500 focus:ring-red-200 focus:border-red-500" 
+                          : "border-[#F0D5B8] focus:ring-[#E8622A]/20 focus:border-[#E8622A]"
+                      }`}
+                    >
+                      <option value="">{en ? "-- Select Category --" : "-- श्रेणी चुनें --"}</option>
+                      {categories.map((c) => (
+                        <option key={c.value} value={c.value}>
+                          {en ? c.en : c.hi}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.articleCategory && (
+                      <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3" /> {errors.articleCategory}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Contact Info */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  
+                  {/* Email */}
+                  <div>
+                    <label className="block text-sm font-semibold text-[#1E0F05] mb-2">
+                      {en ? "Email Address *" : "ईमेल पता *"}
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      placeholder="author@domain.com"
+                      className={`w-full px-4 py-3 bg-[#FDF5EC]/30 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                        errors.email 
+                          ? "border-red-500 focus:ring-red-200 focus:border-red-500" 
+                          : "border-[#F0D5B8] focus:ring-[#E8622A]/20 focus:border-[#E8622A]"
+                      }`}
+                    />
+                    {errors.email && (
+                      <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3" /> {errors.email}
                       </p>
                     )}
                   </div>
@@ -199,7 +240,7 @@ export default function Complaints() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      placeholder={en ? "10-digit mobile number" : "10 अंकों का मोबाइल नंबर"}
+                      placeholder="10-digit mobile number"
                       className={`w-full px-4 py-3 bg-[#FDF5EC]/30 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
                         errors.phone 
                           ? "border-red-500 focus:ring-red-200 focus:border-red-500" 
@@ -212,144 +253,88 @@ export default function Complaints() {
                       </p>
                     )}
                   </div>
-
-                  {/* Email */}
-                  <div>
-                    <label className="block text-sm font-semibold text-[#1E0F05] mb-2">
-                      {en ? "Email Address *" : "ईमेल पता *"}
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      placeholder="example@domain.com"
-                      className={`w-full px-4 py-3 bg-[#FDF5EC]/30 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
-                        errors.email 
-                          ? "border-red-500 focus:ring-red-200 focus:border-red-500" 
-                          : "border-[#F0D5B8] focus:ring-[#E8622A]/20 focus:border-[#E8622A]"
-                      }`}
-                    />
-                    {errors.email && (
-                      <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" /> {errors.email}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* State */}
-                  <div>
-                    <label className="block text-sm font-semibold text-[#1E0F05] mb-2">
-                      {en ? "State *" : "राज्य *"}
-                    </label>
-                    <select
-                      name="state"
-                      value={formData.state}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 bg-[#FDF5EC]/30 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
-                        errors.state 
-                          ? "border-red-500 focus:ring-red-200 focus:border-red-500" 
-                          : "border-[#F0D5B8] focus:ring-[#E8622A]/20 focus:border-[#E8622A]"
-                      }`}
-                    >
-                      <option value="">{en ? "-- Select State --" : "-- राज्य चुनें --"}</option>
-                      {indianStates.map((st) => (
-                        <option key={st} value={st}>{st}</option>
-                      ))}
-                    </select>
-                    {errors.state && (
-                      <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" /> {errors.state}
-                      </p>
-                    )}
-                  </div>
                 </div>
 
-                {/* Category & Subject */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Article Header */}
+                <div className="space-y-6 pt-2 border-t border-[#FDF5EC]">
                   
-                  {/* Category */}
+                  {/* Article Title */}
                   <div>
                     <label className="block text-sm font-semibold text-[#1E0F05] mb-2">
-                      {en ? "Grievance Category *" : "शिकायत की श्रेणी *"}
-                    </label>
-                    <select
-                      name="category"
-                      value={formData.category}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 bg-[#FDF5EC]/30 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
-                        errors.category 
-                          ? "border-red-500 focus:ring-red-200 focus:border-red-500" 
-                          : "border-[#F0D5B8] focus:ring-[#E8622A]/20 focus:border-[#E8622A]"
-                      }`}
-                    >
-                      <option value="">{en ? "-- Select Category --" : "-- श्रेणी चुनें --"}</option>
-                      {categories.map((c) => (
-                        <option key={c.value} value={c.value}>
-                          {en ? c.en : c.hi}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.category && (
-                      <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" /> {errors.category}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Subject */}
-                  <div>
-                    <label className="block text-sm font-semibold text-[#1E0F05] mb-2">
-                      {en ? "Subject/Topic *" : "विषय / मुद्दा *"}
+                      {en ? "Article Title *" : "लेख का शीर्षक *"}
                     </label>
                     <input
                       type="text"
-                      name="subject"
-                      value={formData.subject}
+                      name="title"
+                      value={formData.title}
                       onChange={handleInputChange}
-                      placeholder={en ? "Brief summary of issue" : "मुद्दे का संक्षिप्त विवरण"}
+                      placeholder={en ? "Enter title of the article" : "लेख का शीर्षक दर्ज करें"}
                       className={`w-full px-4 py-3 bg-[#FDF5EC]/30 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
-                        errors.subject 
+                        errors.title 
                           ? "border-red-500 focus:ring-red-200 focus:border-red-500" 
                           : "border-[#F0D5B8] focus:ring-[#E8622A]/20 focus:border-[#E8622A]"
                       }`}
                     />
-                    {errors.subject && (
+                    {errors.title && (
                       <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" /> {errors.subject}
+                        <AlertCircle className="w-3 h-3" /> {errors.title}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Summary/Excerpt */}
+                  <div>
+                    <label className="block text-sm font-semibold text-[#1E0F05] mb-2">
+                      {en ? "Brief Summary/Excerpt *" : "संक्षिप्त सारांश/भूमिका *"}
+                    </label>
+                    <input
+                      type="text"
+                      name="summary"
+                      value={formData.summary}
+                      onChange={handleInputChange}
+                      placeholder={en ? "A short outline of the article (1-2 sentences)" : "लेख की संक्षिप्त रूपरेखा (१-२ वाक्य)"}
+                      className={`w-full px-4 py-3 bg-[#FDF5EC]/30 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                        errors.summary 
+                          ? "border-red-500 focus:ring-red-200 focus:border-red-500" 
+                          : "border-[#F0D5B8] focus:ring-[#E8622A]/20 focus:border-[#E8622A]"
+                      }`}
+                    />
+                    {errors.summary && (
+                      <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3" /> {errors.summary}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Main Content */}
+                  <div>
+                    <label className="block text-sm font-semibold text-[#1E0F05] mb-2">
+                      {en ? "Full Article Content *" : "लेख की पूरी सामग्री *"}
+                    </label>
+                    <textarea
+                      name="content"
+                      rows="8"
+                      value={formData.content}
+                      onChange={handleInputChange}
+                      placeholder={en ? "Write or paste your article content here..." : "अपने लेख की सामग्री यहाँ लिखें या पेस्ट करें..."}
+                      className={`w-full px-4 py-3 bg-[#FDF5EC]/30 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                        errors.content 
+                          ? "border-red-500 focus:ring-red-200 focus:border-red-500" 
+                          : "border-[#F0D5B8] focus:ring-[#E8622A]/20 focus:border-[#E8622A]"
+                      }`}
+                    />
+                    {errors.content && (
+                      <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3" /> {errors.content}
                       </p>
                     )}
                   </div>
                 </div>
 
-                {/* Description */}
+                {/* Cover Image */}
                 <div>
                   <label className="block text-sm font-semibold text-[#1E0F05] mb-2">
-                    {en ? "Detailed Complaint Description *" : "शिकायत का विस्तृत विवरण *"}
-                  </label>
-                  <textarea
-                    name="description"
-                    rows="5"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    placeholder={en ? "Describe the issue and desired solution in detail..." : "मुद्दे और वांछित समाधान का विस्तार से वर्णन करें..."}
-                    className={`w-full px-4 py-3 bg-[#FDF5EC]/30 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
-                      errors.description 
-                        ? "border-red-500 focus:ring-red-200 focus:border-red-500" 
-                        : "border-[#F0D5B8] focus:ring-[#E8622A]/20 focus:border-[#E8622A]"
-                    }`}
-                  />
-                  {errors.description && (
-                    <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3" /> {errors.description}
-                    </p>
-                  )}
-                </div>
-
-                {/* File Attachment */}
-                <div>
-                  <label className="block text-sm font-semibold text-[#1E0F05] mb-2">
-                    {en ? "Attach Supporting Documents (Optional)" : "सहायक दस्तावेज संलग्न करें (वैकल्पिक)"}
+                    {en ? "Attach Cover/Feature Image (Optional)" : "कवर या फीचर छवि संलग्न करें (वैकल्पिक)"}
                   </label>
                   <div className="flex items-center justify-center w-full">
                     <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-[#F0D5B8] rounded-xl cursor-pointer bg-[#FDF5EC]/20 hover:bg-[#FDF5EC]/50 transition-colors">
@@ -360,20 +345,20 @@ export default function Complaints() {
                           {en ? " or drag and drop" : " या ड्रैग एंड ड्रॉप करें"}
                         </p>
                         <p className="text-[10px] text-gray-400 mt-1">
-                          PDF, JPG, PNG {en ? "(Max 5MB)" : "(अधिकतम 5MB)"}
+                          JPG, PNG {en ? "(Max 5MB)" : "(अधिकतम 5MB)"}
                         </p>
                       </div>
-                      <input type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png" onChange={handleFileChange} />
+                      <input type="file" className="hidden" accept=".jpg,.jpeg,.png" onChange={handleFileChange} />
                     </label>
                   </div>
-                  {formData.file && (
+                  {formData.coverImage && (
                     <p className="text-xs text-[#E8622A] mt-2 font-medium flex items-center gap-1">
-                      <FileText className="w-4 h-4" /> {formData.file.name} ({(formData.file.size / (1024 * 1024)).toFixed(2)} MB)
+                      <FileText className="w-4 h-4" /> {formData.coverImage.name} ({(formData.coverImage.size / (1024 * 1024)).toFixed(2)} MB)
                     </p>
                   )}
-                  {errors.file && (
+                  {errors.coverImage && (
                     <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3" /> {errors.file}
+                      <AlertCircle className="w-3 h-3" /> {errors.coverImage}
                     </p>
                   )}
                 </div>
@@ -388,12 +373,12 @@ export default function Complaints() {
                     {isSubmitting ? (
                       <>
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>{en ? "Submitting Request..." : "याचिका सबमिट की जा रही है..."}</span>
+                        <span>{en ? "Submitting Article..." : "लेख सबमिट किया जा रहा है..."}</span>
                       </>
                     ) : (
                       <>
                         <Send className="w-5 h-5" />
-                        <span>{en ? "Submit Complaint" : "याचिका दर्ज करें"}</span>
+                        <span>{en ? "Submit Article" : "लेख सबमिट करें"}</span>
                       </>
                     )}
                   </button>
@@ -402,7 +387,7 @@ export default function Complaints() {
             </motion.div>
           ) : (
             <motion.div
-              key="complaint-success"
+              key="article-success"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -413,34 +398,26 @@ export default function Complaints() {
                 <CheckCircle className="w-12 h-12 text-green-500" />
               </div>
               <h2 className="text-2xl md:text-3xl font-bold font-serif text-[#1E0F05] mb-2">
-                {en ? "Complaint Registered Successfully!" : "याचिका सफलतापूर्वक दर्ज की गई!"}
+                {en ? "Article Submitted Successfully!" : "लेख सफलतापूर्वक प्राप्त हुआ!"}
               </h2>
-              <p className="text-[#7A5C45] text-sm md:text-base max-w-md mx-auto mb-8">
+              <p className="text-[#7A5C45] text-sm md:text-base max-w-md mx-auto mb-8 leading-relaxed">
                 {en 
-                  ? "Thank you for bringing this concern to our attention. Our team will review the details and get back to you shortly." 
-                  : "हमारी संस्था के प्रति आपका विश्वास सराहनीय है। हमारी टीम जल्द ही याचिका की समीक्षा करेगी और आपसे संपर्क करेगी।"}
+                  ? "Thank you for sharing your thoughts. Our editorial committee will review your submission, and once approved, it will be published in the Jan Samwad section." 
+                  : "विचार साझा करने के लिए आपका धन्यवाद। हमारी संपादकीय समिति आपके लेख की समीक्षा करेगी, और स्वीकृति के बाद इसे जन संवाद अनुभाग में प्रकाशित किया जाएगा।"}
               </p>
-
-              {/* Ticket details */}
-              <div className="bg-[#FDF5EC] border border-[#F0D5B8] rounded-xl p-5 max-w-xs mx-auto mb-8">
-                <span className="block text-xs uppercase tracking-wider text-[#7A5C45] font-semibold mb-1">
-                  {en ? "Your Tracking Number" : "आपकी ट्रैकिंग संख्या"}
-                </span>
-                <span className="text-lg font-mono font-bold text-[#E8622A]">{ticketNumber}</span>
-              </div>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
                   onClick={() => setIsSubmitted(false)}
                   className="px-6 py-3 border border-[#E8622A] text-[#E8622A] hover:bg-[#E8622A]/10 font-semibold rounded-xl transition-all"
                 >
-                  {en ? "Submit Another Complaint" : "एक और याचिका दर्ज करें"}
+                  {en ? "Submit Another Article" : "एक और लेख सबमिट करें"}
                 </button>
                 <a
-                  href="/"
+                  href="/jan-samwad"
                   className="px-6 py-3 bg-[#E8622A] text-white hover:bg-[#D4880C] font-semibold rounded-xl shadow transition-all"
                 >
-                  {en ? "Go Back Home" : "मुख्य पृष्ठ पर जाएं"}
+                  {en ? "Go to Jan Samwad" : "जन संवाद पर जाएं"}
                 </a>
               </div>
             </motion.div>

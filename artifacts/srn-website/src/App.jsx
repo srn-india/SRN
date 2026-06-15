@@ -33,6 +33,8 @@ import AboutTeam from "./pages/AboutTeam";
 import Complaints from "./pages/Complaints";
 import RequestPosting from "./pages/RequestPosting";
 import JanSamwad from "./pages/JanSamwad";
+import JanmantAapKiAawaz from "./pages/JanmantAapKiAawaz";
+import JanYachikaye from "./pages/JanYachikaye";
 
 function Layout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -107,6 +109,8 @@ export default function App() {
               <Route path="/complaints" element={<Layout><Complaints /></Layout>} />
               <Route path="/request-posting" element={<Layout><RequestPosting /></Layout>} />
               <Route path="/jan-samwad" element={<Layout><JanSamwad /></Layout>} />
+              <Route path="/janmant-aap-ki-aawaz" element={<Layout><JanmantAapKiAawaz /></Layout>} />
+              <Route path="/jan-yachikaye" element={<Layout><JanYachikaye /></Layout>} />
 
               {/* Auth pages — no Navbar, no Footer */}
               <Route path="/login" element={<NoNavLayout><Login /></NoNavLayout>} />
