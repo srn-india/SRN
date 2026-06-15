@@ -177,14 +177,14 @@ export default function Signup() {
 
   return (
     <div 
-      className="min-h-screen relative flex flex-col justify-center items-center px-4 sm:px-6 md:px-16 pt-24 pb-12 overflow-y-auto overflow-x-hidden bg-cover bg-center"
+      className="min-h-screen relative flex flex-col lg:flex-row justify-center lg:justify-between items-center px-4 sm:px-6 md:px-16 lg:px-24 pt-24 pb-12 gap-8 lg:gap-16 overflow-y-auto overflow-x-hidden bg-cover bg-center"
       style={{ backgroundImage: "url('/hero-bg-2.png')" }}
     >
       {/* Dark gradient overlay for extreme contrast and premium feel */}
       <div className="fixed inset-0 bg-gradient-to-tr from-black/80 via-[#1E0A04]/70 to-[#E8622A]/20 pointer-events-none" />
 
       {/* Left floating branding (hidden on mobile/tablet) */}
-      <div className="flex-1 hidden lg:flex flex-col items-center justify-center text-center z-10 pointer-events-none pr-8">
+      <div className="flex-1 hidden lg:flex flex-col items-center justify-center text-center z-10 pointer-events-none">
         <motion.img 
           src="/logo.PNG" 
           alt="Sashakt Rashtra Nirman Logo" 

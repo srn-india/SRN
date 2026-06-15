@@ -120,11 +120,32 @@ export default function Complaints() {
   };
 
   return (
-    <div className="bg-[#FDF5EC] min-h-screen py-24 md:py-32 px-4 md:px-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="bg-[#FDF5EC] min-h-screen pb-20">
+      
+      {/* ── Hero Section with Monochromatic Pattern Background ───────── */}
+      <section className="relative bg-gradient-to-br from-[#FFF9F2] via-[#FDF5EC] to-[#FFF5EB] py-36 text-center px-6 overflow-hidden min-h-[44vh] flex items-center justify-center border-b border-[#F0D5B8]/40">
         
-        {/* Header Block */}
-        <div className="text-center mb-12">
+        {/* Monochromatic styled background pattern */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat mix-blend-multiply opacity-35"
+          style={{ backgroundImage: "url('/jan_samwad_monochrome_bg.png')" }}
+        />
+
+        <div
+          className="absolute inset-0 opacity-[0.06] mix-blend-overlay"
+          style={{ backgroundImage: `repeating-linear-gradient(-45deg, #E8622A, #E8622A 1px, transparent 1px, transparent 28px)` }}
+        />
+        
+        {/* Glow accents */}
+        <div className="absolute top-8 left-12 w-48 h-48 rounded-full bg-[#E8622A]/10 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-8 right-12 w-40 h-40 rounded-full bg-[#D4880C]/10 blur-3xl pointer-events-none" />
+
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="relative max-w-4xl mx-auto z-10"
+        >
           <motion.span
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -132,18 +153,35 @@ export default function Complaints() {
           >
             {en ? "Public Grievance Portal" : "जन शिकायत निवारण पोर्टल"}
           </motion.span>
-          <h1 className="text-3xl md:text-5xl font-bold text-[#1E0F05] font-serif leading-tight">
-            {en ? "Register Your Complaint (Jan Shikayat)" : "जन शिकायत दर्ज करें"}
+          <h1 className="text-4xl md:text-6xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
+            {en ? "Register Your Complaint" : "जन शिकायत दर्ज करें"}
           </h1>
-          <div className="mx-auto mt-4 h-1 w-20 rounded-full bg-gradient-to-r from-[#E8622A] to-[#D4880C]" />
-          <p className="text-[#7A5C45] text-sm md:text-base mt-4 max-w-xl mx-auto">
+          <p className="text-[#7A5C45] text-base md:text-lg mt-4 max-w-2xl mx-auto font-medium leading-relaxed">
             {en 
               ? "Submit your grievances, social problems or community concerns directly to the Sashakt Rashtra Nirman Trust administration."
               : "अपनी समस्याओं, सामाजिक चिंताओं या सामुदायिक मुद्दों को सीधे सशक्त राष्ट्र निर्माण न्यास के प्रशासन के समक्ष प्रस्तुत करें।"}
           </p>
-        </div>
+          
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ delay: 0.55, duration: 0.5 }}
+            className="h-1 bg-gradient-to-r from-[#E8622A] to-[#D4880C] mt-6 mx-auto w-24 rounded-full origin-center shadow-sm"
+          />
+        </motion.div>
+      </section>
 
-        <AnimatePresence mode="wait">
+      {/* ── Form & Content Section with Grid Stripes ───────────── */}
+      <section className="relative py-16 px-4 md:px-8 z-10">
+        
+        {/* Grid Pattern Overlay */}
+        <div 
+          className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-multiply" 
+          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0V0zm20 20h20v20H20V20zM0 20h20v20H0V20z' fill='%232C1810' fill-rule='evenodd'/%3E%3C/svg%3E")` }} 
+        />
+
+        <div className="max-w-4xl mx-auto relative z-10">
+          <AnimatePresence mode="wait">
           {!isSubmitted ? (
             <motion.div
               key="complaint-form"
@@ -447,7 +485,8 @@ export default function Complaints() {
           )}
         </AnimatePresence>
 
-      </div>
+        </div>
+      </section>
     </div>
   );
 }
