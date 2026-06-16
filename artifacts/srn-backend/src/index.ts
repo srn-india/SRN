@@ -78,6 +78,7 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.error(`CORS Blocked: Origin "${origin}" is not in the allowed list:`, allowedOrigins);
       callback(new Error('Not allowed by CORS'));
     }
   },
