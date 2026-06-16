@@ -30,7 +30,7 @@ export default function Login() {
   const lc = t.login;
 
   const handleGoogleLogin = () => {
-    window.location.href = `${API_BASE}/api/auth/google`;
+    window.location.href = `${API_BASE}/api/auth/google?redirect_to=${encodeURIComponent(window.location.origin)}`;
   };
 
   const {

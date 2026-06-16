@@ -75,7 +75,7 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
 
   const handleGoogleLogin = () => {
-    window.location.href = `${API_BASE}/api/auth/google`;
+    window.location.href = `${API_BASE}/api/auth/google?redirect_to=${encodeURIComponent(window.location.origin)}`;
   };
 
   async function onSubmit(data) {

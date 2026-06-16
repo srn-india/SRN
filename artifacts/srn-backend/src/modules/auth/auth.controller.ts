@@ -135,15 +135,18 @@ const client = new OAuth2Client(
 );
 
 export const googleLogin = catchAsync(async (req: Request, res: Response) => {
+  const { redirect_to } = req.query;
+  const state = redirect_to ? Buffer.from(redirect_to as string).toString('base64') : '';
   const url = client.generateAuthUrl({
     access_type: 'offline',
     scope: ['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email'],
+    state: state
   });
   res.redirect(url);
 });
 
 export const googleCallback = catchAsync(async (req: Request, res: Response) => {
-  const { code } = req.query;
+  const { code, state } = req.query;
   const { tokens } = await client.getToken(code as string);
   client.setCredentials(tokens);
 
@@ -171,7 +174,27 @@ export const googleCallback = catchAsync(async (req: Request, res: Response) => 
     maxAge: 7 * 24 * 60 * 60 * 1000
   });
 
-  res.redirect(`${process.env.FRONTEND_URL}/auth/success?token=${result.accessToken}`);
+  let frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8080';
+  if (state) {
+    try {
+      const decodedState = Buffer.from(state as string, 'base64').toString('ascii');
+      const allowedOrigins = [
+        'http://localhost:8080',
+        'http://localhost:5173',
+        process.env.FRONTEND_URL
+      ].filter(Boolean) as string[];
+
+      const isVercelAllowed = decodedState.startsWith('https://srn-') && decodedState.endsWith('.vercel.app');
+
+      if (allowedOrigins.includes(decodedState) || isVercelAllowed) {
+        frontendUrl = decodedState;
+      }
+    } catch (err) {
+      // fallback to default frontendUrl
+    }
+  }
+
+  res.redirect(`${frontendUrl}/auth/success?token=${result.accessToken}`);
 });
 
 export const forgotPassword = catchAsync(async (req: Request, res: Response) => {
