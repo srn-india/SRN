@@ -5,6 +5,16 @@ import { sendSuccess, sendError } from '../../utils/response';
 import { OAuth2Client } from 'google-auth-library';
 import { redis } from '../../lib/cache';
 
+const getCookieOptions = (req: Request, maxAge: number) => {
+  const isSecure = req.secure || req.headers['x-forwarded-proto'] === 'https';
+  return {
+    httpOnly: true,
+    secure: isSecure,
+    sameSite: (isSecure ? 'none' : 'lax') as 'none' | 'lax',
+    maxAge
+  };
+};
+
 export const register = catchAsync(async (req: Request, res: Response) => {
   try {
     const result = await authService.registerUser(req.body);
@@ -15,24 +25,12 @@ export const register = catchAsync(async (req: Request, res: Response) => {
       }, 'OTP sent to email', 200);
     }
     
-    // In case registration bypasses OTP in the future
     const accessToken = (result as any).accessToken;
     const refreshToken = (result as any).refreshToken;
 
     if (accessToken && refreshToken) {
-      res.cookie('accessToken', accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        maxAge: 15 * 60 * 1000 // 15 minutes
-      });
-
-      res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-      });
+      res.cookie('accessToken', accessToken, getCookieOptions(req, 15 * 60 * 1000));
+      res.cookie('refreshToken', refreshToken, getCookieOptions(req, 7 * 24 * 60 * 60 * 1000));
     }
 
     sendSuccess(res, {
@@ -74,19 +72,8 @@ export const login = catchAsync(async (req: Request, res: Response) => {
     const accessToken = (result as any).accessToken;
     const refreshToken = (result as any).refreshToken;
 
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 15 * 60 * 1000
-    });
-
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+    res.cookie('accessToken', accessToken, getCookieOptions(req, 15 * 60 * 1000));
+    res.cookie('refreshToken', refreshToken, getCookieOptions(req, 7 * 24 * 60 * 60 * 1000));
 
     sendSuccess(res, {
       user: { 
@@ -166,19 +153,8 @@ export const googleCallback = catchAsync(async (req: Request, res: Response) => 
     avatar: profile.picture,
   });
 
-  res.cookie('accessToken', result.accessToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    maxAge: 15 * 60 * 1000
-  });
-
-  res.cookie('refreshToken', result.refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000
-  });
+  res.cookie('accessToken', result.accessToken, getCookieOptions(req, 15 * 60 * 1000));
+  res.cookie('refreshToken', result.refreshToken, getCookieOptions(req, 7 * 24 * 60 * 60 * 1000));
 
   let frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8080';
   if (state) {
@@ -235,19 +211,8 @@ export const verifyOtp = catchAsync(async (req: Request, res: Response) => {
 
   const result = await authService.verifyOtp(email, otp);
 
-  res.cookie('accessToken', result.accessToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    maxAge: 15 * 60 * 1000
-  });
-
-  res.cookie('refreshToken', result.refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000
-  });
+  res.cookie('accessToken', result.accessToken, getCookieOptions(req, 15 * 60 * 1000));
+  res.cookie('refreshToken', result.refreshToken, getCookieOptions(req, 7 * 24 * 60 * 60 * 1000));
 
   sendSuccess(res, {
     user: { 
@@ -287,19 +252,8 @@ export const verify2FALogin = catchAsync(async (req: Request, res: Response) => 
 
   const result = await authService.verify2FALogin(tempAuthToken, totpToken);
 
-  res.cookie('accessToken', result.accessToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    maxAge: 15 * 60 * 1000
-  });
-
-  res.cookie('refreshToken', result.refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000
-  });
+  res.cookie('accessToken', result.accessToken, getCookieOptions(req, 15 * 60 * 1000));
+  res.cookie('refreshToken', result.refreshToken, getCookieOptions(req, 7 * 24 * 60 * 60 * 1000));
 
   sendSuccess(res, {
     user: { 
