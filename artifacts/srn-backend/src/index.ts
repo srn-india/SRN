@@ -75,7 +75,10 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Dynamically check if the origin is localhost or matches a Vercel preview domain for this app
+    const isVercelAllowed = origin && origin.startsWith('https://srn-') && origin.endsWith('.vercel.app');
+
+    if (!origin || allowedOrigins.includes(origin) || isVercelAllowed) {
       callback(null, true);
     } else {
       console.error(`CORS Blocked: Origin "${origin}" is not in the allowed list:`, allowedOrigins);
