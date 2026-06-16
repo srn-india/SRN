@@ -47,6 +47,9 @@ export function AuthProvider({ children }) {
       return data.data; // { requires2FA: true, tempAuthToken: ... }
     }
     
+    if (data.data?.accessToken) {
+      localStorage.setItem("accessToken", data.data.accessToken);
+    }
     setUser(data.data.user);
     return data.data.user;
   };
@@ -65,6 +68,9 @@ export function AuthProvider({ children }) {
       return data.data;
     }
     
+    if (data.data?.accessToken) {
+      localStorage.setItem("accessToken", data.data.accessToken);
+    }
     setUser(data.data.user);
     return data.data.user;
   };
@@ -79,6 +85,9 @@ export function AuthProvider({ children }) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Invalid OTP");
     
+    if (data.data?.accessToken) {
+      localStorage.setItem("accessToken", data.data.accessToken);
+    }
     setUser(data.data.user);
     return data.data.user;
   };
@@ -88,6 +97,7 @@ export function AuthProvider({ children }) {
       method: "POST",
       credentials: "include",
     });
+    localStorage.removeItem("accessToken");
     setUser(null);
   };
 
@@ -116,6 +126,9 @@ export function AuthProvider({ children }) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Invalid 2FA token");
     
+    if (data.data?.accessToken) {
+      localStorage.setItem("accessToken", data.data.accessToken);
+    }
     setUser(data.data.user);
     return data.data.user;
   };

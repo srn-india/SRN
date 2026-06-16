@@ -9,6 +9,13 @@ export default function AuthSuccess() {
 
   useEffect(() => {
     const handleAuth = async () => {
+      // Extract token from query params and save it to localStorage
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("token");
+      if (token) {
+        localStorage.setItem("accessToken", token);
+      }
+
       // Verify auth status
       const user = await checkAuth();
       if (user) {
