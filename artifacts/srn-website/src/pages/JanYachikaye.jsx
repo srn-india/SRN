@@ -69,10 +69,43 @@ export default function JanYachikaye() {
   const { lang } = useLanguage();
   const en = lang === "en";
 
+  const [publishedComplaints, setPublishedComplaints] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     window.scrollTo(0, 0);
     document.title = en ? "Jan Yachikaye (Solved) – SRN" : "जन याचिकाएं (निस्तारित) – SRN";
   }, [en]);
+
+  useEffect(() => {
+    const fetchPublished = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/complaints/published`);
+        if (res.ok) {
+          const data = await res.json();
+          const transformed = data.data.map(comp => ({
+            id: comp.ticket,
+            dateSolved: new Date(comp.updatedAt).toISOString().split('T')[0],
+            category: comp.category,
+            state: comp.state,
+            titleEn: comp.titleEn || comp.subject,
+            titleHi: comp.titleHi || comp.subject,
+            issueEn: comp.description,
+            issueHi: comp.description,
+            resolutionEn: comp.resolutionEn || "",
+            resolutionHi: comp.resolutionHi || "",
+            isFromDb: true
+          }));
+          setPublishedComplaints(transformed);
+        }
+      } catch (err) {
+        console.error("Failed to fetch published complaints:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPublished();
+  }, []);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
@@ -86,7 +119,12 @@ export default function JanYachikaye() {
     { value: "women", en: "Women Welfare", hi: "महिला कल्याण" }
   ];
 
-  const filteredData = solvedComplaintsData.filter(item => {
+  const combinedComplaints = [
+    ...publishedComplaints,
+    ...solvedComplaintsData.filter(mock => !publishedComplaints.some(db => db.id === mock.id))
+  ];
+
+  const filteredData = combinedComplaints.filter(item => {
     const title = en ? item.titleEn : item.titleHi;
     const issue = en ? item.issueEn : item.issueHi;
     const matchesSearch = title.toLowerCase().includes(searchQuery.toLowerCase()) || 

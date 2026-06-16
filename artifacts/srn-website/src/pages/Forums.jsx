@@ -1,9 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { MessageSquare, TrendingUp, Users, Search, ChevronRight, Hash } from "lucide-react";
 import SectionHeader from "../components/SectionHeader";
 import { useFadeIn } from "../hooks/useFadeIn";
 import { useLanguage } from "../context/LanguageContext";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function FadeSection({ children, delay = 0, className = "" }) {
   const ref = useFadeIn(0.1);
@@ -33,20 +35,30 @@ const categories = [
   }
 ];
 
-const trendingThreads = [
-  { id: 1, title: "Strategies for youth employment in rural sectors", author: "Rajesh K.", replies: 342, category: "Policy Discussions", time: "2h ago" },
-  { id: 2, title: "Organizing the upcoming digital literacy drive", author: "Priya M.", replies: 128, category: "Local Chapters", time: "5h ago" },
-  { id: 3, title: "Feedback on the new education reform proposals", author: "Dr. Singh", replies: 512, category: "National Policy", time: "1d ago" },
-  { id: 4, title: "Volunteer coordination for Mumbai convention", author: "Amit P.", replies: 89, category: "Events & Meets", time: "1d ago" },
-];
-
 export default function Forums() {
   const { lang } = useLanguage();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const en = lang === "en";
+  const [threads, setThreads] = useState([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
     document.title = "Forums | Sashakt Rashtra Nirman";
+
+    const fetchThreads = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/forum/threads`);
+        const data = await res.json();
+        if (data.success) {
+          // The API returns paginated data: { threads: [...], pagination: {...} }
+          setThreads(data.data.threads || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch threads:", err);
+      }
+    };
+    fetchThreads();
   }, []);
 
   return (
@@ -137,30 +149,36 @@ export default function Forums() {
                 <button className="text-sm font-semibold text-[#E8622A] hover:text-[#C04A18]">{en ? "View All" : "सभी देखें"}</button>
               </div>
               <div className="divide-y divide-[#F0D5B8]/50">
-                {trendingThreads.map((thread) => (
-                  <div key={thread.id} className="p-6 hover:bg-[#FFF9F2]/50 transition-colors cursor-pointer group">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-white bg-[#E8622A]/80 px-2 py-0.5 rounded-full">{thread.category}</span>
-                          <span className="text-xs text-[#7A5C45] font-medium flex items-center gap-1"><Hash className="w-3 h-3"/> {thread.id}842</span>
+                {threads.length === 0 ? (
+                  <div className="p-8 text-center text-[#7A5C45]">
+                    {en ? "No discussions found." : "कोई चर्चा नहीं मिली।"}
+                  </div>
+                ) : (
+                  threads.map((thread) => (
+                    <div key={thread.id} className="p-6 hover:bg-[#FFF9F2]/50 transition-colors cursor-pointer group">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-white bg-[#E8622A]/80 px-2 py-0.5 rounded-full">{en ? "General" : "सामान्य"}</span>
+                            <span className="text-xs text-[#7A5C45] font-medium flex items-center gap-1"><Hash className="w-3 h-3"/> {thread.id.slice(0, 8)}</span>
+                          </div>
+                          <h4 className="text-[#1E0F05] font-bold text-lg leading-snug group-hover:text-[#E8622A] transition-colors mb-2">
+                            {thread.title}
+                          </h4>
+                          <div className="flex items-center gap-4 text-xs text-[#7A5C45] font-medium">
+                            <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5 text-[#C04A18]" /> {thread.author?.firstName || 'Admin'}</span>
+                            <span>•</span>
+                            <span>{new Date(thread.createdAt).toLocaleDateString()}</span>
+                          </div>
                         </div>
-                        <h4 className="text-[#1E0F05] font-bold text-lg leading-snug group-hover:text-[#E8622A] transition-colors mb-2">
-                          {thread.title}
-                        </h4>
-                        <div className="flex items-center gap-4 text-xs text-[#7A5C45] font-medium">
-                          <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5 text-[#C04A18]" /> {thread.author}</span>
-                          <span>•</span>
-                          <span>{thread.time}</span>
+                        <div className="hidden sm:flex flex-col items-center justify-center bg-[#FDF5EC] border border-[#F0D5B8] rounded-xl px-4 py-2 group-hover:bg-[#E8622A]/10 group-hover:border-[#E8622A]/30 transition-colors">
+                          <span className="font-bold text-[#5C1010] text-lg">{thread._count?.comments || 0}</span>
+                          <span className="text-[10px] uppercase text-[#7A5C45] font-semibold">{en ? "Replies" : "जवाब"}</span>
                         </div>
-                      </div>
-                      <div className="hidden sm:flex flex-col items-center justify-center bg-[#FDF5EC] border border-[#F0D5B8] rounded-xl px-4 py-2 group-hover:bg-[#E8622A]/10 group-hover:border-[#E8622A]/30 transition-colors">
-                        <span className="font-bold text-[#5C1010] text-lg">{thread.replies}</span>
-                        <span className="text-[10px] uppercase text-[#7A5C45] font-semibold">{en ? "Replies" : "जवाब"}</span>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           </FadeSection>
@@ -172,12 +190,26 @@ export default function Forums() {
             <div className="bg-gradient-to-br from-[#E8622A] to-[#C04A18] rounded-2xl p-6 text-white shadow-lg shadow-orange-900/20 relative overflow-hidden">
               <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `repeating-linear-gradient(45deg, white, white 1px, transparent 1px, transparent 10px)`}}/>
               <div className="relative z-10">
-                <h3 className="font-serif font-bold text-xl mb-2">{en ? "Join the Conversation" : "चर्चा में शामिल हों"}</h3>
+                <h3 className="font-serif font-bold text-xl mb-2">
+                  {user 
+                    ? (en ? "Start a New Discussion" : "नई चर्चा शुरू करें")
+                    : (en ? "Join the Conversation" : "चर्चा में शामिल हों")
+                  }
+                </h3>
                 <p className="text-white/80 text-sm mb-6 leading-relaxed">
-                  {en ? "Sign in to create new topics, reply to discussions, and connect directly with other members." : "नए विषय बनाने, चर्चाओं का जवाब देने और अन्य सदस्यों से सीधे जुड़ने के लिए साइन इन करें।"}
+                  {user 
+                    ? (en ? "You are logged in. Share your thoughts, ask questions, and engage with the community by starting a new thread." : "आप लॉग इन हैं। अपने विचार साझा करें, प्रश्न पूछें और नया थ्रेड शुरू करके समुदाय से जुड़ें।")
+                    : (en ? "Sign in to create new topics, reply to discussions, and connect directly with other members." : "नए विषय बनाने, चर्चाओं का जवाब देने और अन्य सदस्यों से सीधे जुड़ने के लिए साइन इन करें।")
+                  }
                 </p>
-                <button className="w-full bg-white text-[#C04A18] font-bold py-3 rounded-xl hover:bg-[#FFF9F2] transition-colors shadow-md">
-                  {en ? "Login to Post" : "पोस्ट करने के लिए लॉगिन करें"}
+                <button 
+                  onClick={() => navigate(user ? '/dashboard' : '/login')}
+                  className="w-full bg-white text-[#C04A18] font-bold py-3 rounded-xl hover:bg-[#FFF9F2] transition-colors shadow-md"
+                >
+                  {user 
+                    ? (en ? "Create New Topic" : "नया विषय बनाएं")
+                    : (en ? "Login to Post" : "पोस्ट करने के लिए लॉगिन करें")
+                  }
                 </button>
               </div>
             </div>

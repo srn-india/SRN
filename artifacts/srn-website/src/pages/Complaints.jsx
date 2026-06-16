@@ -1,11 +1,24 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "../context/LanguageContext";
+import { useAuth } from "../context/AuthContext";
 import { FileText, Send, CheckCircle, Upload, AlertCircle, Phone, Mail, MapPin } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function Complaints() {
   const { lang } = useLanguage();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const en = lang === "en";
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
+  const handleFormInteraction = (e) => {
+    if (!user) {
+      e.preventDefault();
+      setShowLoginPrompt(true);
+      setTimeout(() => setShowLoginPrompt(false), 5000);
+    }
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -14,10 +27,10 @@ export default function Complaints() {
 
   // Form State
   const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    state: "",
+    fullName: user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : "",
+    email: user?.email || "",
+    phone: user?.phone || "",
+    state: user?.state || "",
     category: "",
     subject: "",
     description: "",
@@ -28,6 +41,7 @@ export default function Complaints() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [ticketNumber, setTicketNumber] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   // States of India for selection
   const indianStates = [
@@ -103,25 +117,85 @@ export default function Complaints() {
     return Object.keys(tempErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     setIsSubmitting(true);
+    setErrors({});
 
-    // Mock API Submission delay
-    setTimeout(() => {
-      // Generate unique ticket number
-      const randomTicket = "SRN-GRI-" + Math.floor(100000 + Math.random() * 900000);
-      setTicketNumber(randomTicket);
+    try {
+      const data = new FormData();
+      Object.keys(formData).forEach(key => {
+        if (key === 'file' && formData[key]) {
+          data.append('file', formData[key]);
+        } else if (key !== 'file') {
+          data.append(key, formData[key]);
+        }
+      });
+
+      const res = await fetch(`${API_BASE}/api/complaints`, {
+        method: "POST",
+        credentials: "include",
+        body: data,
+      });
+
+      const result = await res.json();
+      if (res.ok) {
+        setTicketNumber(result.data.ticket);
+        setIsSubmitting(false);
+        setIsSubmitted(true);
+      } else {
+        setErrors({ subject: result.message || 'Submission failed' });
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      setErrors({ subject: 'An error occurred. Please try again later.' });
       setIsSubmitting(false);
-      setIsSubmitted(true);
-    }, 1500);
+    }
   };
 
   return (
-    <div className="bg-[#FDF5EC] min-h-screen pb-20">
+    <div className="bg-[#FDF5EC] min-h-screen pb-20 relative">
       
+      {/* Login Prompt Toast */}
+      <AnimatePresence>
+        {showLoginPrompt && (
+          <motion.div
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 100 }}
+            className="fixed top-24 right-6 z-50 bg-white border-l-4 border-[#E8622A] shadow-2xl rounded-lg p-5 max-w-sm"
+          >
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-6 h-6 text-[#E8622A] shrink-0" />
+              <div>
+                <h4 className="font-bold text-[#1E0F05] text-sm mb-1">
+                  {en ? "Login Required" : "लॉगिन आवश्यक है"}
+                </h4>
+                <p className="text-xs text-[#7A5C45] mb-4">
+                  {en ? "Please login or sign up first to submit a grievance." : "शिकायत दर्ज करने के लिए कृपया पहले लॉगिन या साइन अप करें।"}
+                </p>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => navigate('/login?redirect=/complaints')}
+                    className="px-4 py-2 bg-[#E8622A] text-white text-xs font-bold rounded-md hover:bg-[#D4880C] shadow-sm transition-colors"
+                  >
+                    {en ? "Login Now" : "अभी लॉगिन करें"}
+                  </button>
+                  <button 
+                    onClick={() => setShowLoginPrompt(false)}
+                    className="px-4 py-2 bg-gray-100 text-gray-700 text-xs font-bold rounded-md hover:bg-gray-200 transition-colors"
+                  >
+                    {en ? "Dismiss" : "खारिज करें"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ── Hero Section with Monochromatic Pattern Background ───────── */}
       <section className="relative bg-gradient-to-br from-[#FFF9F2] via-[#FDF5EC] to-[#FFF5EB] py-36 text-center px-6 overflow-hidden min-h-[44vh] flex items-center justify-center border-b border-[#F0D5B8]/40">
         
@@ -193,7 +267,12 @@ export default function Complaints() {
               {/* Stripe */}
               <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#E8622A] to-[#D4880C]" />
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form 
+                onSubmit={handleSubmit} 
+                onClick={handleFormInteraction}
+                onFocusCapture={handleFormInteraction}
+                className="space-y-6"
+              >
                 
                 {/* Section Title */}
                 <h3 className="text-lg font-bold font-serif text-[#1E0F05] border-b border-[#FDF5EC] pb-3 mb-2 flex items-center gap-2">

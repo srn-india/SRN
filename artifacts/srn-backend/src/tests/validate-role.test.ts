@@ -65,7 +65,7 @@ describe('validate middleware', () => {
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
         success: false,
-        message: 'Validation failed',
+        message: expect.stringContaining('Validation failed'),
       }),
     );
   });

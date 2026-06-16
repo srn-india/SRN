@@ -1,24 +1,52 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "../context/LanguageContext";
-import { FileText, Send, CheckCircle, Upload, ArrowLeft, ArrowRight, User, GraduationCap, Heart } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { FileText, Send, CheckCircle, Upload, ArrowLeft, ArrowRight, User, GraduationCap, Heart, X } from "lucide-react";
 
 export default function RequestPosting() {
   const { lang } = useLanguage();
+  const { API_BASE, user } = useAuth();
   const en = lang === "en";
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    document.title = en ? "Pad ke liye Awedan Kare – SRN" : "पद के लिए आवेदन करें – SRN";
+    document.title = en ? "Apply for a Post – SRN" : "पद के लिए आवेदन करें – SRN";
   }, [en]);
+
+  const [existingApp, setExistingApp] = useState(null);
+  const [loadingExisting, setLoadingExisting] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      const checkExisting = async () => {
+        try {
+          const res = await fetch(`${API_BASE}/api/applications/me`, { credentials: 'include' });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.data) {
+              setExistingApp(data.data);
+            }
+          }
+        } catch(e) {
+          console.error(e);
+        } finally {
+          setLoadingExisting(false);
+        }
+      };
+      checkExisting();
+    } else {
+      setLoadingExisting(false);
+    }
+  }, [user, API_BASE]);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
-    fullName: "",
-    dob: "",
-    gender: "",
-    email: "",
-    phone: "",
+    fullName: user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : "",
+    dob: user?.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split('T')[0] : "",
+    gender: user?.gender ? user.gender.toLowerCase() : "",
+    email: user?.email || "",
+    phone: user?.phone || "",
     address: "",
     qualification: "",
     appliedPosition: "",
@@ -27,6 +55,19 @@ export default function RequestPosting() {
     whyJoin: "",
     resume: null,
   });
+
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        fullName: prev.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+        email: prev.email || user.email || '',
+        phone: prev.phone || user.phone || '',
+        gender: prev.gender || (user.gender ? user.gender.toLowerCase() : '') || '',
+        dob: prev.dob || (user.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split('T')[0] : '')
+      }));
+    }
+  }, [user]);
 
   const [errors, setErrors] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -94,15 +135,39 @@ export default function RequestPosting() {
     setCurrentStep((prev) => prev - 1);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateStep(3)) return;
 
     setIsSubmitting(true);
-    setTimeout(() => {
+    
+    try {
+      const submitData = new FormData();
+      Object.keys(formData).forEach((key) => {
+        if (formData[key] !== null && formData[key] !== undefined) {
+          submitData.append(key, formData[key]);
+        }
+      });
+
+      const res = await fetch(`${API_BASE}/api/applications`, {
+        method: "POST",
+        credentials: "include",
+        body: submitData,
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setIsSubmitted(true);
+      } else {
+        alert(data.message || (data.errors ? JSON.stringify(data.errors) : "Submission failed."));
+      }
+    } catch (error) {
+      console.error(error);
+      alert("An error occurred during submission. Please try again.");
+    } finally {
       setIsSubmitting(false);
-      setIsSubmitted(true);
-    }, 1800);
+    }
   };
 
   // Step names & icons
@@ -111,6 +176,15 @@ export default function RequestPosting() {
     { number: 2, labelEn: "Academic", labelHi: "अकादमिक", icon: GraduationCap },
     { number: 3, labelEn: "Social Work", labelHi: "सामाजिक कार्य", icon: Heart },
   ];
+
+  if (loadingExisting) {
+    return (
+      <div className="min-h-screen pt-24 pb-12 bg-[#FDF5EC] flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#E8622A] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
 
   return (
     <div className="bg-[#FDF5EC] min-h-screen pb-20">
@@ -147,7 +221,7 @@ export default function RequestPosting() {
             {en ? "Join the Executive Committee" : "कार्यकारिणी में शामिल हों"}
           </motion.span>
           <h1 className="text-4xl md:text-6xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
-            {en ? "Pad ke liye Awedan Kare" : "पद के लिए आवेदन करें"}
+            {en ? "Apply for a Post" : "पद के लिए आवेदन करें"}
           </h1>
           <p className="text-[#7A5C45] text-base md:text-lg mt-4 max-w-2xl mx-auto font-medium leading-relaxed">
             {en 
@@ -175,7 +249,56 @@ export default function RequestPosting() {
 
         <div className="max-w-3xl mx-auto relative z-10">
           
-          {/* Form Container */}
+          {existingApp ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-white/70 backdrop-blur-md rounded-2xl shadow-xl p-12 border border-[#F0D5B8] text-center"
+            >
+              <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${
+                existingApp.status === 'Approved' ? 'bg-green-50' : 
+                existingApp.status === 'Rejected' ? 'bg-red-50' : 'bg-[#FDF5EC]'
+              }`}>
+                {existingApp.status === 'Approved' ? (
+                  <CheckCircle className="w-10 h-10 text-green-500" />
+                ) : existingApp.status === 'Rejected' ? (
+                  <X className="w-10 h-10 text-red-500" />
+                ) : (
+                  <CheckCircle className="w-10 h-10 text-[#E8622A]" />
+                )}
+              </div>
+              <h2 className="text-3xl font-bold text-[#1E0F05] mb-4">
+                {existingApp.status === 'Approved' 
+                  ? (en ? "Application Approved" : "आवेदन स्वीकृत")
+                  : existingApp.status === 'Rejected'
+                  ? (en ? "Application Not Selected" : "आवेदन अस्वीकृत")
+                  : (en ? "Application Under Review" : "आवेदन समीक्षाधीन है")
+                }
+              </h2>
+              <p className="text-[#1E0F05]/70 mb-8 max-w-lg mx-auto">
+                {existingApp.status === 'Approved'
+                  ? (en 
+                      ? `Congratulations! Your application for "${existingApp.appliedPosition}" has been approved. Our team will contact you shortly with further instructions.` 
+                      : `बधाई हो! "${existingApp.appliedPosition}" के लिए आपका आवेदन स्वीकृत कर लिया गया है। हमारी टीम जल्द ही आपसे संपर्क करेगी।`)
+                  : existingApp.status === 'Rejected'
+                  ? (en 
+                      ? `Thank you for applying for "${existingApp.appliedPosition}". After careful review, we are unable to proceed with your application at this time. We appreciate your interest in Sashakt Rashtra Nirman Trust.` 
+                      : `"${existingApp.appliedPosition}" के लिए आवेदन करने के लिए धन्यवाद। सावधानीपूर्वक समीक्षा के बाद, हम इस समय आपके आवेदन के साथ आगे बढ़ने में असमर्थ हैं।`)
+                  : (en 
+                      ? `You have already applied for the position of "${existingApp.appliedPosition}". Your application is currently pending review by our team. We will notify you once a decision is made.` 
+                      : `आपने पहले ही "${existingApp.appliedPosition}" पद के लिए आवेदन कर दिया है। आपका आवेदन वर्तमान में हमारी टीम द्वारा समीक्षाधीन है। निर्णय लिए जाने पर हम आपको सूचित करेंगे।`)
+                }
+              </p>
+              {existingApp.status === 'Rejected' && (
+                <button
+                  onClick={() => setExistingApp(null)}
+                  className="px-6 py-3 border border-[#E8622A] text-[#E8622A] hover:bg-[#E8622A]/10 font-semibold rounded-xl transition-all"
+                >
+                  {en ? "Submit a New Request" : "नया आवेदन सबमिट करें"}
+                </button>
+              )}
+            </motion.div>
+          ) : (
           <div className="bg-white rounded-2xl shadow-xl border border-[#F0D5B8] overflow-hidden relative">
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#E8622A] to-[#D4880C]" />
           
@@ -544,6 +667,7 @@ export default function RequestPosting() {
               </AnimatePresence>
             </div>
           </div>
+          )}
         </div>
       </section>
     </div>

@@ -1,11 +1,12 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { Upload } from "lucide-react";
 import { 
   ArrowLeft, LogOut, UserCircle, Calendar, MessageSquare, 
   ShieldCheck, CheckCircle2, XCircle, Plus, Trash2, ShieldAlert,
   Settings, Sliders, Bell, LayoutDashboard, Key, TrendingUp, Download, MapPin,
-  BookOpen, AlertCircle, Briefcase, FileText
+  BookOpen, AlertCircle, Briefcase, FileText, X, Eye, GraduationCap, Heart, CalendarDays, User, Users
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -30,6 +31,7 @@ const fadeVariants = {
 
 export default function AdminDashboard() {
   const { user, logout, API_BASE, checkAuth } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("profile");
   
   // 2FA Setup State
@@ -80,18 +82,28 @@ export default function AdminDashboard() {
     }
   };
 
-  // --- MOCK DATA ---
-  const [events, setEvents] = useState([
-    { id: 1, title: "National Peace Rally 2026", date: "May 25, 2026", location: "New Delhi" },
-    { id: 2, title: "Youth Empowerment Summit", date: "June 10, 2026", location: "Mumbai" },
-    { id: 3, title: "Clean India Drive", date: "June 15, 2026", location: "Bangalore" },
-  ]);
+  const [events, setEvents] = useState([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+  const [showEventModal, setShowEventModal] = useState(false);
+  const [newEvent, setNewEvent] = useState({ title: '', description: '', location: '', date: '', image: null });
 
-  const [forums, setForums] = useState([
-    { id: 1, title: "Strategies for Rural Development", posts: 142 },
-    { id: 2, title: "Educational Reforms Discussion", posts: 89 },
-    { id: 3, title: "Youth Participation in Politics", posts: 215 },
-  ]);
+  const [forums, setForums] = useState([]);
+  const [loadingForums, setLoadingForums] = useState(true);
+  const [showForumModal, setShowForumModal] = useState(false);
+  const [newForum, setNewForum] = useState({ title: '', content: '', image: null });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
+
+  const handleExportData = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ events, forums, adminComplaints, applications }, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `srn_platform_data_${new Date().toISOString().slice(0,10)}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  };
 
   const [pendingUsers, setPendingUsers] = useState([
     { id: 101, name: "Rahul Sharma", email: "rahul.s@example.com", date: "2026-05-27" },
@@ -99,47 +111,320 @@ export default function AdminDashboard() {
     { id: 103, name: "Amit Kumar", email: "amit.k@example.com", date: "2026-05-29" },
   ]);
 
-  const [articles, setArticles] = useState([
-    { id: 1, title: "Importance of Clean Energy in Rural Villages", author: "Karan Johar", date: "2026-06-14", category: "Articles", status: "Pending" },
-    { id: 2, title: "Primary Education Needs in Tribal Belts", author: "Dr. Savita Sen", date: "2026-06-13", category: "Articles", status: "Approved" },
-    { id: 3, title: "Revisiting Rainwater Harvesting Systems", author: "Rajesh Mishra", date: "2026-06-10", category: "Current Affairs", status: "Pending" },
-  ]);
+  const [articles, setArticles] = useState([]);
+  const [loadingArticles, setLoadingArticles] = useState(true);
 
-  const [adminComplaints, setAdminComplaints] = useState([
-    { id: 1, ticket: "SRN-GRI-982041", subject: "Stagnant Water and Sanitation Leakage", applicant: "Sanjeev Gupta", date: "2026-06-15", category: "Infrastructure", status: "Pending" },
-    { id: 2, ticket: "SRN-GRI-392014", subject: "Lack of Primary School Textbooks", applicant: "Meena Devi", date: "2026-06-12", category: "Education", status: "Solved" },
-    { id: 3, ticket: "SRN-GRI-405928", subject: "Illegal Sand Mining near Riverbank", applicant: "Ramesh Negi", date: "2026-06-08", category: "Environment", status: "Pending" },
-  ]);
+  const [adminComplaints, setAdminComplaints] = useState([]);
+  const [loadingComplaints, setLoadingComplaints] = useState(true);
 
-  const [applications, setApplications] = useState([
-    { id: 1, name: "Vikas Patel", phone: "9876543211", postApplied: "District Coordinator (Dehradun)", date: "2026-06-14", status: "Under Review" },
-    { id: 2, name: "Neha Gupta", phone: "7654321098", postApplied: "Social Work Supervisor (Haridwar)", date: "2026-06-13", status: "Interview Scheduled" },
-    { id: 3, name: "Alok Dwivedi", phone: "8765432109", postApplied: "State Youth Convener", date: "2026-06-10", status: "Pending" },
-  ]);
+  useEffect(() => {
+    if (activeTab === "complaints") fetchComplaints();
+    if (activeTab === "articles") fetchArticles();
+    if (activeTab === "events") fetchEvents();
+    if (activeTab === "forums") fetchForums();
+  }, [activeTab]);
+
+  const fetchComplaints = async () => {
+    setLoadingComplaints(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/complaints`, {
+        credentials: 'include'
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setAdminComplaints(data.data.map(c => ({
+          id: c.id,
+          ticket: c.ticket,
+          subject: c.subject,
+          description: c.description,
+          phone: c.phone,
+          email: c.email,
+          state: c.state,
+          fileUrl: c.fileUrl,
+          applicant: c.user ? `${c.user.firstName || ''} ${c.user.lastName || ''}`.trim() : c.fullName,
+          date: new Date(c.createdAt).toLocaleDateString(),
+          category: c.category,
+          status: c.status
+        })));
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingComplaints(false);
+    }
+  };
+
+  const fetchArticles = async () => {
+    setLoadingArticles(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/articles`, {
+        credentials: 'include'
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setArticles(data.data.map(art => ({
+          id: art.id,
+          title: art.title,
+          author: art.authorName,
+          date: new Date(art.createdAt).toLocaleDateString(),
+          category: art.articleCategory,
+          status: art.status
+        })));
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingArticles(false);
+    }
+  };
+
+  const [applications, setApplications] = useState([]);
+  const [loadingApplications, setLoadingApplications] = useState(true);
+  const [selectedApplication, setSelectedApplication] = useState(null);
+
+  useEffect(() => {
+    fetchComplaints();
+    fetchArticles();
+    fetchApplications();
+    fetchEvents();
+    fetchForums();
+  }, [API_BASE]);
+
+  const fetchApplications = async () => {
+    setLoadingApplications(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/applications`, {
+        credentials: 'include'
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setApplications(data.data.map(app => ({
+          ...app,
+          date: new Date(app.createdAt).toLocaleDateString()
+        })));
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingApplications(false);
+    }
+  };
 
   // --- HANDLERS ---
-  const handleDeleteEvent = (id) => setEvents(events.filter(e => e.id !== id));
-  const handleDeleteForum = (id) => setForums(forums.filter(f => f.id !== id));
+  const fetchEvents = async () => {
+    setLoadingEvents(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/events`, { credentials: 'include' });
+      const data = await res.json();
+      if (res.ok) setEvents(data.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingEvents(false);
+    }
+  };
+
+  const fetchForums = async () => {
+    setLoadingForums(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/forum/threads`, { credentials: 'include' });
+      const data = await res.json();
+      if (res.ok) setForums(data.data.threads || data.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingForums(false);
+    }
+  };
+
+  const handleCreateEvent = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const formData = new FormData();
+      formData.append('title', newEvent.title);
+      formData.append('description', newEvent.description);
+      formData.append('location', newEvent.location);
+      formData.append('date', newEvent.date);
+      if (newEvent.image) formData.append('image', newEvent.image);
+
+      const res = await fetch(`${API_BASE}/api/events`, {
+        method: 'POST',
+        credentials: 'include',
+        body: formData
+      });
+      if (res.ok) {
+        setShowEventModal(false);
+        setNewEvent({ title: '', description: '', location: '', date: '', image: null });
+        fetchEvents();
+      } else {
+        const errorData = await res.json();
+        alert(`Failed to create event: ${errorData.message}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert(`Exception: ${err.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteEvent = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this event?")) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/events/${id}`, { method: 'DELETE', credentials: 'include' });
+      if (res.ok) {
+        fetchEvents();
+      } else {
+        const errorData = await res.json();
+        alert(`Failed to delete event: ${errorData.message}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete event.");
+    }
+  };
+
+  const handleCreateForum = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const formData = new FormData();
+      formData.append('title', newForum.title);
+      formData.append('content', newForum.content);
+      if (newForum.image) formData.append('image', newForum.image);
+
+      const res = await fetch(`${API_BASE}/api/forum/threads`, {
+        method: 'POST',
+        credentials: 'include',
+        body: formData
+      });
+      if (res.ok) {
+        setShowForumModal(false);
+        setNewForum({ title: '', content: '', image: null });
+        fetchForums();
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteForum = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this forum thread?")) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/forum/threads/${id}`, { method: 'DELETE', credentials: 'include' });
+      if (res.ok) {
+        fetchForums();
+      } else {
+        const errorData = await res.json();
+        alert(`Failed to delete forum: ${errorData.message}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete forum.");
+    }
+  };
   const handleApproveUser = (id) => setPendingUsers(pendingUsers.filter(u => u.id !== id));
   const handleDeclineUser = (id) => setPendingUsers(pendingUsers.filter(u => u.id !== id));
 
-  const handleApproveArticle = (id) => {
-    setArticles(articles.map(art => art.id === id ? { ...art, status: "Approved" } : art));
+  const handleApproveArticle = async (id) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/articles/${id}/approve`, {
+        method: 'PATCH',
+        credentials: 'include'
+      });
+      if (res.ok) {
+        setArticles(articles.map(art => art.id === id ? { ...art, status: "Approved" } : art));
+      }
+    } catch (error) {
+      console.error('Error approving article:', error);
+    }
   };
-  const handleDeleteArticle = (id) => setArticles(articles.filter(art => art.id !== id));
+  
+  const handleDeleteArticle = async (id) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/articles/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      if (res.ok) {
+        setArticles(articles.filter(art => art.id !== id));
+      }
+    } catch (error) {
+      console.error('Error deleting article:', error);
+    }
+  };
 
-  const handleSolveComplaint = (id) => {
-    setAdminComplaints(adminComplaints.map(comp => comp.id === id ? { ...comp, status: "Solved" } : comp));
+  const handleSolveComplaint = async (id) => {
+    try {
+      await fetch(`${API_BASE}/api/complaints/${id}/status`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: 'Solved' })
+      });
+      setAdminComplaints(adminComplaints.map(comp => comp.id === id ? { ...comp, status: "Solved" } : comp));
+    } catch (err) {
+      console.error(err);
+    }
   };
-  const handleDeleteComplaint = (id) => setAdminComplaints(adminComplaints.filter(comp => comp.id !== id));
 
-  const handleScheduleInterview = (id) => {
-    setApplications(applications.map(app => app.id === id ? { ...app, status: "Interview Scheduled" } : app));
+  const handleDeleteComplaint = async (id) => {
+    try {
+      await fetch(`${API_BASE}/api/complaints/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      setAdminComplaints(adminComplaints.filter(comp => comp.id !== id));
+    } catch (err) {
+      console.error(err);
+    }
   };
-  const handleRejectApplication = (id) => {
-    setApplications(applications.map(app => app.id === id ? { ...app, status: "Rejected" } : app));
+
+  const handleApproveApplication = async (id) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/applications/${id}/status`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'Approved' })
+      });
+      if (res.ok) {
+        setApplications(applications.map(app => app.id === id ? { ...app, status: "Approved" } : app));
+      }
+    } catch (err) { console.error(err); }
   };
-  const handleDeleteApplication = (id) => setApplications(applications.filter(app => app.id !== id));
+
+  const handleRejectApplication = async (id) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/applications/${id}/status`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'Rejected' })
+      });
+      if (res.ok) {
+        setApplications(applications.map(app => app.id === id ? { ...app, status: "Rejected" } : app));
+      }
+    } catch (err) { console.error(err); }
+  };
+
+  const handleDeleteApplication = async (id) => {
+    if (!window.confirm("Delete this application forever?")) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/applications/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      if (res.ok) {
+        setApplications(applications.filter(app => app.id !== id));
+      }
+    } catch (err) { console.error(err); }
+  };
 
   const TABS = [
     { id: "profile", label: "Admin Profile", icon: UserCircle },
@@ -273,7 +558,9 @@ export default function AdminDashboard() {
                     </div>
                     <div className="bg-white/60 backdrop-blur-md rounded-[2rem] p-6 border border-white/80 shadow-sm">
                       <UserCircle className="w-8 h-8 text-rose-500 mb-4" />
-                      <h3 className="text-2xl font-bold text-[#2C1810]">{pendingUsers.length}</h3>
+                      <h3 className="text-2xl font-bold text-[#2C1810]">
+                        {adminComplaints.filter(c => c.status === "Pending").length}
+                      </h3>
                       <p className="text-sm text-[#7A5C45] font-semibold">Pending Approvals</p>
                     </div>
                   </div>
@@ -288,12 +575,12 @@ export default function AdminDashboard() {
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 relative z-10">
                       {[
-                        { label: "New Event", icon: Plus, bg: "bg-blue-50/80", border: "border-blue-100", text: "text-blue-600" },
-                        { label: "Analytics", icon: TrendingUp, bg: "bg-emerald-50/80", border: "border-emerald-100", text: "text-emerald-600" },
-                        { label: "User Roles", icon: ShieldAlert, bg: "bg-purple-50/80", border: "border-purple-100", text: "text-purple-600" },
-                        { label: "Export Data", icon: Download, bg: "bg-amber-50/80", border: "border-amber-100", text: "text-amber-600" },
+                        { label: "New Event", icon: Plus, bg: "bg-blue-50/80", border: "border-blue-100", text: "text-blue-600", onClick: () => { setActiveTab("events"); setShowEventModal(true); } },
+                        { label: "Analytics", icon: TrendingUp, bg: "bg-emerald-50/80", border: "border-emerald-100", text: "text-emerald-600", onClick: () => setShowAnalyticsModal(true) },
+                        { label: "User Roles", icon: ShieldAlert, bg: "bg-purple-50/80", border: "border-purple-100", text: "text-purple-600", onClick: () => setActiveTab("approvals") },
+                        { label: "Grievances", icon: AlertCircle, bg: "bg-amber-50/80", border: "border-amber-100", text: "text-amber-600", onClick: () => setActiveTab("complaints") },
                       ].map((action, i) => (
-                        <div key={i} className={`p-5 rounded-[1.5rem] border ${action.border} ${action.bg} shadow-sm cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all flex flex-col items-center justify-center gap-3 backdrop-blur-sm`}>
+                        <div key={i} onClick={action.onClick} className={`p-5 rounded-[1.5rem] border ${action.border} ${action.bg} shadow-sm cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all flex flex-col items-center justify-center gap-3 backdrop-blur-sm`}>
                           <div className={`p-3 rounded-full bg-white shadow-sm ${action.text}`}>
                             <action.icon className="w-5 h-5" />
                           </div>
@@ -313,7 +600,7 @@ export default function AdminDashboard() {
                       <h2 className="text-2xl font-bold text-[#2C1810] font-serif">Manage Events</h2>
                       <p className="text-sm text-[#7A5C45] mt-1">Add or remove upcoming rallies and events.</p>
                     </div>
-                    <button className="flex items-center gap-2 bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md hover:shadow-lg hover:scale-105 transition-all">
+                    <button onClick={() => setShowEventModal(true)} className="flex items-center gap-2 bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md hover:shadow-lg hover:scale-105 transition-all">
                       <Plus className="w-4 h-4" /> Add Event
                     </button>
                   </div>
@@ -324,8 +611,8 @@ export default function AdminDashboard() {
                         <div className="absolute top-0 left-0 w-1.5 h-full bg-[#E8622A] opacity-0 group-hover:opacity-100 transition-opacity" />
                         <div className="flex items-center gap-5 relative z-10">
                           <div className="w-14 h-14 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl flex flex-col items-center justify-center border border-orange-200 text-[#E8622A] shadow-inner">
-                            <span className="text-[10px] font-bold uppercase leading-none mt-1">{event.date.split(" ")[0]}</span>
-                            <span className="text-lg font-black leading-none mt-0.5">{event.date.split(" ")[1].replace(',', '')}</span>
+                            <span className="text-[10px] font-bold uppercase leading-none mt-1">{new Date(event.date).toLocaleString('default', { month: 'short' })}</span>
+                            <span className="text-lg font-black leading-none mt-0.5">{new Date(event.date).getDate()}</span>
                           </div>
                           <div>
                             <h4 className="font-bold text-[#2C1810] text-lg group-hover:text-[#E8622A] transition-colors">{event.title}</h4>
@@ -334,12 +621,20 @@ export default function AdminDashboard() {
                             </div>
                           </div>
                         </div>
-                        <button 
-                          onClick={() => handleDeleteEvent(event.id)}
-                          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all text-sm font-bold border border-red-100 hover:border-red-500 shadow-sm relative z-10"
-                        >
-                          <Trash2 className="w-4 h-4" /> Delete
-                        </button>
+                        <div className="flex flex-col sm:flex-row gap-2 relative z-10">
+                          <button 
+                            onClick={() => navigate(`/admin/events/${event.id}`)}
+                            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-[#E8622A] rounded-xl hover:bg-[#E8622A] hover:text-white transition-all text-sm font-bold border border-orange-100 hover:border-[#E8622A] shadow-sm"
+                          >
+                            <Users className="w-4 h-4" /> Attendees
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteEvent(event.id)}
+                            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all text-sm font-bold border border-red-100 hover:border-red-500 shadow-sm"
+                          >
+                            <Trash2 className="w-4 h-4" /> Delete
+                          </button>
+                        </div>
                       </div>
                     ))}
                     {events.length === 0 && (
@@ -357,7 +652,7 @@ export default function AdminDashboard() {
                       <h2 className="text-2xl font-bold text-[#2C1810] font-serif">Manage Forums</h2>
                       <p className="text-sm text-[#7A5C45] mt-1">Add or remove discussion topics.</p>
                     </div>
-                    <button className="flex items-center gap-2 bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md hover:shadow-lg hover:scale-105 transition-all">
+                    <button onClick={() => setShowForumModal(true)} className="flex items-center gap-2 bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md hover:shadow-lg hover:scale-105 transition-all">
                       <Plus className="w-4 h-4" /> Add Forum
                     </button>
                   </div>
@@ -428,6 +723,12 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2.5 relative z-10 shrink-0">
+                          <button 
+                            onClick={() => navigate(`/admin-dashboard/article/${art.id}`)}
+                            className="px-4 py-2 bg-white text-[#2C1810] rounded-xl text-xs font-bold border border-gray-200 hover:bg-gray-50 transition-all shadow-sm"
+                          >
+                            View Details
+                          </button>
                           {art.status === "Pending" && (
                             <button 
                               onClick={() => handleApproveArticle(art.id)}
@@ -492,6 +793,12 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2.5 relative z-10 shrink-0">
+                          <button 
+                            onClick={() => navigate(`/admin-dashboard/complaint/${comp.id}`)}
+                            className="px-4 py-2 bg-white text-[#2C1810] rounded-xl text-xs font-bold border border-gray-200 hover:bg-gray-50 transition-all shadow-sm"
+                          >
+                            View Details
+                          </button>
                           {comp.status === "Pending" && (
                             <button 
                               onClick={() => handleSolveComplaint(comp.id)}
@@ -535,15 +842,20 @@ export default function AdminDashboard() {
                             <Briefcase className="w-6 h-6" />
                           </div>
                           <div>
-                            <h4 className="font-bold text-[#2C1810] text-base">{app.name}</h4>
-                            <p className="text-xs text-[#E8622A] font-bold mt-0.5">{app.postApplied}</p>
+                            <h4 className="font-bold text-[#2C1810] text-base">{app.fullName}</h4>
+                            <p className="text-xs text-[#E8622A] font-bold mt-0.5">{app.appliedPosition}</p>
                             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#7A5C45] mt-1.5">
                               <span>Mobile: {app.phone}</span>
                               <span>Applied: {app.date}</span>
+                              {app.resumeUrl && (
+                                <a href={app.resumeUrl} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">
+                                  View Resume
+                                </a>
+                              )}
                             </div>
                             <div className="mt-2.5">
                               <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                                app.status === "Interview Scheduled" ? "bg-emerald-100 text-emerald-700" :
+                                app.status === "Approved" ? "bg-emerald-100 text-emerald-700" :
                                 app.status === "Rejected" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"
                               }`}>
                                 {app.status}
@@ -552,12 +864,18 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2.5 relative z-10 shrink-0">
+                          <button 
+                            onClick={() => navigate(`/admin-dashboard/application/${app.id}`)}
+                            className="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-bold border border-blue-100 hover:bg-blue-100 transition-all shadow-sm flex items-center gap-1"
+                          >
+                            <Eye className="w-3.5 h-3.5" /> Details
+                          </button>
                           {app.status === "Pending" && (
                             <button 
-                              onClick={() => handleScheduleInterview(app.id)}
-                              className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl text-xs font-bold border border-blue-400 hover:scale-105 transition-all shadow"
+                              onClick={() => handleApproveApplication(app.id)}
+                              className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl text-xs font-bold border border-emerald-400 hover:scale-105 transition-all shadow"
                             >
-                              Schedule Interview
+                              Approve
                             </button>
                           )}
                           {app.status !== "Rejected" && (
@@ -760,6 +1078,171 @@ export default function AdminDashboard() {
           </div>
           
         </div>
+
+        {/* EVENT MODAL */}
+        <AnimatePresence>
+          {showEventModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative"
+              >
+                <div className="bg-[#E8622A] p-4 text-white flex justify-between items-center">
+                  <h3 className="font-bold font-serif text-xl">Create New Event</h3>
+                  <button onClick={() => setShowEventModal(false)} className="hover:bg-white/20 p-1 rounded-full"><X className="w-5 h-5"/></button>
+                </div>
+                <form onSubmit={handleCreateEvent} className="p-6 space-y-4">
+                  <div>
+                    <label className="block text-sm font-bold text-[#2C1810] mb-1">Event Title *</label>
+                    <input required type="text" value={newEvent.title} onChange={e => setNewEvent({...newEvent, title: e.target.value})} className="w-full px-4 py-2 border border-[#F0D5B8] rounded-xl focus:ring-2 focus:ring-[#E8622A] focus:border-transparent" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-[#2C1810] mb-1">Description *</label>
+                    <textarea required value={newEvent.description} onChange={e => setNewEvent({...newEvent, description: e.target.value})} className="w-full px-4 py-2 border border-[#F0D5B8] rounded-xl focus:ring-2 focus:ring-[#E8622A] focus:border-transparent h-24 resize-none" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-[#2C1810] mb-1">Date *</label>
+                      <input required type="datetime-local" value={newEvent.date} onChange={e => setNewEvent({...newEvent, date: e.target.value})} className="w-full px-4 py-2 border border-[#F0D5B8] rounded-xl focus:ring-2 focus:ring-[#E8622A] focus:border-transparent" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-[#2C1810] mb-1">Location *</label>
+                      <input required type="text" value={newEvent.location} onChange={e => setNewEvent({...newEvent, location: e.target.value})} className="w-full px-4 py-2 border border-[#F0D5B8] rounded-xl focus:ring-2 focus:ring-[#E8622A] focus:border-transparent" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-[#2C1810] mb-1">Event Image (Optional)</label>
+                    <div className="flex items-center gap-3">
+                      <label className="flex-1 cursor-pointer bg-[#FDF5EC] border border-dashed border-[#E8622A] rounded-xl p-3 flex flex-col items-center justify-center hover:bg-[#F0D5B8]/30 transition-colors">
+                        <Upload className="w-5 h-5 text-[#E8622A] mb-1" />
+                        <span className="text-xs font-semibold text-[#7A5C45]">{newEvent.image ? newEvent.image.name : "Upload Image"}</span>
+                        <input type="file" accept="image/*" className="hidden" onChange={e => setNewEvent({...newEvent, image: e.target.files[0]})} />
+                      </label>
+                    </div>
+                  </div>
+                  <button disabled={isSubmitting} type="submit" className="w-full py-3 bg-[#E8622A] text-white font-bold rounded-xl shadow hover:bg-[#D4880C] transition-colors disabled:opacity-50">
+                    {isSubmitting ? "Creating..." : "Create Event"}
+                  </button>
+                </form>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* FORUM MODAL */}
+        <AnimatePresence>
+          {showForumModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative"
+              >
+                <div className="bg-[#E8622A] p-4 text-white flex justify-between items-center">
+                  <h3 className="font-bold font-serif text-xl">Create New Forum Thread</h3>
+                  <button onClick={() => setShowForumModal(false)} className="hover:bg-white/20 p-1 rounded-full"><X className="w-5 h-5"/></button>
+                </div>
+                <form onSubmit={handleCreateForum} className="p-6 space-y-4">
+                  <div>
+                    <label className="block text-sm font-bold text-[#2C1810] mb-1">Thread Title *</label>
+                    <input required type="text" value={newForum.title} onChange={e => setNewForum({...newForum, title: e.target.value})} className="w-full px-4 py-2 border border-[#F0D5B8] rounded-xl focus:ring-2 focus:ring-[#E8622A] focus:border-transparent" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-[#2C1810] mb-1">Content / Question *</label>
+                    <textarea required value={newForum.content} onChange={e => setNewForum({...newForum, content: e.target.value})} className="w-full px-4 py-2 border border-[#F0D5B8] rounded-xl focus:ring-2 focus:ring-[#E8622A] focus:border-transparent h-32 resize-none" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-[#2C1810] mb-1">Attached Image (Optional)</label>
+                    <div className="flex items-center gap-3">
+                      <label className="flex-1 cursor-pointer bg-[#FDF5EC] border border-dashed border-[#E8622A] rounded-xl p-3 flex flex-col items-center justify-center hover:bg-[#F0D5B8]/30 transition-colors">
+                        <Upload className="w-5 h-5 text-[#E8622A] mb-1" />
+                        <span className="text-xs font-semibold text-[#7A5C45]">{newForum.image ? newForum.image.name : "Upload Image"}</span>
+                        <input type="file" accept="image/*" className="hidden" onChange={e => setNewForum({...newForum, image: e.target.files[0]})} />
+                      </label>
+                    </div>
+                  </div>
+                  <button disabled={isSubmitting} type="submit" className="w-full py-3 bg-[#E8622A] text-white font-bold rounded-xl shadow hover:bg-[#D4880C] transition-colors disabled:opacity-50">
+                    {isSubmitting ? "Creating..." : "Create Forum Thread"}
+                  </button>
+                </form>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* ANALYTICS MODAL */}
+        <AnimatePresence>
+          {showAnalyticsModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden relative"
+              >
+                <div className="bg-[#E8622A] p-5 text-white flex justify-between items-center">
+                  <h3 className="font-bold font-serif text-xl flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5" />
+                    Platform Analytics
+                  </h3>
+                  <button onClick={() => setShowAnalyticsModal(false)} className="hover:bg-white/20 p-1 rounded-full"><X className="w-5 h-5"/></button>
+                </div>
+                <div className="p-6 space-y-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-[#FDF5EC] p-4 rounded-xl border border-[#F0D5B8]">
+                      <span className="text-xs text-[#7A5C45] font-semibold uppercase tracking-wider block mb-1">Total Events</span>
+                      <span className="text-2xl font-bold text-[#2C1810]">{events.length}</span>
+                    </div>
+                    <div className="bg-[#FDF5EC] p-4 rounded-xl border border-[#F0D5B8]">
+                      <span className="text-xs text-[#7A5C45] font-semibold uppercase tracking-wider block mb-1">Forum Threads</span>
+                      <span className="text-2xl font-bold text-[#2C1810]">{forums.length}</span>
+                    </div>
+                    <div className="bg-[#FDF5EC] p-4 rounded-xl border border-[#F0D5B8]">
+                      <span className="text-xs text-[#7A5C45] font-semibold uppercase tracking-wider block mb-1">Total Grievances</span>
+                      <span className="text-2xl font-bold text-[#2C1810]">{adminComplaints.length}</span>
+                    </div>
+                    <div className="bg-[#FDF5EC] p-4 rounded-xl border border-[#F0D5B8]">
+                      <span className="text-xs text-[#7A5C45] font-semibold uppercase tracking-wider block mb-1">Pending Grievances</span>
+                      <span className="text-2xl font-bold text-red-600">{adminComplaints.filter(c => c.status === "Pending").length}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm font-semibold text-[#2C1810]">
+                      <span>Grievance Resolution Rate</span>
+                      <span>
+                        {adminComplaints.length > 0 
+                          ? Math.round(((adminComplaints.filter(c => c.status !== "Pending").length) / adminComplaints.length) * 100)
+                          : 100}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+                      <div 
+                        className="bg-gradient-to-r from-emerald-400 to-emerald-600 h-full rounded-full transition-all duration-500"
+                        style={{ 
+                          width: `${adminComplaints.length > 0 
+                            ? ((adminComplaints.filter(c => c.status !== "Pending").length) / adminComplaints.length) * 100 
+                            : 100}%` 
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="bg-orange-50/50 p-4 rounded-xl border border-orange-100/80">
+                    <h4 className="font-bold text-[#2C1810] text-sm mb-2">Member Applications Status</h4>
+                    <div className="flex justify-between items-center text-xs font-semibold text-[#7A5C45]">
+                      <span>Total Submitted: {applications.length}</span>
+                      <span className="text-[#E8622A]">Pending Review: {applications.filter(a => a.status === "Pending").length}</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

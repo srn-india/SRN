@@ -108,8 +108,12 @@ export const logout = catchAsync(async (req: Request, res: Response) => {
   const token = req.cookies?.accessToken || req.headers.authorization?.split(' ')[1];
   
   if (token) {
-    // Blacklist the token for 15 minutes (standard expiry)
-    await redis.set(`blacklist:${token}`, 'true', 'EX', 15 * 60);
+    try {
+      // Blacklist the token for 15 minutes (standard expiry)
+      await redis.set(`blacklist:${token}`, 'true', 'EX', 15 * 60);
+    } catch (err) {
+      console.warn('Could not blacklist token in redis:', err);
+    }
   }
 
   res.clearCookie('accessToken');

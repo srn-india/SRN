@@ -32,6 +32,9 @@ import forumRoutes from './modules/forum/forum.routes';
 import notificationRoutes from './modules/notification/notification.routes';
 import paymentRoutes from './modules/payment/payment.routes';
 import membershipRoutes from './modules/membership/membership.routes';
+import complaintRoutes from './modules/complaint/complaint.routes';
+import articleRoutes from './modules/article/article.routes';
+import applicationRoutes from './modules/application/application.routes';
 import { createServer } from 'http';
 import { initSocket } from './lib/socket';
 import logger from './utils/logger';
@@ -79,6 +82,14 @@ if (process.env.NODE_ENV !== 'test') {
   const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // Limit each IP to 100 requests per windowMs
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    handler: (req: Request, res: Response) => {
+      res.status(429).json({
+        success: false,
+        message: 'Too many requests, please try again later.'
+      });
+    }
   });
   app.use('/api', limiter);
 }
@@ -101,13 +112,33 @@ app.use('/api/forum', forumRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/memberships', membershipRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/complaints', complaintRoutes);
+app.use('/api/articles', articleRoutes);
+app.use('/api/applications', applicationRoutes);
 
 Sentry.setupExpressErrorHandler(app);
 
 // Error Handling Middleware
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  if (err.isOperational) {
+    return res.status(err.statusCode || 400).json({
+      success: false,
+      message: err.message
+    });
+  }
+
   logger.error(err.stack || err.message);
-  res.status(500).json({
+
+  if (err.code === 'P2025') {
+    return res.status(404).json({
+      success: false,
+      message: 'Record not found',
+      error: process.env.NODE_ENV === 'development' ? err : {}
+    });
+  }
+
+  res.status(err.statusCode || 500).json({
     success: false,
     message: err.message || 'Internal Server Error',
     error: process.env.NODE_ENV === 'development' ? err : {}

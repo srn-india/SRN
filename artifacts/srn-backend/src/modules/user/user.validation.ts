@@ -10,6 +10,7 @@ export const updateProfileSchema = z.object({
     gender: z.string().min(1, 'Gender is required').optional(),
     dateOfBirth: z.string().optional().transform((val) => val ? new Date(val) : undefined),
     avatar: z.string().url('Must be a valid URL').optional(),
+    profilePicture: z.string().optional(),
   }),
 });
 

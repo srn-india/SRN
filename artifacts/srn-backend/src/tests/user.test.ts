@@ -6,16 +6,16 @@ import bcrypt from 'bcrypt';
 import { generateAccessToken } from '../utils/jwt';
 
 // Mock Supabase to prevent actual uploads during testing
-jest.mock('@supabase/supabase-js', () => {
+jest.mock('../lib/supabase', () => {
   return {
-    createClient: jest.fn().mockReturnValue({
+    supabase: {
       storage: {
         from: jest.fn().mockReturnValue({
           upload: jest.fn().mockResolvedValue({ data: { path: 'fake-path.jpg' }, error: null }),
           getPublicUrl: jest.fn().mockReturnValue({ data: { publicUrl: 'https://dummy.supabase.co/fake-path.jpg' } })
         })
       }
-    })
+    }
   };
 });
 

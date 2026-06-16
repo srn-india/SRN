@@ -7,6 +7,7 @@ export const createThread = async (data: any, userId: string) => {
     data: {
       title: data.title,
       content: data.content,
+      imageUrl: data.imageUrl,
       userId,
     },
     include: {
@@ -57,6 +58,12 @@ export const getThreadById = async (id: string) => {
 
   if (!thread) throw new Error('Thread not found');
   return thread;
+};
+
+export const deleteThread = async (id: string) => {
+  return await prisma.forumThread.delete({
+    where: { id },
+  });
 };
 
 export const createComment = async (data: any, threadId: string, userId: string) => {

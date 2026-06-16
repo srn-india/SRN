@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import * as forumController from './forum.controller';
 import { protect } from '../../middleware/auth';
+import { restrictTo } from '../../middleware/role';
+import { upload } from '../../utils/upload';
 
 const router = Router();
 
@@ -55,7 +57,7 @@ router.get('/threads/:id', forumController.getThreadById);
  *       201:
  *         description: Thread created successfully
  */
-router.post('/threads', protect, forumController.createThread);
+router.post('/threads', protect, upload.single('image'), forumController.createThread);
 
 /**
  * @swagger
@@ -84,5 +86,7 @@ router.post('/threads', protect, forumController.createThread);
  *         description: Comment added successfully
  */
 router.post('/threads/:threadId/comments', protect, forumController.createComment);
+
+router.delete('/threads/:id', protect, restrictTo('ADMIN'), forumController.deleteThread);
 
 export default router;

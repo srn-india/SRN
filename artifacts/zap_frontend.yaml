@@ -1,0 +1,33 @@
+env:
+  contexts:
+  - excludePaths: []
+    name: frontend_baseline
+    urls:
+    - http://host.docker.internal:8080
+  parameters:
+    failOnError: true
+    progressToStdout: false
+jobs:
+- parameters:
+    enableTags: false
+    maxAlertsPerRule: 10
+  type: passiveScan-config
+- parameters:
+    maxDuration: 1
+    url: http://host.docker.internal:8080
+  type: spider
+- parameters:
+    maxDuration: 0
+  type: passiveScan-wait
+- parameters:
+    format: Long
+    summaryFile: /home/zap/zap_frontend_out.json
+  rules: []
+  type: outputSummary
+- parameters:
+    reportDescription: 'ZAP scan report for the React Frontend Application'
+    reportDir: /zap/wrk/
+    reportFile: zap_frontend_report.html
+    reportTitle: ZAP Frontend Scanning Report
+    template: traditional-html
+  type: report

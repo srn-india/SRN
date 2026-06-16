@@ -26,17 +26,22 @@ import Media from "./pages/Media";
 import Donate from "./pages/Donate";
 import BecomeMember from "./pages/BecomeMember";
 import AuthSuccess from "./pages/AuthSuccess";
+import AdminEventDetails from "./pages/AdminEventDetails";
 import Contact from "./pages/Contact";
 import NationalPresident from "./pages/NationalPresident";
 import Sansrakshak from "./pages/Sanrakshak";
 import AboutTeam from "./pages/AboutTeam";
 import Complaints from "./pages/Complaints";
+import ComplaintDetails from "./pages/ComplaintDetails";
+import ApplicationDetails from "./pages/ApplicationDetails";
+import ArticleDetails from "./pages/ArticleDetails";
 import RequestPosting from "./pages/RequestPosting";
 import JanSamwad from "./pages/JanSamwad";
 import JanmantAapKiAawaz from "./pages/JanmantAapKiAawaz";
 import JanYachikaye from "./pages/JanYachikaye";
 import { Phone, X } from "lucide-react";
 import { useLanguage } from "./context/LanguageContext";
+import { Toaster } from "./components/ui/toaster";
 
 // ── Phone Popup — rendered at root to avoid all stacking context issues ──────
 function PhonePopup({ show, onClose }) {
@@ -119,6 +124,14 @@ function NoNavLayout({ children }) {
   );
 }
 
+function AdminLayout({ children }) {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <main className="flex-1 flex flex-col">{children}</main>
+    </div>
+  );
+}
+
 export default function App() {
   const [splashDone, setSplashDone] = useState(() => {
     // Skip splash screen only if returning from OAuth redirect
@@ -175,6 +188,17 @@ export default function App() {
               <Route path="/auth/success" element={<NoNavLayout><AuthSuccess /></NoNavLayout>} />
 
               {/* Dashboard pages — with Navbar, no Footer */}
+
+              <Route 
+                path="/admin-dashboard/application/:id" 
+                element={
+                  <ProtectedRoute requireRole="ADMIN">
+                    <NoNavLayout>
+                      <ApplicationDetails />
+                    </NoNavLayout>
+                  </ProtectedRoute>
+                } 
+              />
               <Route 
                 path="/dashboard" 
                 element={
@@ -186,12 +210,48 @@ export default function App() {
                 } 
               />
               <Route 
+                path="/admin" 
+                element={
+                  <ProtectedRoute requireRole="ADMIN">
+                    <NoNavLayout><AdminDashboard /></NoNavLayout>
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/events/:id" 
+                element={
+                  <ProtectedRoute requireRole="ADMIN">
+                    <NoNavLayout><AdminEventDetails /></NoNavLayout>
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
                 path="/admin-dashboard" 
                 element={
                   <ProtectedRoute requireRole="ADMIN">
-                    <AuthLayout onPhoneClick={() => setShowPhonePopup(true)}>
+                    <AdminLayout>
                       <AdminDashboard />
-                    </AuthLayout>
+                    </AdminLayout>
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin-dashboard/complaint/:id" 
+                element={
+                  <ProtectedRoute requireRole="ADMIN">
+                    <NoNavLayout>
+                      <ComplaintDetails />
+                    </NoNavLayout>
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin-dashboard/article/:id" 
+                element={
+                  <ProtectedRoute requireRole="ADMIN">
+                    <NoNavLayout>
+                      <ArticleDetails />
+                    </NoNavLayout>
                   </ProtectedRoute>
                 } 
               />
@@ -223,6 +283,7 @@ export default function App() {
         </AuthProvider>
       </LanguageProvider>
       <Analytics />
+      <Toaster />
       </>
     </MotionConfig>
   );

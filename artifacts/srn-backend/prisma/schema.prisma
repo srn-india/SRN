@@ -60,6 +60,9 @@ model User {
   forumComments ForumComment[]
   notifications Notification[]
   eventRegistrations EventRegistration[]
+  complaints    Complaint[]
+  janmantArticles JanmantArticle[]
+  postApplications PostApplication[]
 }
 
 model Membership {
@@ -110,6 +113,7 @@ model Event {
   description String
   location    String
   date        DateTime
+  imageUrl    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
@@ -134,6 +138,7 @@ model ForumThread {
   id        String   @id @default(uuid())
   title     String
   content   String
+  imageUrl  String?
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
@@ -167,6 +172,73 @@ model Notification {
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Complaint {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ticket      String   @unique
+  fullName    String
+  email       String
+  phone       String
+  state       String
+  category    String
+  subject     String
+  description String
+  fileUrl     String?
+  status       String   @default("Pending")
+  isPublished  Boolean  @default(false)
+  titleEn      String?
+  titleHi      String?
+  resolutionEn String?
+  resolutionHi String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model JanmantArticle {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  authorName      String
+  email           String
+  phone           String
+  articleCategory String
+  title           String
+  summary         String
+  content         String
+  coverImageUrl   String?
+  status          String   @default("Pending") // Pending, Approved, Rejected
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model PostApplication {
+  id                 String   @id @default(uuid())
+  userId             String?
+  user               User?    @relation(fields: [userId], references: [id])
+  fullName           String
+  dob                String
+  gender             String
+  email              String
+  phone              String
+  address            String
+  qualification      String
+  appliedPosition    String
+  currentOccupation  String?
+  socialContribution String
+  whyJoin            String
+  resumeUrl          String?
+  status             String   @default("Pending") // Pending, Approved, Rejected
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   @@index([userId])
 }

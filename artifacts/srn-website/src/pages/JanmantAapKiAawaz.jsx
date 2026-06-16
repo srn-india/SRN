@@ -1,16 +1,31 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "../context/LanguageContext";
-import { BookOpen, Send, CheckCircle, Upload, AlertCircle, FileText, User, Mail, Tag } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { BookOpen, Send, CheckCircle, Upload, AlertCircle, FileText, User, Mail, Tag, X } from "lucide-react";
 
 export default function JanmantAapKiAawaz() {
   const { lang } = useLanguage();
+  const { user, API_BASE } = useAuth();
+  const navigate = useNavigate();
   const en = lang === "en";
 
   useEffect(() => {
     window.scrollTo(0, 0);
     document.title = en ? "Janmant Aap Ki Aawaz – SRN" : "जनमत आपकी आवाज़ – SRN";
   }, [en]);
+
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        authorName: user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : prev.authorName,
+        email: user.email || prev.email,
+        phone: user.phone || prev.phone,
+      }));
+    }
+  }, [user]);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -27,6 +42,7 @@ export default function JanmantAapKiAawaz() {
   const [errors, setErrors] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   const categories = [
     { value: "articles", en: "Articles & Opinions", hi: "लेख एवं विचार" },
@@ -48,7 +64,7 @@ export default function JanmantAapKiAawaz() {
       if (file.size > 5 * 1024 * 1024) {
         setErrors((prev) => ({
           ...prev,
-          coverImage: en ? "Image size must be less than 5MB" : "छवि का आकार 5MB से कम होना चाहिए"
+          coverImage: en ? "File size must be less than 5MB" : "फ़ाइल का आकार 5MB से कम होना चाहिए"
         }));
         return;
       }
@@ -64,7 +80,7 @@ export default function JanmantAapKiAawaz() {
     }
     if (!formData.email.trim()) {
       tempErrors.email = en ? "Email address is required" : "ईमेल पता आवश्यक है";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
       tempErrors.email = en ? "Please enter a valid email address" : "कृपया एक मान्य ईमेल दर्ज करें";
     }
     if (!formData.phone.trim()) {
@@ -89,17 +105,45 @@ export default function JanmantAapKiAawaz() {
     return Object.keys(tempErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!user) {
+      setShowLoginPrompt(true);
+      return;
+    }
     if (!validateForm()) return;
 
     setIsSubmitting(true);
+    setErrors({});
 
-    // Mock submission delay
-    setTimeout(() => {
+    try {
+      const data = new FormData();
+      Object.keys(formData).forEach(key => {
+        if (key === 'coverImage' && formData[key]) {
+          data.append('file', formData[key]);
+        } else if (key !== 'coverImage') {
+          data.append(key, formData[key]);
+        }
+      });
+
+      const res = await fetch(`${API_BASE}/api/articles`, {
+        method: "POST",
+        credentials: "include",
+        body: data,
+      });
+
+      const result = await res.json();
+      if (res.ok) {
+        setIsSubmitting(false);
+        setIsSubmitted(true);
+      } else {
+        setErrors({ authorName: result.message || 'Submission failed' });
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      setErrors({ authorName: 'An error occurred. Please try again later.' });
       setIsSubmitting(false);
-      setIsSubmitted(true);
-    }, 1500);
+    }
   };
 
   return (
@@ -372,7 +416,7 @@ export default function JanmantAapKiAawaz() {
                 {/* Cover Image */}
                 <div>
                   <label className="block text-sm font-semibold text-[#1E0F05] mb-2">
-                    {en ? "Attach Cover/Feature Image (Optional)" : "कवर या फीचर छवि संलग्न करें (वैकल्पिक)"}
+                    {en ? "Attach Cover Image or PDF (Optional)" : "कवर छवि या पीडीएफ संलग्न करें (वैकल्पिक)"}
                   </label>
                   <div className="flex items-center justify-center w-full">
                     <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-[#F0D5B8] rounded-xl cursor-pointer bg-[#FDF5EC]/20 hover:bg-[#FDF5EC]/50 transition-colors">
@@ -383,10 +427,10 @@ export default function JanmantAapKiAawaz() {
                           {en ? " or drag and drop" : " या ड्रैग एंड ड्रॉप करें"}
                         </p>
                         <p className="text-[10px] text-gray-400 mt-1">
-                          JPG, PNG {en ? "(Max 5MB)" : "(अधिकतम 5MB)"}
+                          JPG, PNG, PDF {en ? "(Max 5MB)" : "(अधिकतम 5MB)"}
                         </p>
                       </div>
-                      <input type="file" className="hidden" accept=".jpg,.jpeg,.png" onChange={handleFileChange} />
+                      <input type="file" className="hidden" accept=".jpg,.jpeg,.png,.pdf" onChange={handleFileChange} />
                     </label>
                   </div>
                   {formData.coverImage && (
@@ -464,6 +508,46 @@ export default function JanmantAapKiAawaz() {
 
         </div>
       </section>
+
+      {/* LOGIN PROMPT MODAL */}
+      <AnimatePresence>
+        {showLoginPrompt && (
+          <motion.div
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 100 }}
+            className="fixed top-24 right-6 z-50 bg-white border-l-4 border-[#E8622A] shadow-2xl rounded-lg p-5 max-w-sm"
+          >
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-6 h-6 text-[#E8622A] shrink-0" />
+              <div>
+                <h4 className="font-bold text-[#1E0F05] text-sm mb-1">
+                  {en ? "Login Required" : "लॉगिन आवश्यक है"}
+                </h4>
+                <p className="text-xs text-[#7A5C45] mb-4">
+                  {en 
+                    ? "You need to be logged in to submit an article. Please log in or create an account to proceed."
+                    : "लेख सबमिट करने के लिए आपको लॉग इन होना चाहिए। कृपया आगे बढ़ने के लिए लॉग इन करें या एक खाता बनाएं।"}
+                </p>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => navigate('/login')}
+                    className="px-4 py-2 bg-[#E8622A] text-white text-xs font-bold rounded-md hover:bg-[#D4880C] shadow-sm transition-colors"
+                  >
+                    {en ? "Login Now" : "अभी लॉगिन करें"}
+                  </button>
+                  <button 
+                    onClick={() => setShowLoginPrompt(false)}
+                    className="px-4 py-2 bg-gray-100 text-gray-700 text-xs font-bold rounded-md hover:bg-gray-200 transition-colors"
+                  >
+                    {en ? "Dismiss" : "खारिज करें"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

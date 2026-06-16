@@ -2,6 +2,7 @@ import { Router } from 'express';
 import * as eventsController from './events.controller';
 import { validate } from '../../middleware/validate';
 import { protect } from '../../middleware/auth';
+import { upload } from '../../utils/upload';
 import { restrictTo } from '../../middleware/role';
 import { createEventSchema } from './events.validation';
 
@@ -82,7 +83,7 @@ router.post('/:id/register', eventsController.registerForEvent);
  *       201:
  *         description: Event created successfully
  */
-router.post('/', protect, restrictTo('ADMIN'), validate(createEventSchema), eventsController.createEvent);
+router.post('/', protect, restrictTo('ADMIN'), upload.single('image'), validate(createEventSchema), eventsController.createEvent);
 
 /**
  * @swagger
@@ -101,6 +102,8 @@ router.post('/', protect, restrictTo('ADMIN'), validate(createEventSchema), even
  *       200:
  *         description: List of attendees
  */
-router.get('/:id/attendees', restrictTo('ADMIN'), eventsController.getAttendees);
+router.get('/:id/attendees', protect, restrictTo('ADMIN'), eventsController.getAttendees);
+
+router.delete('/:id', protect, restrictTo('ADMIN'), eventsController.deleteEvent);
 
 export default router;

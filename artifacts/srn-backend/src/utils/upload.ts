@@ -6,10 +6,10 @@ import path from 'path';
 const storage = multer.memoryStorage();
 
 const fileFilter = (req: any, file: any, cb: any) => {
-  if (file.mimetype.startsWith('image/')) {
+  if (file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf') {
     cb(null, true);
   } else {
-    cb(new Error('Not an image! Please upload only images.'), false);
+    cb(new Error('Invalid file type! Please upload only images or PDFs.'), false);
   }
 };
 

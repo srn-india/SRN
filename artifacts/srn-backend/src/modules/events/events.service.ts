@@ -1,15 +1,20 @@
 import { prisma } from '../../lib/prisma';
-import { getCache, setCache } from '../../lib/cache';
+import { getCache, setCache, delCache } from '../../lib/cache';
+import { AppError } from '../../utils/errors';
+
 
 export const createEvent = async (data: any) => {
-  return await prisma.event.create({
+  const event = await prisma.event.create({
     data: {
       title: data.title,
       description: data.description,
       location: data.location,
       date: new Date(data.date),
+      imageUrl: data.imageUrl,
     },
   });
+  await delCache('events:all');
+  return event;
 };
 
 export const getEvents = async () => {
@@ -30,7 +35,8 @@ export const getEvents = async () => {
       title: true,
       date: true,
       location: true,
-      // intentionally excluding 'description' as it might be large
+      imageUrl: true,
+      description: true,
     }
   });
 
@@ -46,6 +52,14 @@ export const getEventById = async (id: string) => {
   return event;
 };
 
+export const deleteEvent = async (id: string) => {
+  const event = await prisma.event.delete({
+    where: { id },
+  });
+  await delCache('events:all');
+  return event;
+};
+
 export const registerForEvent = async (eventId: string, userId: string) => {
   // Check if already registered
   const existing = await prisma.eventRegistration.findUnique({
@@ -55,7 +69,7 @@ export const registerForEvent = async (eventId: string, userId: string) => {
   });
 
   if (existing) {
-    throw new Error('You are already registered for this event');
+    throw new AppError('You are already registered for this event', 400);
   }
 
   return await prisma.eventRegistration.create({
