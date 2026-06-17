@@ -69,7 +69,7 @@ const bioData = {
   en: {
     name: "Mahamandaleshwar Swami Yatindranand Giri Maharaj",
     titleBadge: "Sanrakshak / Patron",
-    degrees: "Senior Spiritual Leader of Juna Akhara",
+    degrees: "Mahamandaleshwar of Juna Akhara",
     subtitles: [
       "Revered Senior Spiritual Leader",
       "Prominent Figure of Juna Akhara",

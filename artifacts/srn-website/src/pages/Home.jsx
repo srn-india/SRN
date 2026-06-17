@@ -105,10 +105,13 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.55, duration: 0.45 }}
-            className="mt-5"
+            className="mt-5 flex flex-col items-center gap-3"
           >
             <span className="inline-block bg-gradient-to-r from-[#E8622A] to-[#D4880C] text-white text-sm sm:text-base md:text-xl font-semibold italic py-1.5 px-4 md:py-2.5 md:px-8 rounded-full shadow-lg shadow-black/30">
               सेवा, शक्ति और संकल्प | हर कदम राष्ट्र निर्माण की ओर।
+            </span>
+            <span className="text-white/80 text-[11px] sm:text-xs md:text-sm font-medium italic tracking-widest uppercase drop-shadow-md">
+              {lang === "en" ? "Working Nationwide" : "देशभर में कार्यरत"}
             </span>
           </motion.div>
 
