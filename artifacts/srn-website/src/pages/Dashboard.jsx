@@ -227,7 +227,7 @@ export default function Dashboard() {
                 <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 translate-x-[-100%] group-hover:translate-x-[100%] transition-all duration-1000 ease-in-out pointer-events-none" />
                 
                 <div className="flex justify-between items-start mb-10 relative z-10">
-                  <img src="/logo.PNG" alt="Logo" className="w-12 h-12 object-contain opacity-80" />
+                  <img src="/srn-logo.png" alt="Logo" className="w-12 h-12 object-contain opacity-80" />
                   <ShieldCheck className="w-8 h-8 text-[#E8D5B8]" />
                 </div>
                 

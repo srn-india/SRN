@@ -70,7 +70,7 @@ export default function SplashScreen({ onDone }) {
 
       {/* Logo */}
       <motion.img
-        src="/logo.PNG"
+        src="/srn-logo.png"
         alt="Sashakt Rashtra Nirman"
         className="relative z-10 object-contain drop-shadow-2xl"
         style={{ width: 180, height: 180 }}

@@ -85,7 +85,7 @@ export default function Footer() {
               <div className="relative">
                 <div className="absolute inset-0 bg-[#E8622A]/10 blur-[10px] rounded-full" />
                 <img
-                  src="/logo.PNG"
+                  src="/srn-logo.png"
                   alt="Sashakt Rashtra Nirman Logo"
                   className="w-16 h-16 object-contain relative z-10 drop-shadow-sm"
                 />

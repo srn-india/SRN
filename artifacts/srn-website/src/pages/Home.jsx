@@ -79,7 +79,7 @@ export default function Home() {
         >
           {/* Logo */}
           <motion.img
-            src="/srn logo.png"
+            src="/srn-logo.png"
             alt="Sashakt Rashtra Nirman Logo"
             initial={{ scale: 0.7, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}

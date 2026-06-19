@@ -179,7 +179,7 @@ export default function Login() {
       {/* Left floating branding (hidden on mobile/tablet) */}
       <div className="flex-1 hidden lg:flex flex-col items-center justify-center text-center z-10 pointer-events-none">
         <motion.img 
-          src="/logo.PNG" 
+          src="/srn-logo.png" 
           alt="Sashakt Rashtra Nirman Logo" 
           className="w-48 h-48 drop-shadow-[0_0_30px_rgba(232,98,42,0.6)] mb-8" 
           animate={{ y: [0, -12, 0] }} 

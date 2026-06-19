@@ -152,7 +152,7 @@ export default function Navbar({ isOpen, setIsOpen, onPhoneClick }) {
         
         {/* Top Left: Logo & Name */}
         <Link to="/" className="flex items-center gap-2 sm:gap-3 group">
-          <img src="/logo.PNG" alt="SRN Logo" className="w-[56px] h-[56px] md:w-[52px] md:h-[52px] object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md" />
+          <img src="/srn-logo.png" alt="SRN Logo" className="w-[56px] h-[56px] md:w-[52px] md:h-[52px] object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md" />
           <div className="hidden sm:block">
             <h1 className="text-white font-bold text-lg font-serif leading-tight drop-shadow-md">
               {en ? "Sashakt Rashtra Nirman" : "सशक्त राष्ट्र निर्माण"}
