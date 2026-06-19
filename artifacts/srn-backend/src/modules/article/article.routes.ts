@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import multer from 'multer';
+import { upload } from '../../utils/upload';
 import { submitArticle, getArticles, getArticleById, approveArticle, deleteArticle } from './article.controller';
 import { protect } from '../../middleware/auth';
 import { restrictTo } from '../../middleware/role';
@@ -7,7 +7,6 @@ import { validate } from '../../middleware/validate';
 import { submitArticleSchema } from './article.schema';
 
 const router = Router();
-const upload = multer({ storage: multer.memoryStorage() });
 
 /**
  * @swagger

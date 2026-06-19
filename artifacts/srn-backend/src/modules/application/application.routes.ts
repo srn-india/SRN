@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import multer from 'multer';
+import { upload } from '../../utils/upload';
 import {
   submitApplication, 
   getApplications, 
@@ -13,7 +13,6 @@ import { restrictTo } from '../../middleware/role';
 
 const admin = restrictTo('ADMIN');
 const router = Router();
-const upload = multer({ storage: multer.memoryStorage() });
 
 /**
  * @swagger
