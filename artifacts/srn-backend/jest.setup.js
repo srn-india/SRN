@@ -4,3 +4,15 @@ require('dotenv').config();
 
 // Increase test timeout to handle slow OTP emails
 jest.setTimeout(30000);
+
+// Silence logger output during unit tests
+jest.mock('./src/utils/logger', () => ({
+  __esModule: true,
+  default: {
+    error: jest.fn(),
+    warn: jest.fn(),
+    info: jest.fn(),
+    http: jest.fn(),
+    debug: jest.fn(),
+  },
+}));
