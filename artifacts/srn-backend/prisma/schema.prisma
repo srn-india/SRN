@@ -9,7 +9,6 @@ datasource db {
 
 enum Role {
   USER
-  MEMBER
   ADMIN
 }
 
@@ -28,6 +27,37 @@ enum PaymentStatus {
   PENDING
   SUCCESS
   FAILED
+}
+
+enum PaymentType {
+  MEMBERSHIP
+  DONATION
+  EVENT
+}
+
+enum MembershipPlan {
+  BASIC
+  PREMIUM
+  LIFETIME
+}
+
+enum ComplaintStatus {
+  PENDING
+  UNDER_REVIEW
+  RESOLVED
+  REJECTED
+}
+
+enum ArticleStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 model User {
@@ -63,13 +93,14 @@ model User {
   complaints    Complaint[]
   janmantArticles JanmantArticle[]
   postApplications PostApplication[]
+  refreshTokens   RefreshToken[]
 }
 
 model Membership {
   id        String           @id @default(uuid())
   userId    String
   user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  plan      String
+  plan      MembershipPlan
   startDate DateTime
   endDate   DateTime
   status    MembershipStatus @default(ACTIVE)
@@ -80,15 +111,18 @@ model Membership {
 }
 
 model Payment {
-  id            String        @id @default(uuid())
-  userId        String
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  amount        Float
-  transactionId String?       @unique
-  provider      String        @default("RAZORPAY")
-  status        PaymentStatus @default(PENDING)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id                String        @id @default(uuid())
+  userId            String
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount            Decimal       @db.Decimal(10, 2)
+  type              PaymentType
+  razorpayOrderId   String?       @unique
+  razorpayPaymentId String?       @unique
+  provider          String        @default("RAZORPAY")
+  status            PaymentStatus @default(PENDING)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  donation          Donation?
 
   @@index([userId])
 }
@@ -177,34 +211,34 @@ model Notification {
 }
 
 model Complaint {
-  id          String   @id @default(uuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  ticket      String   @unique
-  fullName    String
-  email       String
-  phone       String
-  state       String
-  category    String
-  subject     String
-  description String
-  fileUrl     String?
-  status       String   @default("Pending")
-  isPublished  Boolean  @default(false)
+  id           String          @id @default(uuid())
+  userId       String
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ticket       String          @unique
+  fullName     String
+  email        String
+  phone        String
+  state        String
+  category     String
+  subject      String
+  description  String
+  fileUrl      String?
+  status       ComplaintStatus @default(PENDING)
+  isPublished  Boolean         @default(false)
   titleEn      String?
   titleHi      String?
   resolutionEn String?
   resolutionHi String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
 
   @@index([userId])
 }
 
 model JanmantArticle {
-  id              String   @id @default(uuid())
+  id              String        @id @default(uuid())
   userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   authorName      String
   email           String
   phone           String
@@ -213,19 +247,19 @@ model JanmantArticle {
   summary         String
   content         String
   coverImageUrl   String?
-  status          String   @default("Pending") // Pending, Approved, Rejected
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  status          ArticleStatus @default(PENDING)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
   @@index([userId])
 }
 
 model PostApplication {
-  id                 String   @id @default(uuid())
+  id                 String            @id @default(uuid())
   userId             String?
-  user               User?    @relation(fields: [userId], references: [id])
+  user               User?             @relation(fields: [userId], references: [id])
   fullName           String
-  dob                String
+  dob                DateTime
   gender             String
   email              String
   phone              String
@@ -236,9 +270,31 @@ model PostApplication {
   socialContribution String
   whyJoin            String
   resumeUrl          String?
-  status             String   @default("Pending") // Pending, Approved, Rejected
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  status             ApplicationStatus @default(PENDING)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  @@index([userId])
+}
+
+model Donation {
+  id          String   @id @default(uuid())
+  paymentId   String   @unique
+  payment     Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  purpose     String?
+  donorName   String?
+  donorEmail  String?
+  anonymous   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 
   @@index([userId])
 }

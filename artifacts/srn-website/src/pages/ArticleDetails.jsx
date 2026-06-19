@@ -115,8 +115,8 @@ export default function ArticleDetails() {
               </div>
               <div className="shrink-0 flex items-center justify-end">
                 <span className={`px-4 py-1.5 rounded-full text-sm font-bold shadow-md ${
-                  article.status === 'Approved' ? 'bg-white text-green-600' : 
-                  article.status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-white text-amber-600'
+                  article.status === 'APPROVED' ? 'bg-white text-green-600' : 
+                  article.status === 'REJECTED' ? 'bg-red-100 text-red-700' : 'bg-white text-amber-600'
                 }`}>
                   Status: {article.status}
                 </span>
@@ -191,7 +191,7 @@ export default function ArticleDetails() {
 
                 <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 flex flex-col gap-3">
                   <h4 className="font-bold text-[#2C1810] mb-2">Actions</h4>
-                  {article.status === 'Pending' && (
+                  {article.status === 'PENDING' && (
                     <button 
                       onClick={handleApprove}
                       className="w-full flex justify-center items-center gap-2 px-4 py-3 bg-emerald-500 text-white font-bold rounded-xl shadow-sm hover:bg-emerald-600 transition-colors"

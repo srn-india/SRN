@@ -1,8 +1,9 @@
 import { prisma } from '../../lib/prisma';
 import { generateAndUploadIdCard } from './idcard.service';
 import { sendMembershipEmail } from '../../utils/email';
+import { MembershipPlan } from '@prisma/client';
 
-export const subscribeUser = async (userId: string, plan: string, durationInMonths: number, txClient?: any) => {
+export const subscribeUser = async (userId: string, plan: MembershipPlan, durationInMonths: number, txClient?: any) => {
   const startDate = new Date();
   const endDate = new Date();
   endDate.setMonth(endDate.getMonth() + durationInMonths);
@@ -18,12 +19,6 @@ export const subscribeUser = async (userId: string, plan: string, durationInMont
       endDate,
       status: 'ACTIVE',
     },
-  });
-
-  // 2. Update user role to MEMBER
-  await client.user.update({
-    where: { id: userId },
-    data: { role: 'MEMBER' },
   });
 
   // 3. Asynchronously generate and upload the ID card

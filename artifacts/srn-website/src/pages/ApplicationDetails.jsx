@@ -42,10 +42,10 @@ export default function ApplicationDetails() {
         method: 'PATCH',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'Approved' })
+        body: JSON.stringify({ status: 'APPROVED' })
       });
       if (res.ok) {
-        setApplication(prev => ({ ...prev, status: 'Approved' }));
+        setApplication(prev => ({ ...prev, status: 'APPROVED' }));
       }
     } catch (err) {
       console.error(err);
@@ -58,10 +58,10 @@ export default function ApplicationDetails() {
         method: 'PATCH',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'Rejected' })
+        body: JSON.stringify({ status: 'REJECTED' })
       });
       if (res.ok) {
-        setApplication(prev => ({ ...prev, status: 'Rejected' }));
+        setApplication(prev => ({ ...prev, status: 'REJECTED' }));
       }
     } catch (err) {
       console.error(err);
@@ -135,8 +135,8 @@ export default function ApplicationDetails() {
               </div>
               <div className="shrink-0 flex items-center justify-end">
                 <span className={`px-4 py-1.5 rounded-full text-sm font-bold shadow-md ${
-                  application.status === 'Approved' ? 'bg-white text-emerald-600' : 
-                  application.status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-white text-amber-600'
+                  application.status === 'APPROVED' ? 'bg-white text-emerald-600' : 
+                  application.status === 'REJECTED' ? 'bg-red-100 text-red-700' : 'bg-white text-amber-600'
                 }`}>
                   Status: {application.status}
                 </span>
@@ -161,7 +161,7 @@ export default function ApplicationDetails() {
                     </div>
                     <div>
                       <span className="block text-[#7A5C45] font-semibold text-xs uppercase tracking-wider mb-1">Date of Birth</span>
-                      <span className="font-medium">{application.dob || "N/A"}</span>
+                      <span className="font-medium">{application.dob ? new Date(application.dob).toLocaleDateString() : "N/A"}</span>
                     </div>
                     <div className="sm:col-span-2">
                       <span className="block text-[#7A5C45] font-semibold text-xs uppercase tracking-wider mb-1">Address</span>
@@ -269,7 +269,7 @@ export default function ApplicationDetails() {
                   </h3>
                   
                   <div className="space-y-3">
-                    {application.status === 'Pending' && (
+                    {application.status === 'PENDING' && (
                       <button 
                         onClick={handleApprove}
                         className="w-full py-2.5 flex justify-center items-center gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-xl font-bold shadow-sm transition-all"
@@ -278,7 +278,7 @@ export default function ApplicationDetails() {
                       </button>
                     )}
                     
-                    {application.status !== 'Rejected' && (
+                    {application.status !== 'REJECTED' && (
                       <button 
                         onClick={handleReject}
                         className="w-full py-2.5 flex justify-center items-center gap-2 bg-white text-[#7A5C45] hover:text-red-600 border border-gray-200 hover:border-red-200 hover:bg-red-50 rounded-xl font-bold shadow-sm transition-all"

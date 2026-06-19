@@ -1,4 +1,5 @@
 import { prisma } from '../../lib/prisma';
+import { ComplaintStatus } from '@prisma/client';
 
 export const createComplaint = async (userId: string, data: any) => {
   return await prisma.complaint.create({
@@ -49,7 +50,7 @@ export const getComplaintById = async (id: string) => {
   });
 };
 
-export const updateComplaintStatus = async (id: string, status: string) => {
+export const updateComplaintStatus = async (id: string, status: ComplaintStatus) => {
   return await prisma.complaint.update({
     where: { id },
     data: { status },
@@ -66,7 +67,7 @@ export const getPublishedComplaints = async () => {
   return await prisma.complaint.findMany({
     where: {
       isPublished: true,
-      status: 'Solved',
+      status: 'RESOLVED',
     },
     orderBy: { updatedAt: 'desc' },
   });
@@ -82,7 +83,7 @@ export const publishComplaint = async (id: string, data: any) => {
       titleHi,
       resolutionEn,
       resolutionHi,
-      status: isPublished ? 'Solved' : undefined,
+      status: isPublished ? 'RESOLVED' : undefined,
     },
   });
 };

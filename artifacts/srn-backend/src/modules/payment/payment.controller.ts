@@ -8,7 +8,8 @@ export const getRazorpayKey = catchAsync(async (req: Request, res: Response) => 
 });
 
 export const createOrder = catchAsync(async (req: Request, res: Response) => {
-  const order = await paymentService.createOrder(req.user.id, req.body.amount);
+  const { amount, type } = req.body;
+  const order = await paymentService.createOrder(req.user.id, amount, type);
   sendSuccess(res, order, 'Payment order created', 201);
 });
 

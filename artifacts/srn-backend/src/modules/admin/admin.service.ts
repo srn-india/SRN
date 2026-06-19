@@ -1,4 +1,5 @@
 import { prisma } from '../../lib/prisma';
+import { Role } from '@prisma/client';
 
 /**
  * Fetches all users with pagination
@@ -71,7 +72,7 @@ export const deleteUser = async (userId: string) => {
 /**
  * Updates a user's role
  */
-export const updateUserRole = async (userId: string, role: 'USER' | 'MEMBER' | 'ADMIN') => {
+export const updateUserRole = async (userId: string, role: Role) => {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new Error('User not found');
 
@@ -88,7 +89,7 @@ export const updateUserRole = async (userId: string, role: 'USER' | 'MEMBER' | '
 export const getAnalytics = async () => {
   const [totalUsers, totalMembers, totalPosts, totalEvents, totalPayments, revenueResult] = await Promise.all([
     prisma.user.count(),
-    prisma.user.count({ where: { role: 'MEMBER' } }),
+    prisma.membership.count({ where: { status: 'ACTIVE' } }),
     prisma.post.count(),
     prisma.event.count(),
     prisma.payment.count({ where: { status: 'SUCCESS' } }),
@@ -104,7 +105,7 @@ export const getAnalytics = async () => {
     totalPosts,
     totalEvents,
     totalPayments,
-    totalRevenue: revenueResult._sum.amount || 0,
+    totalRevenue: revenueResult._sum.amount ? Number(revenueResult._sum.amount) : 0,
   };
 };
 

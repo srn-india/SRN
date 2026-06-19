@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Heart, ShieldCheck, IndianRupee, ArrowRight, CheckCircle2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Heart, ShieldCheck, IndianRupee, ArrowRight, CheckCircle2, ChevronDown } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 import { useAuth } from "../context/AuthContext";
 import ProfileCompletionModal from "../components/ProfileCompletionModal";
@@ -11,14 +12,40 @@ const QUICK_AMOUNTS = [500, 1000, 2500, 5000];
 export default function Donate() {
   const { lang } = useLanguage();
   const { user, API_BASE } = useAuth();
+  const navigate = useNavigate();
   const en = lang === "en";
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [amount, setAmount] = useState(1000);
   const [customAmount, setCustomAmount] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPurposeDropdown, setShowPurposeDropdown] = useState(false);
+
+  const donationPurposes = [
+    { value: "General Fund", label: en ? "General Fund" : "सामान्य कोष" },
+    { value: "Education", label: en ? "Education & Literacy" : "शिक्षा और साक्षरता" },
+    { value: "Healthcare", label: en ? "Healthcare Support" : "स्वास्थ्य सहायता" },
+    { value: "Culture", label: en ? "Cultural Preservation" : "सांस्कृतिक संरक्षण" }
+  ];
+
+  const [formData, setFormData] = useState({
+    fullName: user ? `${user.firstName || ""} ${user.lastName || ""}`.trim() : "",
+    email: user?.email || "",
+    phone: user?.phone || "",
+    purpose: "General Fund"
+  });
+
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        fullName: prev.fullName || `${user.firstName || ""} ${user.lastName || ""}`.trim(),
+        email: prev.email || user.email || "",
+        phone: prev.phone || user.phone || ""
+      }));
+    }
+  }, [user]);
 
   const handleQuickSelect = (val) => {
     setAmount(val);
@@ -34,7 +61,8 @@ export default function Donate() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) {
-      setIsModalOpen(true);
+      alert(en ? "Please sign in to make a secure donation." : "कृपया सुरक्षित दान करने के लिए साइन इन करें।");
+      navigate("/login");
       return;
     }
 
@@ -45,7 +73,7 @@ export default function Donate() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ amount: amount || 1000, currency: "INR" })
+        body: JSON.stringify({ amount: amount || 1000, currency: "INR", type: "DONATION", purpose: formData.purpose })
       });
       const orderData = await orderRes.json();
       if (!orderRes.ok) throw new Error(orderData.message || "Failed to create order");
@@ -69,7 +97,7 @@ export default function Donate() {
         currency: orderData.data.currency || "INR",
         name: "Sashakt Rashtra Nirman",
         description: "Donation",
-        order_id: orderData.data.transactionId,
+        order_id: orderData.data.razorpayOrderId,
         handler: async function (response) {
           try {
             // 3. Verify Payment
@@ -80,7 +108,8 @@ export default function Donate() {
               body: JSON.stringify({ 
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature 
+                razorpay_signature: response.razorpay_signature,
+                purpose: formData.purpose
               })
             });
             
@@ -98,9 +127,9 @@ export default function Donate() {
           }
         },
         prefill: {
-          name: `${user.firstName} ${user.lastName}`,
-          email: user.email,
-          contact: user.phone
+          name: formData.fullName,
+          email: formData.email,
+          contact: formData.phone
         },
         theme: {
           color: "#E8622A"
@@ -170,10 +199,10 @@ export default function Donate() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="bg-white rounded-3xl p-8 md:p-10 shadow-2xl border border-[#E8622A]/10 relative overflow-hidden"
+            className="bg-white rounded-3xl p-8 md:p-10 shadow-2xl border border-[#E8622A]/10 relative overflow-visible"
           >
             {/* Top decorative bar */}
-            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#E8622A] to-[#D4880C]" />
+            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#E8622A] to-[#D4880C] rounded-t-3xl" />
 
             {submitted ? (
               <div className="flex flex-col items-center justify-center text-center py-20">
@@ -237,21 +266,59 @@ export default function Donate() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-semibold text-[#7A5C45] mb-1.5 uppercase">{en ? "Full Name" : "पूरा नाम"} *</label>
-                      <input required type="text" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none" />
+                      <input required type="text" value={formData.fullName} onChange={e => setFormData({ ...formData, fullName: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none" />
                     </div>
                     <div>
                       <label className="block text-xs font-semibold text-[#7A5C45] mb-1.5 uppercase">{en ? "Phone Number" : "फ़ोन नंबर"} *</label>
-                      <input required type="tel" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none" />
+                      <input required type="tel" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none" />
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-semibold text-[#7A5C45] mb-1.5 uppercase">{en ? "Email Address" : "ईमेल"} *</label>
-                      <input required type="email" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none" />
+                      <input required type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none" />
                     </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-[#7A5C45] mb-1.5 uppercase">{en ? "PAN Number (For 80G)" : "पैन नंबर (80G के लिए)"}</label>
-                      <input type="text" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none uppercase" />
+                    <div className="relative">
+                      <label className="block text-xs font-semibold text-[#7A5C45] mb-1.5 uppercase">{en ? "Purpose of Donation" : "दान का उद्देश्य"}</label>
+                      <button
+                        type="button"
+                        onClick={() => setShowPurposeDropdown(!showPurposeDropdown)}
+                        className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none text-left flex justify-between items-center text-[#1E0F05] text-sm shadow-sm"
+                      >
+                        <span className="font-medium">
+                          {donationPurposes.find(p => p.value === formData.purpose)?.label || formData.purpose}
+                        </span>
+                        <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showPurposeDropdown ? "rotate-180" : ""}`} />
+                      </button>
+                      <AnimatePresence>
+                        {showPurposeDropdown && (
+                          <>
+                            <div className="fixed inset-0 z-10" onClick={() => setShowPurposeDropdown(false)} />
+                            <motion.div
+                              initial={{ opacity: 0, y: -10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -10 }}
+                              className="absolute z-20 w-full mt-2 bg-white border border-gray-100 rounded-xl shadow-xl max-h-48 overflow-y-auto"
+                            >
+                              {donationPurposes.map((p) => (
+                                <button
+                                  key={p.value}
+                                  type="button"
+                                  onClick={() => {
+                                    setFormData({ ...formData, purpose: p.value });
+                                    setShowPurposeDropdown(false);
+                                  }}
+                                  className={`w-full px-4 py-3 text-left text-sm hover:bg-orange-50 hover:text-[#E8622A] transition-colors ${
+                                    formData.purpose === p.value ? "bg-orange-50 text-[#E8622A] font-semibold" : "text-gray-700"
+                                  }`}
+                                >
+                                  {p.label}
+                                </button>
+                              ))}
+                            </motion.div>
+                          </>
+                        )}
+                      </AnimatePresence>
                     </div>
                   </div>
                 </div>

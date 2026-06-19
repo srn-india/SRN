@@ -78,7 +78,7 @@ export const getArticleById = async (req: Request, res: Response): Promise<void>
 export const approveArticle = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = req.params.id as string;
-    const article = await articleService.updateStatus(id, 'Approved');
+    const article = await articleService.updateStatus(id, 'APPROVED');
     res.status(200).json({ message: 'Article approved successfully', data: article });
   } catch (error: any) {
     res.status(500).json({ message: 'Error approving article', error: error.message });

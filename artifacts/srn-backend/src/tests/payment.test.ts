@@ -59,11 +59,12 @@ describe('Payment & Membership Module', () => {
       .set('Authorization', `Bearer ${userToken}`)
       .send({
         amount: 999,
-        currency: 'INR'
+        currency: 'INR',
+        type: 'MEMBERSHIP'
       });
 
     expect(res.status).toBe(201);
-    expect(res.body.data.amount).toBe(999);
+    expect(Number(res.body.data.amount)).toBe(999);
     expect(res.body.data.status).toBe('PENDING');
   });
 
@@ -72,10 +73,10 @@ describe('Payment & Membership Module', () => {
     const orderRes = await request(app)
       .post('/api/payments/order')
       .set('Authorization', `Bearer ${userToken}`)
-      .send({ amount: 999 });
+      .send({ amount: 999, type: 'MEMBERSHIP' });
 
     const paymentId = orderRes.body.data.id;
-    const razorpay_order_id = orderRes.body.data.transactionId;
+    const razorpay_order_id = orderRes.body.data.razorpayOrderId;
     const razorpay_payment_id = 'fake_payment_id';
 
     const body = razorpay_order_id + "|" + razorpay_payment_id;
@@ -97,9 +98,9 @@ describe('Payment & Membership Module', () => {
     expect(res.status).toBe(200);
     expect(res.body.data.status).toBe('SUCCESS');
 
-    // Check if user is now a MEMBER
+    // Check if user is USER
     const user = await prisma.user.findUnique({ where: { id: userId } });
-    expect(user?.role).toBe('MEMBER');
+    expect(user?.role).toBe('USER');
 
     // Check membership record
     const membership = await prisma.membership.findFirst({ where: { userId } });

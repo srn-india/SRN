@@ -50,10 +50,10 @@ export default function ComplaintDetails() {
         method: 'PATCH',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'Solved' })
+        body: JSON.stringify({ status: 'RESOLVED' })
       });
       if (res.ok) {
-        setComplaint(prev => ({ ...prev, status: 'Solved' }));
+        setComplaint(prev => ({ ...prev, status: 'RESOLVED' }));
       }
     } catch (err) {
       console.error(err);
@@ -185,8 +185,8 @@ export default function ComplaintDetails() {
               </div>
               <div className="shrink-0 flex flex-col items-end gap-2">
                 <span className={`px-4 py-1.5 rounded-full text-sm font-bold shadow-md ${
-                  complaint.status === 'Solved' ? 'bg-white text-green-600' : 
-                  complaint.status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-white text-amber-600'
+                  complaint.status === 'RESOLVED' ? 'bg-white text-green-600' : 
+                  complaint.status === 'REJECTED' ? 'bg-red-100 text-red-700' : 'bg-white text-amber-600'
                 }`}>
                   Status: {complaint.status}
                 </span>
@@ -265,7 +265,7 @@ export default function ComplaintDetails() {
 
                 <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 flex flex-col gap-3">
                   <h4 className="font-bold text-[#2C1810] mb-2">Actions</h4>
-                  {complaint.status === 'Pending' && (
+                  {complaint.status === 'PENDING' && (
                     <button 
                       onClick={handleSolve}
                       className="w-full flex justify-center items-center gap-2 px-4 py-3 bg-emerald-500 text-white font-bold rounded-xl shadow-sm hover:bg-emerald-600 transition-colors"

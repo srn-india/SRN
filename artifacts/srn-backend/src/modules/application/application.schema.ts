@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const createApplicationSchema = z.object({
   fullName: z.string().min(1, 'Full name is required'),
-  dob: z.string().min(1, 'Date of birth is required'),
+  dob: z.string().min(1, 'Date of birth is required').transform((val) => new Date(val)),
   gender: z.string().min(1, 'Gender is required'),
   email: z.string().email('Valid email is required'),
   phone: z.string().min(10, 'Valid phone number is required'),
@@ -15,5 +15,5 @@ export const createApplicationSchema = z.object({
 });
 
 export const updateApplicationStatusSchema = z.object({
-  status: z.enum(['Pending', 'Approved', 'Rejected'])
+  status: z.enum(['PENDING', 'APPROVED', 'REJECTED'])
 });

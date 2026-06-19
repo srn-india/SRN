@@ -97,7 +97,7 @@ export default function BecomeMember() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ amount: 999, currency: "INR" })
+        body: JSON.stringify({ amount: 999, currency: "INR", type: "MEMBERSHIP" })
       });
       const orderData = await orderRes.json();
       
@@ -122,7 +122,7 @@ export default function BecomeMember() {
         currency: orderData.data.currency || "INR",
         name: "Sashakt Rashtra Nirman",
         description: "Membership Registration",
-        order_id: orderData.data.transactionId,
+        order_id: orderData.data.razorpayOrderId,
         handler: async function (response) {
           try {
             // 4. Verify Payment

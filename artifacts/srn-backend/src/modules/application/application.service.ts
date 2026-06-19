@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, ApplicationStatus } from '@prisma/client';
 import { prisma } from '../../lib/prisma';
 
 export const createApplication = async (data: Prisma.PostApplicationUncheckedCreateInput) => {
@@ -36,7 +36,7 @@ export const getApplicationById = async (id: string) => {
   });
 };
 
-export const updateApplicationStatus = async (id: string, status: string) => {
+export const updateApplicationStatus = async (id: string, status: ApplicationStatus) => {
   return prisma.postApplication.update({
     where: { id },
     data: { status },

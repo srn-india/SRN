@@ -6,7 +6,7 @@ import {
   ArrowLeft, LogOut, UserCircle, Calendar, MessageSquare, 
   ShieldCheck, CheckCircle2, XCircle, Plus, Trash2, ShieldAlert,
   Settings, Sliders, Bell, LayoutDashboard, Key, TrendingUp, Download, MapPin,
-  BookOpen, AlertCircle, Briefcase, FileText, X, Eye, GraduationCap, Heart, CalendarDays, User, Users
+  BookOpen, AlertCircle, Briefcase, FileText, X, Eye, GraduationCap, Heart, CalendarDays, User, Users, RotateCw
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -117,11 +117,17 @@ export default function AdminDashboard() {
   const [adminComplaints, setAdminComplaints] = useState([]);
   const [loadingComplaints, setLoadingComplaints] = useState(true);
 
+  const [memberships, setMemberships] = useState([]);
+  const [loadingMemberships, setLoadingMemberships] = useState(true);
+  const [membershipPage, setMembershipPage] = useState(1);
+  const [membershipTotalPages, setMembershipTotalPages] = useState(1);
+
   useEffect(() => {
     if (activeTab === "complaints") fetchComplaints();
     if (activeTab === "articles") fetchArticles();
     if (activeTab === "events") fetchEvents();
     if (activeTab === "forums") fetchForums();
+    if (activeTab === "memberships") fetchMemberships(membershipPage);
   }, [activeTab]);
 
   const fetchComplaints = async () => {
@@ -188,6 +194,7 @@ export default function AdminDashboard() {
     fetchApplications();
     fetchEvents();
     fetchForums();
+    fetchMemberships();
   }, [API_BASE]);
 
   const fetchApplications = async () => {
@@ -235,6 +242,62 @@ export default function AdminDashboard() {
     } finally {
       setLoadingForums(false);
     }
+  };
+
+  const fetchMemberships = async (page = 1) => {
+    setLoadingMemberships(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/memberships?page=${page}&limit=10`, { credentials: 'include' });
+      const data = await res.json();
+      if (res.ok) {
+        setMemberships(data.data.memberships || []);
+        setMembershipPage(data.data.pagination.page);
+        setMembershipTotalPages(data.data.pagination.totalPages);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingMemberships(false);
+    }
+  };
+
+  const handleExportMemberships = () => {
+    if (memberships.length === 0) return;
+
+    // Calculate total revenue (999 per membership)
+    const activeCount = memberships.filter(m => m.status === 'ACTIVE').length;
+    const totalCount = memberships.length;
+    const totalRevenue = totalCount * 999;
+
+    // Build CSV content
+    const headers = ["Member Name", "Email", "Plan", "Start Date", "End Date", "Status", "Revenue (INR)"];
+    const rows = memberships.map(m => [
+      m.user ? `"${m.user.firstName || ''} ${m.user.lastName || ''}"`.trim() : "Unknown User",
+      m.user?.email || "N/A",
+      m.plan,
+      new Date(m.startDate).toLocaleDateString(),
+      new Date(m.endDate).toLocaleDateString(),
+      m.status,
+      "999"
+    ]);
+
+    // Append summary rows
+    rows.push([]);
+    rows.push(["Summary Details"]);
+    rows.push(["Total Registered Members", totalCount]);
+    rows.push(["Active Members", activeCount]);
+    rows.push(["Total Revenue Generated (INR)", totalRevenue]);
+
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", encodedUri);
+    downloadAnchor.setAttribute("download", `srn_membership_revenue_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
   };
 
   const handleCreateEvent = async (e) => {
@@ -434,6 +497,7 @@ export default function AdminDashboard() {
     { id: "complaints", label: "Manage Complaints", icon: AlertCircle },
     { id: "applications", label: "Post Applications", icon: Briefcase },
     { id: "approvals", label: "Approve IDs", icon: ShieldCheck },
+    { id: "memberships", label: "Manage Memberships", icon: Users },
     { id: "settings", label: "Platform Settings", icon: Settings },
   ];
 
@@ -559,7 +623,7 @@ export default function AdminDashboard() {
                     <div className="bg-white/60 backdrop-blur-md rounded-[2rem] p-6 border border-white/80 shadow-sm">
                       <UserCircle className="w-8 h-8 text-rose-500 mb-4" />
                       <h3 className="text-2xl font-bold text-[#2C1810]">
-                        {adminComplaints.filter(c => c.status === "Pending").length}
+                        {adminComplaints.filter(c => c.status === "PENDING").length}
                       </h3>
                       <p className="text-sm text-[#7A5C45] font-semibold">Pending Approvals</p>
                     </div>
@@ -600,9 +664,19 @@ export default function AdminDashboard() {
                       <h2 className="text-2xl font-bold text-[#2C1810] font-serif">Manage Events</h2>
                       <p className="text-sm text-[#7A5C45] mt-1">Add or remove upcoming rallies and events.</p>
                     </div>
-                    <button onClick={() => setShowEventModal(true)} className="flex items-center gap-2 bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md hover:shadow-lg hover:scale-105 transition-all">
-                      <Plus className="w-4 h-4" /> Add Event
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <button 
+                        onClick={fetchEvents}
+                        disabled={loadingEvents}
+                        className="flex items-center justify-center p-2.5 bg-white text-[#7A5C45] hover:text-[#E8622A] rounded-xl border border-gray-200 hover:border-orange-200 transition-all shadow-sm disabled:opacity-50 cursor-pointer"
+                        title="Reload Events"
+                      >
+                        <RotateCw className={`w-4 h-4 ${loadingEvents ? "animate-spin" : ""}`} />
+                      </button>
+                      <button onClick={() => setShowEventModal(true)} className="flex items-center gap-2 bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md hover:shadow-lg hover:scale-105 transition-all">
+                        <Plus className="w-4 h-4" /> Add Event
+                      </button>
+                    </div>
                   </div>
                   
                   <div className="space-y-4">
@@ -652,9 +726,19 @@ export default function AdminDashboard() {
                       <h2 className="text-2xl font-bold text-[#2C1810] font-serif">Manage Forums</h2>
                       <p className="text-sm text-[#7A5C45] mt-1">Add or remove discussion topics.</p>
                     </div>
-                    <button onClick={() => setShowForumModal(true)} className="flex items-center gap-2 bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md hover:shadow-lg hover:scale-105 transition-all">
-                      <Plus className="w-4 h-4" /> Add Forum
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <button 
+                        onClick={fetchForums}
+                        disabled={loadingForums}
+                        className="flex items-center justify-center p-2.5 bg-white text-[#7A5C45] hover:text-[#E8622A] rounded-xl border border-gray-200 hover:border-orange-200 transition-all shadow-sm disabled:opacity-50 cursor-pointer"
+                        title="Reload Forums"
+                      >
+                        <RotateCw className={`w-4 h-4 ${loadingForums ? "animate-spin" : ""}`} />
+                      </button>
+                      <button onClick={() => setShowForumModal(true)} className="flex items-center gap-2 bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md hover:shadow-lg hover:scale-105 transition-all">
+                        <Plus className="w-4 h-4" /> Add Forum
+                      </button>
+                    </div>
                   </div>
                   
                   <div className="space-y-4">
@@ -691,12 +775,22 @@ export default function AdminDashboard() {
               {/* MANAGE ARTICLES TAB */}
               {activeTab === "articles" && (
                 <motion.div key="articles" variants={fadeVariants} initial="hidden" animate="visible" exit="exit" className="bg-white/70 backdrop-blur-xl p-8 rounded-[2rem] border border-white/80 shadow-sm">
-                  <div className="mb-8 pb-4 border-b border-gray-100">
-                    <h2 className="text-2xl font-bold text-[#2C1810] font-serif flex items-center gap-2">
-                      Manage Submitted Articles
-                      <span className="bg-[#E8622A] text-white text-sm px-2 py-0.5 rounded-full">{articles.length}</span>
-                    </h2>
-                    <p className="text-sm text-[#7A5C45] mt-1">Review articles submitted via the "Janmant: Aap Ki Aawaz" portal.</p>
+                  <div className="mb-8 pb-4 border-b border-gray-100 flex justify-between items-center">
+                    <div>
+                      <h2 className="text-2xl font-bold text-[#2C1810] font-serif flex items-center gap-2">
+                        Manage Submitted Articles
+                        <span className="bg-[#E8622A] text-white text-sm px-2 py-0.5 rounded-full">{articles.length}</span>
+                      </h2>
+                      <p className="text-sm text-[#7A5C45] mt-1">Review articles submitted via the "Janmant: Aap Ki Aawaz" portal.</p>
+                    </div>
+                    <button 
+                      onClick={fetchArticles}
+                      disabled={loadingArticles}
+                      className="flex items-center justify-center p-2.5 bg-white text-[#7A5C45] hover:text-[#E8622A] rounded-xl border border-gray-200 hover:border-orange-200 transition-all shadow-sm disabled:opacity-50 cursor-pointer"
+                      title="Reload Articles"
+                    >
+                      <RotateCw className={`w-4 h-4 ${loadingArticles ? "animate-spin" : ""}`} />
+                    </button>
                   </div>
                   
                   <div className="space-y-4">
@@ -715,7 +809,7 @@ export default function AdminDashboard() {
                             </div>
                             <div className="mt-2.5">
                               <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                                art.status === "Approved" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+                                art.status === "APPROVED" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
                               }`}>
                                 {art.status}
                               </span>
@@ -729,7 +823,7 @@ export default function AdminDashboard() {
                           >
                             View Details
                           </button>
-                          {art.status === "Pending" && (
+                          {art.status === "PENDING" && (
                             <button 
                               onClick={() => handleApproveArticle(art.id)}
                               className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl text-xs font-bold border border-emerald-400 hover:scale-105 transition-all shadow"
@@ -756,12 +850,22 @@ export default function AdminDashboard() {
               {/* MANAGE COMPLAINTS TAB */}
               {activeTab === "complaints" && (
                 <motion.div key="complaints" variants={fadeVariants} initial="hidden" animate="visible" exit="exit" className="bg-white/70 backdrop-blur-xl p-8 rounded-[2rem] border border-white/80 shadow-sm">
-                  <div className="mb-8 pb-4 border-b border-gray-100">
-                    <h2 className="text-2xl font-bold text-[#2C1810] font-serif flex items-center gap-2">
-                      Manage Complaints
-                      <span className="bg-[#E8622A] text-white text-sm px-2 py-0.5 rounded-full">{adminComplaints.length}</span>
-                    </h2>
-                    <p className="text-sm text-[#7A5C45] mt-1">Review public complaints registered via the "Jan Shikayat" portal.</p>
+                  <div className="mb-8 pb-4 border-b border-gray-100 flex justify-between items-center">
+                    <div>
+                      <h2 className="text-2xl font-bold text-[#2C1810] font-serif flex items-center gap-2">
+                        Manage Complaints
+                        <span className="bg-[#E8622A] text-white text-sm px-2 py-0.5 rounded-full">{adminComplaints.length}</span>
+                      </h2>
+                      <p className="text-sm text-[#7A5C45] mt-1">Review public complaints registered via the "Jan Shikayat" portal.</p>
+                    </div>
+                    <button 
+                      onClick={fetchComplaints}
+                      disabled={loadingComplaints}
+                      className="flex items-center justify-center p-2.5 bg-white text-[#7A5C45] hover:text-[#E8622A] rounded-xl border border-gray-200 hover:border-orange-200 transition-all shadow-sm disabled:opacity-50 cursor-pointer"
+                      title="Reload Complaints"
+                    >
+                      <RotateCw className={`w-4 h-4 ${loadingComplaints ? "animate-spin" : ""}`} />
+                    </button>
                   </div>
                   
                   <div className="space-y-4">
@@ -785,7 +889,7 @@ export default function AdminDashboard() {
                             </div>
                             <div className="mt-2.5">
                               <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                                comp.status === "Solved" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+                                comp.status === "RESOLVED" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
                               }`}>
                                 {comp.status}
                               </span>
@@ -799,7 +903,7 @@ export default function AdminDashboard() {
                           >
                             View Details
                           </button>
-                          {comp.status === "Pending" && (
+                          {comp.status === "PENDING" && (
                             <button 
                               onClick={() => handleSolveComplaint(comp.id)}
                               className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl text-xs font-bold border border-emerald-400 hover:scale-105 transition-all shadow"
@@ -826,12 +930,22 @@ export default function AdminDashboard() {
               {/* POST APPLICATIONS TAB */}
               {activeTab === "applications" && (
                 <motion.div key="applications" variants={fadeVariants} initial="hidden" animate="visible" exit="exit" className="bg-white/70 backdrop-blur-xl p-8 rounded-[2rem] border border-white/80 shadow-sm">
-                  <div className="mb-8 pb-4 border-b border-gray-100">
-                    <h2 className="text-2xl font-bold text-[#2C1810] font-serif flex items-center gap-2">
-                      Manage Post Applications
-                      <span className="bg-[#E8622A] text-white text-sm px-2 py-0.5 rounded-full">{applications.length}</span>
-                    </h2>
-                    <p className="text-sm text-[#7A5C45] mt-1">Review applicant submissions for organizational roles.</p>
+                  <div className="mb-8 pb-4 border-b border-gray-100 flex justify-between items-center">
+                    <div>
+                      <h2 className="text-2xl font-bold text-[#2C1810] font-serif flex items-center gap-2">
+                        Manage Post Applications
+                        <span className="bg-[#E8622A] text-white text-sm px-2 py-0.5 rounded-full">{applications.length}</span>
+                      </h2>
+                      <p className="text-sm text-[#7A5C45] mt-1">Review applicant submissions for organizational roles.</p>
+                    </div>
+                    <button 
+                      onClick={fetchApplications}
+                      disabled={loadingApplications}
+                      className="flex items-center justify-center p-2.5 bg-white text-[#7A5C45] hover:text-[#E8622A] rounded-xl border border-gray-200 hover:border-orange-200 transition-all shadow-sm disabled:opacity-50 cursor-pointer"
+                      title="Reload Applications"
+                    >
+                      <RotateCw className={`w-4 h-4 ${loadingApplications ? "animate-spin" : ""}`} />
+                    </button>
                   </div>
                   
                   <div className="space-y-4">
@@ -855,8 +969,8 @@ export default function AdminDashboard() {
                             </div>
                             <div className="mt-2.5">
                               <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                                app.status === "Approved" ? "bg-emerald-100 text-emerald-700" :
-                                app.status === "Rejected" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"
+                                app.status === "APPROVED" ? "bg-emerald-100 text-emerald-700" :
+                                app.status === "REJECTED" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"
                               }`}>
                                 {app.status}
                               </span>
@@ -870,7 +984,7 @@ export default function AdminDashboard() {
                           >
                             <Eye className="w-3.5 h-3.5" /> Details
                           </button>
-                          {app.status === "Pending" && (
+                          {app.status === "PENDING" && (
                             <button 
                               onClick={() => handleApproveApplication(app.id)}
                               className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl text-xs font-bold border border-emerald-400 hover:scale-105 transition-all shadow"
@@ -878,7 +992,7 @@ export default function AdminDashboard() {
                               Approve
                             </button>
                           )}
-                          {app.status !== "Rejected" && (
+                          {app.status !== "REJECTED" && (
                             <button 
                               onClick={() => handleRejectApplication(app.id)}
                               className="px-4 py-2 bg-white text-[#7A5C45] rounded-xl text-xs font-bold border border-gray-200 hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-all shadow-sm"
@@ -899,6 +1013,138 @@ export default function AdminDashboard() {
                       <div className="text-center py-10 text-[#7A5C45]">No applications found.</div>
                     )}
                   </div>
+                </motion.div>
+              )}
+
+              {/* MANAGE MEMBERSHIPS TAB */}
+              {activeTab === "memberships" && (
+                <motion.div key="memberships" variants={fadeVariants} initial="hidden" animate="visible" exit="exit" className="bg-white/70 backdrop-blur-xl p-8 rounded-[2rem] border border-white/80 shadow-sm text-left">
+                  <div className="mb-8 pb-4 border-b border-gray-100 flex justify-between items-center">
+                    <div>
+                      <h2 className="text-2xl font-bold text-[#2C1810] font-serif flex items-center gap-2">
+                        Manage Memberships
+                        <span className="bg-[#E8622A] text-white text-sm px-2 py-0.5 rounded-full">{memberships.length}</span>
+                      </h2>
+                      <p className="text-sm text-[#7A5C45] mt-1">View and manage user membership subscriptions.</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button 
+                        onClick={handleExportMemberships}
+                        disabled={loadingMemberships || memberships.length === 0}
+                        className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all disabled:opacity-50 cursor-pointer"
+                        title="Export Memberships Report"
+                      >
+                        <Download className="w-4 h-4" /> Export Report
+                      </button>
+                      <button 
+                        onClick={() => fetchMemberships(membershipPage)}
+                        disabled={loadingMemberships}
+                        className="flex items-center justify-center p-2.5 bg-white text-[#7A5C45] hover:text-[#E8622A] rounded-xl border border-gray-200 hover:border-orange-200 transition-all shadow-sm disabled:opacity-50 cursor-pointer"
+                        title="Reload Memberships"
+                      >
+                        <RotateCw className={`w-4 h-4 ${loadingMemberships ? "animate-spin" : ""}`} />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {loadingMemberships ? (
+                    <div className="flex justify-center items-center py-20">
+                      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#E8622A]" />
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      {/* Revenue & Member Metrics Cards */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <div className="bg-white/60 backdrop-blur-md rounded-[1.5rem] p-5 border border-white/80 shadow-sm">
+                          <span className="text-xs text-[#7A5C45] font-semibold uppercase tracking-wider block mb-1">Total Members</span>
+                          <span className="text-2xl font-bold text-[#2C1810]">{memberships.length}</span>
+                        </div>
+                        <div className="bg-white/60 backdrop-blur-md rounded-[1.5rem] p-5 border border-white/80 shadow-sm">
+                          <span className="text-xs text-[#7A5C45] font-semibold uppercase tracking-wider block mb-1">Active Subscriptions</span>
+                          <span className="text-2xl font-bold text-emerald-600">{memberships.filter(m => m.status === 'ACTIVE').length}</span>
+                        </div>
+                        <div className="bg-white/60 backdrop-blur-md rounded-[1.5rem] p-5 border border-white/80 shadow-sm">
+                          <span className="text-xs text-[#7A5C45] font-semibold uppercase tracking-wider block mb-1">Total Revenue</span>
+                          <span className="text-2xl font-bold text-[#E8622A]">₹{memberships.length * 999}</span>
+                        </div>
+                      </div>
+
+                      <div className="overflow-x-auto rounded-2xl border border-white/80 shadow-sm bg-white/30">
+                        <table className="w-full text-left border-collapse">
+                          <thead>
+                            <tr className="bg-gradient-to-r from-orange-50 to-orange-100/50 text-[#7A5C45] font-bold text-xs uppercase tracking-wider border-b border-gray-100">
+                              <th className="px-6 py-4">Member Name</th>
+                              <th className="px-6 py-4">Email</th>
+                              <th className="px-6 py-4">Plan</th>
+                              <th className="px-6 py-4">Duration</th>
+                              <th className="px-6 py-4">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-100 text-sm">
+                            {memberships.map((m) => (
+                              <tr key={m.id} className="hover:bg-white/50 transition-colors">
+                                <td className="px-6 py-4 font-semibold text-[#2C1810]">
+                                  {m.user ? `${m.user.firstName || ''} ${m.user.lastName || ''}`.trim() : "Unknown User"}
+                                </td>
+                                <td className="px-6 py-4 text-gray-600">
+                                  {m.user?.email || "N/A"}
+                                </td>
+                                <td className="px-6 py-4">
+                                  <span className="px-2.5 py-1 bg-orange-50 text-[#E8622A] rounded-lg text-xs font-bold border border-orange-100">
+                                    {m.plan}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4 text-xs text-gray-500 font-medium">
+                                  <div>Start: {new Date(m.startDate).toLocaleDateString()}</div>
+                                  <div>End: {new Date(m.endDate).toLocaleDateString()}</div>
+                                </td>
+                                <td className="px-6 py-4">
+                                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                                    m.status === "ACTIVE" ? "bg-emerald-100 text-emerald-700" :
+                                    m.status === "EXPIRED" ? "bg-gray-100 text-gray-600" : "bg-red-100 text-red-700"
+                                  }`}>
+                                    {m.status}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                            {memberships.length === 0 && (
+                              <tr>
+                                <td colSpan={5} className="text-center py-10 text-[#7A5C45] bg-white/10">
+                                  No membership records found.
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Pagination Controls */}
+                      {membershipTotalPages > 1 && (
+                        <div className="flex justify-between items-center px-2">
+                          <span className="text-xs text-[#7A5C45] font-semibold">
+                            Page {membershipPage} of {membershipTotalPages}
+                          </span>
+                          <div className="flex gap-2">
+                            <button
+                              disabled={membershipPage <= 1}
+                              onClick={() => fetchMemberships(membershipPage - 1)}
+                              className="px-4 py-2 bg-white text-sm font-bold text-[#7A5C45] border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:hover:bg-white transition-all shadow-sm cursor-pointer"
+                            >
+                              Previous
+                            </button>
+                            <button
+                              disabled={membershipPage >= membershipTotalPages}
+                              onClick={() => fetchMemberships(membershipPage + 1)}
+                              className="px-4 py-2 bg-white text-sm font-bold text-[#7A5C45] border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:hover:bg-white transition-all shadow-sm cursor-pointer"
+                            >
+                              Next
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </motion.div>
               )}
 
@@ -1206,7 +1452,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="bg-[#FDF5EC] p-4 rounded-xl border border-[#F0D5B8]">
                       <span className="text-xs text-[#7A5C45] font-semibold uppercase tracking-wider block mb-1">Pending Grievances</span>
-                      <span className="text-2xl font-bold text-red-600">{adminComplaints.filter(c => c.status === "Pending").length}</span>
+                      <span className="text-2xl font-bold text-red-600">{adminComplaints.filter(c => c.status === "PENDING").length}</span>
                     </div>
                   </div>
 
@@ -1215,7 +1461,7 @@ export default function AdminDashboard() {
                       <span>Grievance Resolution Rate</span>
                       <span>
                         {adminComplaints.length > 0 
-                          ? Math.round(((adminComplaints.filter(c => c.status !== "Pending").length) / adminComplaints.length) * 100)
+                          ? Math.round(((adminComplaints.filter(c => c.status !== "PENDING").length) / adminComplaints.length) * 100)
                           : 100}%
                       </span>
                     </div>
@@ -1224,7 +1470,7 @@ export default function AdminDashboard() {
                         className="bg-gradient-to-r from-emerald-400 to-emerald-600 h-full rounded-full transition-all duration-500"
                         style={{ 
                           width: `${adminComplaints.length > 0 
-                            ? ((adminComplaints.filter(c => c.status !== "Pending").length) / adminComplaints.length) * 100 
+                            ? ((adminComplaints.filter(c => c.status !== "PENDING").length) / adminComplaints.length) * 100 
                             : 100}%` 
                         }}
                       />
@@ -1235,7 +1481,7 @@ export default function AdminDashboard() {
                     <h4 className="font-bold text-[#2C1810] text-sm mb-2">Member Applications Status</h4>
                     <div className="flex justify-between items-center text-xs font-semibold text-[#7A5C45]">
                       <span>Total Submitted: {applications.length}</span>
-                      <span className="text-[#E8622A]">Pending Review: {applications.filter(a => a.status === "Pending").length}</span>
+                      <span className="text-[#E8622A]">Pending Review: {applications.filter(a => a.status === "PENDING").length}</span>
                     </div>
                   </div>
                 </div>

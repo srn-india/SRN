@@ -1,3 +1,4 @@
+import { ArticleStatus } from '@prisma/client';
 import { prisma } from '../../lib/prisma';
 
 export const articleService = {
@@ -39,7 +40,7 @@ export const articleService = {
     });
   },
 
-  updateStatus: async (id: string, status: string) => {
+  updateStatus: async (id: string, status: ArticleStatus) => {
     return prisma.janmantArticle.update({
       where: { id },
       data: { status },
