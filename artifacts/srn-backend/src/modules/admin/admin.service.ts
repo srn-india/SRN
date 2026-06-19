@@ -87,7 +87,16 @@ export const updateUserRole = async (userId: string, role: Role) => {
  * Fetches platform-wide analytics
  */
 export const getAnalytics = async () => {
-  const [totalUsers, totalMembers, totalPosts, totalEvents, totalPayments, revenueResult] = await Promise.all([
+  const [
+    totalUsers,
+    totalMembers,
+    totalPosts,
+    totalEvents,
+    totalPayments,
+    totalRevenueResult,
+    membershipRevenueResult,
+    donationRevenueResult
+  ] = await Promise.all([
     prisma.user.count(),
     prisma.membership.count({ where: { status: 'ACTIVE' } }),
     prisma.post.count(),
@@ -95,6 +104,14 @@ export const getAnalytics = async () => {
     prisma.payment.count({ where: { status: 'SUCCESS' } }),
     prisma.payment.aggregate({
       where: { status: 'SUCCESS' },
+      _sum: { amount: true },
+    }),
+    prisma.payment.aggregate({
+      where: { status: 'SUCCESS', type: 'MEMBERSHIP' },
+      _sum: { amount: true },
+    }),
+    prisma.payment.aggregate({
+      where: { status: 'SUCCESS', type: 'DONATION' },
       _sum: { amount: true },
     }),
   ]);
@@ -105,7 +122,9 @@ export const getAnalytics = async () => {
     totalPosts,
     totalEvents,
     totalPayments,
-    totalRevenue: revenueResult._sum.amount ? Number(revenueResult._sum.amount) : 0,
+    totalRevenue: totalRevenueResult._sum.amount ? Number(totalRevenueResult._sum.amount) : 0,
+    membershipRevenue: membershipRevenueResult._sum.amount ? Number(membershipRevenueResult._sum.amount) : 0,
+    donationRevenue: donationRevenueResult._sum.amount ? Number(donationRevenueResult._sum.amount) : 0,
   };
 };
 

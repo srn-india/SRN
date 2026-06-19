@@ -122,7 +122,11 @@ export default function AdminDashboard() {
   const [membershipPage, setMembershipPage] = useState(1);
   const [membershipTotalPages, setMembershipTotalPages] = useState(1);
 
+  const [analytics, setAnalytics] = useState(null);
+  const [loadingAnalytics, setLoadingAnalytics] = useState(true);
+
   useEffect(() => {
+    fetchAnalytics();
     if (activeTab === "complaints") fetchComplaints();
     if (activeTab === "articles") fetchArticles();
     if (activeTab === "events") fetchEvents();
@@ -258,6 +262,21 @@ export default function AdminDashboard() {
       console.error(err);
     } finally {
       setLoadingMemberships(false);
+    }
+  };
+
+  const fetchAnalytics = async () => {
+    setLoadingAnalytics(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/analytics`, { credentials: 'include' });
+      const data = await res.json();
+      if (res.ok) {
+        setAnalytics(data.data);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingAnalytics(false);
     }
   };
 
@@ -1037,7 +1056,7 @@ export default function AdminDashboard() {
                         <Download className="w-4 h-4" /> Export Report
                       </button>
                       <button 
-                        onClick={() => fetchMemberships(membershipPage)}
+                        onClick={() => { fetchMemberships(membershipPage); fetchAnalytics(); }}
                         disabled={loadingMemberships}
                         className="flex items-center justify-center p-2.5 bg-white text-[#7A5C45] hover:text-[#E8622A] rounded-xl border border-gray-200 hover:border-orange-200 transition-all shadow-sm disabled:opacity-50 cursor-pointer"
                         title="Reload Memberships"
@@ -1054,18 +1073,22 @@ export default function AdminDashboard() {
                   ) : (
                     <div className="space-y-6">
                       {/* Revenue & Member Metrics Cards */}
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                        <div className="bg-white/60 backdrop-blur-md rounded-[1.5rem] p-5 border border-white/80 shadow-sm">
-                          <span className="text-xs text-[#7A5C45] font-semibold uppercase tracking-wider block mb-1">Total Members</span>
-                          <span className="text-2xl font-bold text-[#2C1810]">{memberships.length}</span>
-                        </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div className="bg-white/60 backdrop-blur-md rounded-[1.5rem] p-5 border border-white/80 shadow-sm">
                           <span className="text-xs text-[#7A5C45] font-semibold uppercase tracking-wider block mb-1">Active Subscriptions</span>
-                          <span className="text-2xl font-bold text-emerald-600">{memberships.filter(m => m.status === 'ACTIVE').length}</span>
+                          <span className="text-2xl font-bold text-emerald-600">{analytics?.totalMembers || 0}</span>
+                        </div>
+                        <div className="bg-white/60 backdrop-blur-md rounded-[1.5rem] p-5 border border-white/80 shadow-sm">
+                          <span className="text-xs text-[#7A5C45] font-semibold uppercase tracking-wider block mb-1">Membership Revenue</span>
+                          <span className="text-2xl font-bold text-[#E8622A]">₹{analytics?.membershipRevenue || 0}</span>
+                        </div>
+                        <div className="bg-white/60 backdrop-blur-md rounded-[1.5rem] p-5 border border-white/80 shadow-sm">
+                          <span className="text-xs text-[#7A5C45] font-semibold uppercase tracking-wider block mb-1">Donation Revenue</span>
+                          <span className="text-2xl font-bold text-[#E8622A]">₹{analytics?.donationRevenue || 0}</span>
                         </div>
                         <div className="bg-white/60 backdrop-blur-md rounded-[1.5rem] p-5 border border-white/80 shadow-sm">
                           <span className="text-xs text-[#7A5C45] font-semibold uppercase tracking-wider block mb-1">Total Revenue</span>
-                          <span className="text-2xl font-bold text-[#E8622A]">₹{memberships.length * 999}</span>
+                          <span className="text-2xl font-bold text-blue-600">₹{analytics?.totalRevenue || 0}</span>
                         </div>
                       </div>
 
@@ -1482,6 +1505,24 @@ export default function AdminDashboard() {
                     <div className="flex justify-between items-center text-xs font-semibold text-[#7A5C45]">
                       <span>Total Submitted: {applications.length}</span>
                       <span className="text-[#E8622A]">Pending Review: {applications.filter(a => a.status === "PENDING").length}</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-orange-50/50 p-4 rounded-xl border border-orange-100/80 space-y-2">
+                    <h4 className="font-bold text-[#2C1810] text-sm">Platform Financials</h4>
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      <div className="bg-white p-2 rounded-lg border border-gray-100">
+                        <span className="text-[10px] text-[#7A5C45] font-semibold block">Memberships</span>
+                        <span className="text-sm font-bold text-[#E8622A]">₹{analytics?.membershipRevenue || 0}</span>
+                      </div>
+                      <div className="bg-white p-2 rounded-lg border border-gray-100">
+                        <span className="text-[10px] text-[#7A5C45] font-semibold block">Donations</span>
+                        <span className="text-sm font-bold text-[#E8622A]">₹{analytics?.donationRevenue || 0}</span>
+                      </div>
+                      <div className="bg-white p-2 rounded-lg border border-gray-100">
+                        <span className="text-[10px] text-[#7A5C45] font-semibold block">Total Revenue</span>
+                        <span className="text-sm font-bold text-blue-600">₹{analytics?.totalRevenue || 0}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
