@@ -38,6 +38,7 @@ import applicationRoutes from './modules/application/application.routes';
 import { createServer } from 'http';
 import { initSocket } from './lib/socket';
 import logger from './utils/logger';
+import { sanitizeInput } from './middleware/sanitize';
 
 const app = express();
 app.set('trust proxy', 1);
@@ -90,6 +91,7 @@ app.use(cors({
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cookieParser());
+app.use(sanitizeInput);
 
 // Static Files
 app.use('/uploads', express.static('uploads'));

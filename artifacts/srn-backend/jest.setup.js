@@ -16,3 +16,17 @@ jest.mock('./src/utils/logger', () => ({
     debug: jest.fn(),
   },
 }));
+
+// Mock nodemailer to prevent slow HTTP requests to ethereal.email
+jest.mock('nodemailer', () => ({
+  createTestAccount: jest.fn().mockResolvedValue({
+    user: 'test-user',
+    pass: 'test-pass',
+  }),
+  createTransport: jest.fn().mockReturnValue({
+    sendMail: jest.fn().mockResolvedValue({
+      messageId: 'mocked-message-id',
+    }),
+  }),
+  getTestMessageUrl: jest.fn().mockReturnValue('https://ethereal.email/mock-message'),
+}));
