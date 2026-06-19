@@ -305,7 +305,9 @@ export default function AdminDashboard() {
     rows.push(["Summary Details"]);
     rows.push(["Total Registered Members", totalCount]);
     rows.push(["Active Members", activeCount]);
-    rows.push(["Total Revenue Generated (INR)", totalRevenue]);
+    rows.push(["MEMBERSHIP REVENUE", analytics?.membershipRevenue || 0]);
+    rows.push(["DONATION REVENUE", analytics?.donationRevenue || 0]);
+    rows.push(["TOTAL REVENUE", analytics?.totalRevenue || 0]);
 
     const csvContent = "data:text/csv;charset=utf-8," 
       + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
