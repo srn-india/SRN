@@ -579,7 +579,14 @@ export default function NationalPresident() {
               "/WhatsApp Image 2026-06-03 at 19.54.54 (1).jpeg",
               "/WhatsApp Image 2026-06-03 at 19.54.53 (3).jpeg",
               "/Dr.-Manoj-Kumar-Shukla-in-devotion.jpeg",
-              "/WhatsApp Image 2026-06-03 at 19.54.53.jpeg"
+              "/WhatsApp Image 2026-06-03 at 19.54.53.jpeg",
+              "/1.jpeg",
+              "/2.jpeg",
+              "/3.jpeg",
+              "/4.jpeg",
+              "/5.jpeg",
+              "/6.jpeg",
+              "/7.jpeg"
             ].map((src, idx) => (
               <GalleryImageFrame 
                 key={idx}
