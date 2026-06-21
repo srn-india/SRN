@@ -61,6 +61,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+p {
+  text-align: justify;
+}
+
 /* Page transition wrapper */
 .page-enter {
   opacity: 0;

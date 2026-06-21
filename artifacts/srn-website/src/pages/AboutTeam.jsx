@@ -19,46 +19,41 @@ const foundingMembers = [
     id: 1,
     nameEn: "Dr. Manoj Kumar Shukla",
     nameHi: "डॉ० मनोज कुमार शुक्ल",
-    fatherEn: "S/O Late Vaidyanath Shukla",
-    fatherHi: "पुत्र स्व० वैद्यनाथ शुक्ल",
     positionEn: "Founder / Chief Trustee / President",
     positionHi: "संस्थापक / मुख्य ट्रस्टी / अध्यक्ष",
+    image: ""
   },
   {
     id: 2,
     nameEn: "Dr. Shravan Kumar Shukla",
     nameHi: "डॉ० श्रवण कुमार शुक्ल",
-    fatherEn: "S/O Late Vaidyanath Shukla",
-    fatherHi: "पुत्र स्व० वैद्यनाथ शुक्ल",
     positionEn: "Vice President",
     positionHi: "उपाध्यक्ष",
+    image: ""
   },
   {
     id: 3,
     nameEn: "Shri Vindeshwar Kumar Shukla",
     nameHi: "श्री विंदेश्वर कुमार शुक्ल",
-    fatherEn: "S/O Late Vaidyanath Shukla",
-    fatherHi: "पुत्र स्व० वैद्यनाथ शुक्ल",
     positionEn: "General Secretary",
     positionHi: "महासचिव",
+    image: ""
   },
   {
     id: 4,
     nameEn: "Shri Krishna Mohan Rai",
     nameHi: "श्री कृष्ण मोहन राय",
-    fatherEn: "S/O Late Aniruddh Rai",
-    fatherHi: "पुत्र स्व० अनिरुद्ध राय",
     positionEn: "Member",
     positionHi: "सदस्य",
+    image: ""
   },
   {
     id: 5,
     nameEn: "Shri Jang Bahadur Patel",
     nameHi: "श्री जंग बहादुर पटेल",
-    fatherEn: "S/O Late Chandrabali",
-    fatherHi: "पुत्र स्व० चन्द्रबली",
     positionEn: "Member",
     positionHi: "सदस्य",
+    image: ""
   }
 ];
 
@@ -132,19 +127,26 @@ export default function AboutTeam() {
                   <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#E8622A] to-[#C04A18] transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-out" />
                   
                   <div className="p-8 md:p-10 flex flex-col items-center text-center flex-1">
-                    {/* Sleek Icon Container */}
-                    <div className="relative w-20 h-20 rounded-full bg-[#FFF9F2] border border-[#F0D5B8]/60 text-[#E8622A] flex items-center justify-center mb-6 shadow-sm group-hover:shadow-md group-hover:bg-[#E8622A] group-hover:text-white transition-all duration-500">
-                      <User className="w-8 h-8 opacity-90" strokeWidth={1.25} />
+                    {/* Sleek Icon / Image Container */}
+                    <div className="relative w-24 h-24 rounded-full overflow-hidden bg-[#FFF9F2] border border-[#F0D5B8]/60 text-[#E8622A] flex items-center justify-center mb-6 shadow-sm group-hover:shadow-md transition-all duration-500">
+                      {member.image ? (
+                        <img 
+                          src={member.image} 
+                          alt={member.nameEn} 
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                          }}
+                        />
+                      ) : (
+                        <User className="w-10 h-10 opacity-90" strokeWidth={1.25} />
+                      )}
                     </div>
 
                     {/* Content */}
                     <h3 className="font-bold font-serif mb-2 leading-tight text-xl md:text-2xl text-[#1E0F05] group-hover:text-[#E8622A] transition-colors duration-300">
                       {en ? member.nameEn : member.nameHi}
                     </h3>
-
-                    <p className="text-sm md:text-base text-[#7A5C45] font-medium italic mt-2">
-                      {en ? member.fatherEn : member.fatherHi}
-                    </p>
                   </div>
 
                   {/* Structured Footer for Badge */}

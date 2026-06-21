@@ -1,38 +1,13 @@
-import { useEffect, useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect } from "react";
+import { motion } from "framer-motion";
 import { 
   Award, 
-  Search, 
-  BookOpen, 
-  Briefcase, 
-  HeartHandshake, 
-  Home, 
-  Sprout, 
-  Leaf, 
-  Activity, 
-  Scale, 
-  Globe, 
-  Sparkles, 
-  X,
-  FileText
+  Sparkles
 } from "lucide-react";
 import SectionHeader from "../components/SectionHeader";
 import { useLanguage } from "../context/LanguageContext";
 import { useFadeIn } from "../hooks/useFadeIn";
-import { categories, detailedObjectives } from "../data/detailedObjectives";
-
-// Category-to-Icon Mapper
-const iconMap = {
-  BookOpen: BookOpen,
-  Briefcase: Briefcase,
-  HeartHandshake: HeartHandshake,
-  Home: Home,
-  Sprout: Sprout,
-  Leaf: Leaf,
-  Activity: Activity,
-  Scale: Scale,
-  Globe: Globe
-};
+import { detailedObjectives } from "../data/detailedObjectives";
 
 function FadeSection({ children, className = "", delay = 0 }) {
   const ref = useFadeIn(0.1);
@@ -48,43 +23,10 @@ export default function Uddeshya() {
   const u = t.uddeshya;
   const en = lang === "en";
 
-  const [activeCategory, setActiveCategory] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showBilingual, setShowBilingual] = useState(true);
-
   useEffect(() => {
     window.scrollTo(0, 0);
     document.title = "Sashakt Rashtra Nirman – Objectives";
   }, []);
-
-  // Filter and Search Logic
-  const filteredObjectives = useMemo(() => {
-    return detailedObjectives.filter((item) => {
-      const matchesCategory = activeCategory === "all" || item.category === activeCategory;
-      const matchesSearch = 
-        item.hi.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        item.en.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        String(item.id).includes(searchQuery);
-      return matchesCategory && matchesSearch;
-    });
-  }, [activeCategory, searchQuery]);
-
-  // Framer Motion Variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.04
-      }
-    }
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 15 } },
-    exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } }
-  };
 
   return (
     <div className="bg-[#FDF5EC] min-h-screen pb-20">
@@ -137,176 +79,20 @@ export default function Uddeshya() {
         </motion.div>
       </section>
 
-      {/* ── Filter & Search Section ─────────────────────────────────── */}
-      <section className="relative -mt-12 z-20 px-6">
-        <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-xl border border-[#F0D5B8] p-6 md:p-8">
-          <div className="flex flex-col lg:flex-row gap-6 justify-between items-center mb-8">
-            {/* Search Input */}
-            <div className="relative w-full lg:max-w-md">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder={en ? "Search objectives..." : "उद्देश्यों में खोजें..."}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-10 py-3 bg-[#FDF5EC]/50 border border-[#F0D5B8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E8622A]/20 focus:border-[#E8622A] text-sm text-[#1E0F05] transition-all"
-              />
-              {searchQuery && (
-                <button 
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
+      {/* ── Objectives List ─────────────────────────────────────────── */}
+      <section className="py-16 px-6 max-w-6xl mx-auto">
+        <div className="space-y-8 bg-white border border-[#F0D5B8] rounded-[2rem] p-8 md:p-12 shadow-sm">
+          {detailedObjectives.map((obj, index) => (
+            <div key={obj.id} className="flex gap-4 items-start text-[#1E0F05]">
+              <span className="font-serif font-bold text-lg md:text-xl text-[#E8622A] pt-0.5 min-w-[2.5rem] text-right shrink-0">
+                {index + 1}.
+              </span>
+              <p className="text-sm sm:text-base md:text-lg leading-relaxed font-sans text-justify pt-0.5">
+                {en ? obj.en : obj.hi}
+              </p>
             </div>
-
-            {/* Bilingual Display Toggle */}
-            <div className="flex items-center gap-3 bg-[#FDF5EC] border border-[#F0D5B8] p-1.5 rounded-xl">
-              <button
-                onClick={() => setShowBilingual(false)}
-                className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
-                  !showBilingual 
-                    ? "bg-[#E8622A] text-white shadow-md" 
-                    : "text-[#7A5C45] hover:text-[#E8622A]"
-                }`}
-              >
-                {en ? "Single Language" : "एकल भाषा"}
-              </button>
-              <button
-                onClick={() => setShowBilingual(true)}
-                className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
-                  showBilingual 
-                    ? "bg-[#E8622A] text-white shadow-md" 
-                    : "text-[#7A5C45] hover:text-[#E8622A]"
-                }`}
-              >
-                {en ? "Bilingual View" : "द्विभाषी दृश्य"}
-              </button>
-            </div>
-          </div>
-
-          {/* Category Tabs */}
-          <div className="flex flex-wrap gap-2 justify-center lg:justify-start border-t border-[#FDF5EC] pt-6">
-            {categories.map((cat) => {
-              const IconComponent = iconMap[cat.icon] || Globe;
-              const isSelected = activeCategory === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-xs md:text-sm font-medium transition-all duration-300 ${
-                    isSelected
-                      ? "bg-gradient-to-r from-[#E8622A] to-[#D4880C] text-white shadow-md scale-105"
-                      : "bg-[#FDF5EC] border border-[#F0D5B8]/60 text-[#7A5C45] hover:border-[#E8622A]/60 hover:text-[#E8622A] hover:bg-[#FFF9F2]"
-                  }`}
-                >
-                  <IconComponent className={`w-4 h-4 ${isSelected ? "text-white" : "text-[#E8622A]"}`} />
-                  <span>{en ? cat.labelEn : cat.labelHi}</span>
-                </button>
-              );
-            })}
-          </div>
+          ))}
         </div>
-      </section>
-
-      {/* ── Objectives Grid ─────────────────────────────────────────── */}
-      <section className="py-16 px-6 max-w-7xl mx-auto">
-        <div className="mb-6 flex justify-between items-center px-2">
-          <p className="text-sm text-[#7A5C45]">
-            {en 
-              ? `Showing ${filteredObjectives.length} of 48 Objectives` 
-              : `48 में से ${filteredObjectives.length} उद्देश्य प्रदर्शित`}
-          </p>
-        </div>
-
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
-          <AnimatePresence mode="popLayout">
-            {filteredObjectives.map((obj) => {
-              // Find matching category icon
-              const catObj = categories.find(c => c.id === obj.category) || {};
-              const IconComponent = iconMap[catObj.icon] || Globe;
-
-              return (
-                <motion.div
-                  layout
-                  key={obj.id}
-                  variants={cardVariants}
-                  initial="hidden"
-                  animate="show"
-                  exit="exit"
-                  className="group relative bg-white border border-[#F0D5B8] rounded-2xl p-6 hover:border-[#E8622A]/50 hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden card-shimmer"
-                >
-                  {/* Category Accent Stripe */}
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#E8622A] to-[#D4880C] opacity-70 group-hover:opacity-100 transition-opacity" />
-
-                  <div>
-                    {/* Card Header */}
-                    <div className="flex justify-between items-center mb-5">
-                      <div className="flex items-center gap-2">
-                        <div className="p-2 rounded-xl bg-[#FDF5EC] text-[#E8622A] group-hover:bg-[#E8622A]/10 transition-colors">
-                          <IconComponent className="w-4 h-4" />
-                        </div>
-                        <span className="text-[10px] uppercase tracking-wider text-[#7A5C45] font-semibold bg-[#FDF5EC] px-2.5 py-1 rounded-full">
-                          {en ? catObj.labelEn : catObj.labelHi}
-                        </span>
-                      </div>
-                      <span className="text-sm font-bold font-serif text-[#E8622A]/50 group-hover:text-[#E8622A] transition-colors">
-                        #{String(obj.id).padStart(2, "0")}
-                      </span>
-                    </div>
-
-                    {/* Content */}
-                    <div className="space-y-4">
-                      {/* Hindi Text */}
-                      {(!en || showBilingual) && (
-                        <p className="text-[#1E0F05] text-[15px] font-medium leading-relaxed font-sans border-l-2 border-[#F0D5B8] pl-3">
-                          {obj.hi}
-                        </p>
-                      )}
-
-                      {/* English Text */}
-                      {(en || showBilingual) && (
-                        <p className={`text-sm leading-relaxed ${showBilingual ? "text-gray-500 italic font-sans" : "text-[#1E0F05] font-medium font-sans"}`}>
-                          {obj.en}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-        </motion.div>
-
-        {filteredObjectives.length === 0 && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-20 bg-white rounded-2xl border border-dashed border-[#F0D5B8] mt-6"
-          >
-            <FileText className="w-12 h-12 text-[#E8622A]/40 mx-auto mb-4" />
-            <h3 className="text-lg font-bold text-[#1E0F05] font-serif mb-1">
-              {en ? "No Objectives Found" : "कोई उद्देश्य नहीं मिला"}
-            </h3>
-            <p className="text-sm text-[#7A5C45] max-w-md mx-auto">
-              {en 
-                ? "Try searching for a different keyword or resetting the category filter." 
-                : "कृपया कोई अन्य कीवर्ड खोजें या श्रेणी फ़िल्टर रीसेट करें।"}
-            </p>
-            <button 
-              onClick={() => { setActiveCategory("all"); setSearchQuery(""); }}
-              className="mt-5 px-5 py-2 bg-[#E8622A] hover:bg-[#D4880C] text-white text-xs font-semibold rounded-full shadow transition-all"
-            >
-              {en ? "Reset Filters" : "फ़िल्टर रीसेट करें"}
-            </button>
-          </motion.div>
-        )}
       </section>
 
       {/* ── Mission ────────────────────────────────────────────────── */}

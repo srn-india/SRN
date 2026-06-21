@@ -1,23 +1,14 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
+import { 
+  Camera,
+  Flame,
+  Sun,
   Heart,
   Building2,
   Atom,
   Globe,
-  Mic2,
-  Award,
-  GraduationCap,
-  BookOpen,
-  Users,
-  ChevronRight,
-  Calendar,
-  Sparkles,
-  Camera,
-  Image as ImageIcon,
-  Sun,
-  Flame,
-  CheckCircle2
+  Mic2
 } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 import { useFadeIn } from "../hooks/useFadeIn";
@@ -461,18 +452,6 @@ export default function NationalPresident() {
                   {data.degrees}
                 </p>
 
-                {/* Subtitles badges */}
-                <div className="flex flex-wrap justify-center lg:justify-start gap-2 mt-4">
-                  {data.subtitles.map((title, idx) => (
-                    <span
-                      key={idx}
-                      className="bg-[#FFF9F2] border border-[#F0D5B8] text-[#7A5C45] text-xs font-semibold px-3 py-1.5 rounded-lg shadow-sm hover:border-[#E8622A]/30 transition-all duration-300"
-                    >
-                      {title}
-                    </span>
-                  ))}
-                </div>
-
                 <div className="w-full h-px bg-[#F0D5B8] my-6" />
 
                 {/* Opening blockquote description */}
@@ -497,38 +476,22 @@ export default function NationalPresident() {
             <div className="h-0.5 bg-gradient-to-r from-transparent via-[#E8622A] to-transparent mt-3 mx-auto w-48 rounded-full" />
           </div>
 
-          <div className="space-y-12">
+          <div className="space-y-10">
             {data.sections.map((sec) => {
-              const SectionIcon = sec.icon;
               return (
-                <div key={sec.id} className="bg-white border border-[#F0D5B8] rounded-3xl p-6 md:p-8 shadow-sm relative overflow-hidden text-left">
-                  {/* Section Title details */}
-                  <div className="flex items-center gap-4 mb-6 pb-4 border-b border-[#F0D5B8]/60">
-                    <div className={`p-3 rounded-2xl bg-gradient-to-br ${sec.colorClass.split(' ')[0]} ${sec.colorClass.split(' ')[1]} border border-white/40 shadow-sm shrink-0`}>
-                      <SectionIcon className={`w-6 h-6 ${sec.colorClass.split(' ')[3]}`} />
-                    </div>
-                    <div>
-                      <h4 className="text-xl md:text-2xl font-bold text-[#5C1010] font-serif leading-tight">
-                        {sec.title}
-                      </h4>
-                      <p className="text-sm text-[#7A5C45] mt-1 font-medium leading-relaxed">
-                        {sec.subtitle}
-                      </p>
-                    </div>
-                  </div>
+                <div key={sec.id} className="text-left">
+                  <h4 className="text-xl md:text-2xl font-bold text-[#5C1010] font-serif mb-1">
+                    {sec.title}
+                  </h4>
+                  <p className="text-sm text-[#E8622A] mb-4 font-semibold">
+                    {sec.subtitle}
+                  </p>
 
-                  {/* Accomplishment Bullet List (Running Text Pointers) */}
-                  <div className="space-y-4">
+                  <div className="space-y-3 pl-4 border-l-2 border-[#F0D5B8]">
                     {sec.items.map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="flex gap-3 items-start pl-2"
-                      >
-                        <CheckCircle2 className="w-5 h-5 text-[#E8622A] shrink-0 mt-0.5" />
-                        <p className="text-[#7A5C45] text-sm md:text-base leading-relaxed">
-                          <strong className="text-[#1E0F05] font-semibold">{item.title}:</strong> {item.desc}
-                        </p>
-                      </div>
+                      <p key={idx} className="text-[#1E0F05] text-sm md:text-base leading-relaxed">
+                        <strong className="font-semibold">{item.title}:</strong> {item.desc}
+                      </p>
                     ))}
                   </div>
                 </div>
@@ -566,27 +529,31 @@ export default function NationalPresident() {
               "/Dr. Manoj Kumar Shukla with swami yatindranand ji maharaj.jpeg",
               "/WhatsApp Image 2026-06-03 at 19.54.52 (2).jpeg",
               "/dr. manoj kumar shukla performing hindu rituals .jpeg",
-              "/WhatsApp Image 2026-06-03 at 19.54.53 (1).jpeg",
-              "/WhatsApp Image 2026-06-03 at 19.54.52.jpeg",
               "/Dr.-Manoj-Kumar-Shukla-at-kedarrnath.jpeg",
-              "/WhatsApp Image 2026-06-03 at 19.54.54.jpeg",
-              "/WhatsApp Image 2026-06-03 at 19.54.52 (1).jpeg",
               "/Dr.-Manoj-Kumar-Shukla-giving-speech.jpeg",
-              "/WhatsApp Image 2026-06-03 at 19.54.53 (2).jpeg",
-              "/WhatsApp Image 2026-06-03 at 19.54.54 (2).jpeg",
               "/WhatsApp Image 2026-06-03 at 19.54.51.jpeg",
               "/Dr.-Manoj-Kumar-Shukla-constitution.jpeg",
               "/WhatsApp Image 2026-06-03 at 19.54.54 (1).jpeg",
               "/WhatsApp Image 2026-06-03 at 19.54.53 (3).jpeg",
               "/Dr.-Manoj-Kumar-Shukla-in-devotion.jpeg",
               "/WhatsApp Image 2026-06-03 at 19.54.53.jpeg",
-              "/1.jpeg",
+              "/WhatsApp Image 2026-06-03 at 19.54.52.jpeg",
               "/2.jpeg",
-              "/3.jpeg",
+              "/WhatsApp Image 2026-06-03 at 19.54.53 (1).jpeg",
               "/4.jpeg",
               "/5.jpeg",
               "/6.jpeg",
-              "/7.jpeg"
+              "/7.jpeg",
+              "/8.jpeg",
+              "/9.jpeg",
+              "/10.jpeg",
+              "/11.jpeg",
+              "/12.jpeg",
+              "/14.jpeg",
+              "/15.jpeg",
+              "/16.jpeg",
+              "/17.jpeg",
+              "/18.jpeg"
             ].map((src, idx) => (
               <GalleryImageFrame 
                 key={idx}
