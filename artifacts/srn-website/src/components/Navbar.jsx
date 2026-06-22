@@ -23,7 +23,7 @@ const menuCategories = [
     dropdownLinks: [
       { path: "/organisation/sansrakshak", hindiName: "संरक्षक", englishName: "Sanrakshak" },
       { path: "/organisation/national-president", hindiName: "राष्ट्रीय अध्यक्ष", englishName: "National President" },
-      { path: "/organisation/advisory-board", hindiName: "सलाहकार मंडल", englishName: "Salahkar Mandal/Advisory board", isLocked: true },
+      { path: "/organisation/advisory-board", hindiName: "सलाहकार मंडल", englishName: "Salahkar Mandal/Advisory board" },
       { path: "/organisation/national-office-bearers", hindiName: "राष्ट्रीय पदाधिकारी", englishName: "National office bearers", isLocked: true },
       { path: "/organisation/morcha", hindiName: "मोर्चा", englishName: "Morcha", isLocked: true },
       { path: "/organisation/department", hindiName: "विभाग/प्रभारी", englishName: "Department/Prabhari", isLocked: true },

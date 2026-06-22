@@ -31,6 +31,7 @@ import Contact from "./pages/Contact";
 import NationalPresident from "./pages/NationalPresident";
 import Sansrakshak from "./pages/Sanrakshak";
 import AboutTeam from "./pages/AboutTeam";
+import AdvisoryBoard from "./pages/AdvisoryBoard";
 import Complaints from "./pages/Complaints";
 import ComplaintDetails from "./pages/ComplaintDetails";
 import ApplicationDetails from "./pages/ApplicationDetails";
@@ -171,6 +172,7 @@ export default function App() {
               <Route path="/leadership/founding-presidents" element={<Layout onPhoneClick={() => setShowPhonePopup(true)}><Placeholder title="Founding Presidents" /></Layout>} />
               <Route path="/organisation/sansrakshak" element={<Layout onPhoneClick={() => setShowPhonePopup(true)}><Sansrakshak /></Layout>} />
               <Route path="/organisation/national-president" element={<Layout onPhoneClick={() => setShowPhonePopup(true)}><NationalPresident /></Layout>} />
+              <Route path="/organisation/advisory-board" element={<Layout onPhoneClick={() => setShowPhonePopup(true)}><AdvisoryBoard /></Layout>} />
               <Route path="/initiatives" element={<Layout onPhoneClick={() => setShowPhonePopup(true)}><Initiatives /></Layout>} />
               <Route path="/about-team" element={<Layout onPhoneClick={() => setShowPhonePopup(true)}><AboutTeam /></Layout>} />
               <Route path="/media" element={<Layout onPhoneClick={() => setShowPhonePopup(true)}><Media /></Layout>} />

@@ -455,7 +455,7 @@ export default function NationalPresident() {
                 <div className="w-full h-px bg-[#F0D5B8] my-6" />
 
                 {/* Opening blockquote description */}
-                <p className="text-[#1E0F05] text-base md:text-lg leading-relaxed italic text-left relative pl-6 border-l-4 border-[#E8622A]">
+                <p className="text-[#1E0F05] text-base md:text-lg leading-relaxed italic text-justify relative pl-6 border-l-4 border-[#E8622A]">
                   "{data.aboutText}"
                 </p>
               </div>
@@ -489,7 +489,7 @@ export default function NationalPresident() {
 
                   <div className="space-y-3 pl-4 border-l-2 border-[#F0D5B8]">
                     {sec.items.map((item, idx) => (
-                      <p key={idx} className="text-[#1E0F05] text-sm md:text-base leading-relaxed">
+                      <p key={idx} className="text-[#1E0F05] text-sm md:text-base leading-relaxed text-justify">
                         <strong className="font-semibold">{item.title}:</strong> {item.desc}
                       </p>
                     ))}
@@ -553,7 +553,11 @@ export default function NationalPresident() {
               "/15.jpeg",
               "/16.jpeg",
               "/17.jpeg",
-              "/18.jpeg"
+              "/18.jpeg",
+              "/20.jpeg",
+              "/21.jpeg",
+              "/22.jpeg",
+              "/23.jpeg"
             ].map((src, idx) => (
               <GalleryImageFrame 
                 key={idx}

@@ -111,53 +111,45 @@ export default function AboutTeam() {
         </motion.div>
       </section>
 
-      {/* ── Founding Members Grid ────────────────────────────────────── */}
+      {/* ── Founding Members Table ────────────────────────────────────── */}
       <section className="pb-32 px-6 relative z-20 -mt-12">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-wrap justify-center gap-6 md:gap-8">
-            {foundingMembers.map((member, index) => (
-              <FadeSection 
-                key={member.id} 
-                delay={index * 100} 
-                className="w-full md:w-[calc(50%-16px)] lg:w-[calc(33.333%-22px)] flex"
-              >
-                <div className="w-full group rounded-2xl bg-white/95 backdrop-blur-md shadow-sm border border-gray-100 hover:shadow-[0_20px_60px_rgba(0,0,0,0.06)] hover:-translate-y-2 transition-all duration-500 flex flex-col h-full relative overflow-hidden">
-                  
-                  {/* Premium Accent Line */}
-                  <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#E8622A] to-[#C04A18] transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-out" />
-                  
-                  <div className="p-8 md:p-10 flex flex-col items-center text-center flex-1">
-                    {/* Sleek Icon / Image Container */}
-                    <div className="relative w-24 h-24 rounded-full overflow-hidden bg-[#FFF9F2] border border-[#F0D5B8]/60 text-[#E8622A] flex items-center justify-center mb-6 shadow-sm group-hover:shadow-md transition-all duration-500">
-                      {member.image ? (
-                        <img 
-                          src={member.image} 
-                          alt={member.nameEn} 
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.target.style.display = "none";
-                          }}
-                        />
-                      ) : (
-                        <User className="w-10 h-10 opacity-90" strokeWidth={1.25} />
-                      )}
-                    </div>
-
-                    {/* Content */}
-                    <h3 className="font-bold font-serif mb-2 leading-tight text-xl md:text-2xl text-[#1E0F05] group-hover:text-[#E8622A] transition-colors duration-300">
-                      {en ? member.nameEn : member.nameHi}
-                    </h3>
-                  </div>
-
-                  {/* Structured Footer for Badge */}
-                  <div className="w-full border-t border-gray-100 bg-[#FDF5EC]/50 py-4 px-6 flex justify-center group-hover:bg-[#FDF5EC] transition-colors duration-500">
-                    <span className="text-xs md:text-sm font-bold uppercase tracking-[0.15em] text-[#C04A18]">
-                      {en ? member.positionEn : member.positionHi}
-                    </span>
-                  </div>
-                </div>
-              </FadeSection>
-            ))}
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white border border-[#F0D5B8] rounded-3xl overflow-hidden shadow-xl">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-[#FFF9F2] border-b border-[#F0D5B8]">
+                    <th className="py-5 px-6 text-sm font-bold uppercase tracking-wider text-[#5C1010] w-24 text-center">
+                      क्र.सं.
+                    </th>
+                    <th className="py-5 px-6 text-sm font-bold uppercase tracking-wider text-[#5C1010]">
+                      नाम
+                    </th>
+                    <th className="py-5 px-6 text-sm font-bold uppercase tracking-wider text-[#5C1010]">
+                      पद
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#F0D5B8]/40">
+                  {foundingMembers.map((member, index) => (
+                    <tr 
+                      key={member.id}
+                      className="hover:bg-[#FFF9F2]/30 transition-colors duration-200"
+                    >
+                      <td className="py-5 px-6 text-sm text-[#7A5C45] font-semibold text-center">
+                        {index + 1}
+                      </td>
+                      <td className="py-5 px-6 text-base font-bold text-[#1E0F05] font-serif">
+                        {member.nameHi}
+                      </td>
+                      <td className="py-5 px-6 text-sm font-medium text-[#C04A18] tracking-wide">
+                        {member.positionHi}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>
