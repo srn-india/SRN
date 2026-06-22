@@ -80,11 +80,11 @@ export default function Uddeshya() {
       </section>
 
       {/* ── Objectives List ─────────────────────────────────────────── */}
-      <section className="py-16 px-6 max-w-6xl mx-auto">
-        <div className="space-y-8 bg-white border border-[#F0D5B8] rounded-[2rem] p-8 md:p-12 shadow-sm">
+      <section className="py-16 px-4 sm:px-6 max-w-6xl mx-auto">
+        <div className="space-y-8 bg-white border border-[#F0D5B8] rounded-[2rem] p-3.5 sm:p-8 md:p-12 shadow-sm">
           {detailedObjectives.map((obj, index) => (
-            <div key={obj.id} className="flex gap-4 items-start text-[#1E0F05]">
-              <span className="font-serif font-bold text-lg md:text-xl text-[#E8622A] pt-0.5 min-w-[2.5rem] text-right shrink-0">
+            <div key={obj.id} className="flex gap-1.5 sm:gap-4 items-start text-[#1E0F05]">
+              <span className="font-serif font-bold text-sm sm:text-lg md:text-xl text-[#E8622A] pt-0.5 min-w-[1rem] sm:min-w-[2.5rem] text-left sm:text-right shrink-0">
                 {index + 1}.
               </span>
               <p className="text-sm sm:text-base md:text-lg leading-relaxed font-sans text-justify pt-0.5">

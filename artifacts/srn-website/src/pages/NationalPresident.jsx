@@ -455,7 +455,7 @@ export default function NationalPresident() {
                 <div className="w-full h-px bg-[#F0D5B8] my-6" />
 
                 {/* Opening blockquote description */}
-                <p className="text-[#1E0F05] text-base md:text-lg leading-relaxed italic text-justify relative pl-6 border-l-4 border-[#E8622A]">
+                <p className="text-[#1E0F05] text-base md:text-lg leading-relaxed text-justify relative pl-6 border-l-4 border-[#E8622A]">
                   "{data.aboutText}"
                 </p>
               </div>

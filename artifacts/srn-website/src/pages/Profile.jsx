@@ -119,13 +119,13 @@ export default function Profile() {
   const labelClass = "block text-xs font-bold text-[#5C3A1E] uppercase tracking-wider mb-2 ml-1";
 
   return (
-    <div className="h-[calc(100vh-80px)] min-h-[600px] bg-[#FDF5EC] relative overflow-hidden font-sans selection:bg-[#E8622A] selection:text-white flex items-center justify-center">
+    <div className="min-h-[calc(100vh-80px)] bg-[#FDF5EC] relative overflow-y-visible lg:overflow-hidden lg:h-[calc(100vh-80px)] font-sans selection:bg-[#E8622A] selection:text-white flex items-center justify-center py-10 lg:py-0">
       {/* Static Background Decorators */}
       <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-[#E8622A]/15 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute top-1/2 -right-20 w-[400px] h-[400px] bg-[#D4880C]/15 rounded-full blur-[80px] pointer-events-none" />
       <div className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-multiply" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0V0zm20 20h20v20H20V20zM0 20h20v20H0V20z' fill='%232C1810' fill-rule='evenodd'/%3E%3C/svg%3E")` }} />
 
-      <div className="w-full max-w-5xl mx-auto px-6 relative z-10 flex flex-col h-full py-4 sm:py-6">
+      <div className="w-full max-w-5xl mx-auto px-6 relative z-10 flex flex-col lg:h-full py-4 sm:py-6">
         <motion.div className="mb-4 flex-shrink-0" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }}>
           <Link to="/dashboard" className="inline-flex items-center gap-2 text-sm font-semibold text-[#7A5C45] hover:text-[#E8622A] transition-all duration-300 group bg-white/40 px-5 py-2.5 rounded-2xl border border-white/60 shadow-sm backdrop-blur-md hover:bg-white/80 hover:shadow-md w-max">
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300" />

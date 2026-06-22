@@ -564,13 +564,13 @@ export default function AdminDashboard() {
           
           {/* LEFT SIDEBAR NAVIGATION */}
           <motion.div 
-            className="lg:col-span-3 space-y-2"
+            className="lg:col-span-3"
             variants={containerVariants} 
             initial="hidden" 
             animate="visible"
           >
-            <div className="bg-white/70 backdrop-blur-xl p-4 rounded-[2rem] border border-white/80 shadow-sm flex flex-col gap-2">
-              <div className="px-4 py-3 mb-2 border-b border-gray-100 flex items-center gap-3">
+            <div className="bg-white/70 backdrop-blur-xl p-3 lg:p-4 rounded-2xl lg:rounded-[2rem] border border-white/80 shadow-sm flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible no-scrollbar whitespace-nowrap">
+              <div className="hidden lg:flex px-4 py-3 mb-2 border-b border-gray-100 items-center gap-3">
                 <ShieldAlert className="w-5 h-5 text-[#E8622A]" />
                 <h2 className="font-serif font-bold text-lg text-[#2C1810]">Admin Panel</h2>
               </div>
@@ -581,16 +581,16 @@ export default function AdminDashboard() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300 font-semibold text-sm w-full ${
+                    className={`flex items-center gap-2.5 lg:gap-3 px-3.5 py-2.5 lg:px-4 lg:py-3 rounded-xl lg:rounded-2xl transition-all duration-300 font-semibold text-xs lg:text-sm shrink-0 w-auto lg:w-full ${
                       isActive 
-                        ? "bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white shadow-md shadow-orange-900/20 translate-x-1" 
+                        ? "bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white shadow-md shadow-orange-900/20 lg:translate-x-1" 
                         : "text-[#7A5C45] hover:bg-white hover:text-[#2C1810] hover:shadow-sm"
                     }`}
                   >
-                    <tab.icon className={`w-5 h-5 ${isActive ? "text-white" : "text-[#E8622A]"}`} />
+                    <tab.icon className={`w-4 h-4 lg:w-5 lg:h-5 ${isActive ? "text-white" : "text-[#E8622A]"}`} />
                     {tab.label}
                     {tab.id === "approvals" && pendingUsers.length > 0 && (
-                      <span className={`ml-auto text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                      <span className={`ml-2 lg:ml-auto text-[10px] px-2 py-0.5 rounded-full font-bold ${
                         isActive ? "bg-white text-[#E8622A]" : "bg-[#E8622A] text-white"
                       }`}>
                         {pendingUsers.length}
