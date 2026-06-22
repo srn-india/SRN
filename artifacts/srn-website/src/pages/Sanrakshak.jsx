@@ -502,7 +502,15 @@ export default function Sansrakshak() {
               "/WhatsApp Image 2026-06-01 at 22.34.09 (1).jpeg",
               "/WhatsApp Image 2026-06-01 at 22.34.09 (2).jpeg",
               "/WhatsApp Image 2026-06-01 at 22.34.11 (1).jpeg",
-              "/WhatsApp Image 2026-06-01 at 22.34.11 (2).jpeg"
+              "/WhatsApp Image 2026-06-01 at 22.34.11 (2).jpeg",
+              "/44.jpeg",
+              "/45.jpeg",
+              "/46.jpeg",
+              "/47.jpeg",
+              "/48.jpeg",
+              "/49.jpeg",
+              "/50.jpeg",
+              "/51.jpeg"
             ].map((src, idx) => (
               <GalleryImageFrame 
                 key={idx}
