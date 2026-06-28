@@ -66,7 +66,7 @@ const bioData = {
       "Guardian of Dharma",
       "Distinguished Orator & Philanthropist"
     ],
-    aboutText: "Mahamandaleshwar Swami Yatindranand Giri Maharaj, a revered senior spiritual leader of Juna Akhara, is renowned for his profound wisdom and spiritual insights. As a prominent senior figure within Juna Akhara, he embodies ancient wisdom and devotion, captivating hearts with his teachings and dedication to the spiritual path. Residing in the sacred land of Uttarakhand, Swami Yatindranand Giri Maharaj’s life exemplifies devotion, service, and spiritual enlightenment, making him a beacon of spiritual wisdom.",
+    aboutText: "Mahamandaleshwar Swami Yatindranand Giri Maharaj, a revered senior spiritual leader of Juna Akhara, is renowned for his profound wisdom and spiritual insights. As a prominent senior figure within Juna Akhara, he embodies ancient wisdom and devotion, captivating hearts with his teachings and dedication to the spiritual path. Residing in the sacred land of Uttarakhand, Swami Yatindranand Giri Maharaj’s life exemplifies devotion, service, and spiritual enlightenment, making him a beacon of spiritual wisdom. He is the Senior Mahamandaleshwar of Juna Akhara, Vice President of Akhil Bharatiya Sant Samiti, and Jeevandeep Peethadhishwar (Roorkee, Uttarakhand, Lucknow, Vrindavan). Formerly, he served as a pracharak for the Rashtriya Swayamsevak Sangh (RSS). He also serves as the patron of Himalaya Parivar, Sindhu Darshan Yatra Samiti, and R.R. Inter College, Hardoi.",
     
     sections: [
       {
@@ -191,7 +191,7 @@ const bioData = {
       "धर्म एवं संस्कृति के संरक्षक",
       "अद्भुत वक्ता एवं परोपकारी मार्गदर्शक"
     ],
-    aboutText: "श्री पंचदशनाम जूना अखाड़े के परम आदरणीय वरिष्ठ आध्यात्मिक संत, महामंडलेश्वर स्वामी यतीन्द्रानन्द गिरि महाराज अपनी गहन आध्यात्मिक प्रज्ञा और विवेक के लिए संपूर्ण विश्व में विख्यात हैं। जूना अखाड़े के एक शीर्ष स्तंभ के रूप में, वे प्राचीन सनातन ज्ञान और विशुद्ध भक्ति का जीवंत उदाहरण हैं। उत्तर प्रदेश के शेखपुर गाँव में एक पारंपरिक सनातन सरयूपारीण ब्राह्मण परिवार में जन्मे स्वामी जी के बाल्यकाल के संस्कारों ने उनके दिव्य जीवन की आधारशिला रखी। वर्तमान में देवभूमि उत्तराखंड में निवास करते हुए, महाराज जी का संपूर्ण जीवन सेवा, तप और लोक-कल्याण के प्रति समर्पित है।",
+    aboutText: "श्री पंचदशनाम जूना अखाड़े के परम आदरणीय वरिष्ठ आध्यात्मिक संत, महामंडलेश्वर स्वामी यतीन्द्रानन्द गिरि महाराज अपनी गहन आध्यात्मिक प्रज्ञा और विवेक के लिए संपूर्ण विश्व में विख्यात हैं। जूना अखाड़े के एक शीर्ष स्तंभ के रूप में, वे प्राचीन सनातन ज्ञान और विशुद्ध भक्ति का जीवंत उदाहरण हैं। उत्तर प्रदेश के शेखपुर गाँव में एक पारंपरिक सनातन सरयूपारीण ब्राह्मण परिवार में जन्मे स्वामी जी के बाल्यकाल के संस्कारों ने उनके दिव्य जीवन की आधारशिला रखी। वर्तमान में देवभूमि उत्तराखंड में निवास करते हुए, महाराज जी का संपूर्ण जीवन सेवा, तप और लोक-कल्याण के प्रति समर्पित है। वह जूना अखाड़ा के वरिष्ठ महामंडलेश्वर, अखिल भारतीय संत समिति के उपाध्यक्ष और जीवनदीप पीठाधीश्वर, रुड़की, उत्तराखंड , लखनऊ, वृंदावन हैं। इसके साथ ही, वे पूर्व में राष्ट्रीय स्वयंसेवक संघ के प्रचारक रहे हैं और वर्तमान में हिमालय परिवार, सिंधु दर्शन यात्रा समिति, तथा आर०. आर० इन्टर कॉलेज हरदोई के संरक्षक हैं।",
     
     sections: [
       {
@@ -412,7 +412,6 @@ export default function Sansrakshak() {
 
                 <div className="w-full h-px bg-[#F0D5B8] my-6" />
 
-                {/* Opening blockquote description */}
                 <p className="text-[#1E0F05] text-base md:text-lg leading-relaxed text-justify relative pl-6 border-l-4 border-[#E8622A]">
                   "{data.aboutText}"
                 </p>
