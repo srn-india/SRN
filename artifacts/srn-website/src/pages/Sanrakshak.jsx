@@ -479,6 +479,8 @@ export default function Sansrakshak() {
           {/* Refined Photographic Gallery: Seamless 6-Column Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-0 overflow-hidden rounded-2xl shadow-lg">
             {[
+              "/ANI-20251003164040.jpg",
+              "/Mahamandaleshwar-Swami-Yatindranand-Giri-Maharaj-with-chhatisgarh-cheif-minister-vishnu-sahay-scaled.jpg.webp",
               "/Narendra_Modi1.jpg",
               "/Narendra_Modi2.jpeg",
               "/mohan_bhagwat.jpeg",
