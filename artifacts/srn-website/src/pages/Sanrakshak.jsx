@@ -362,57 +362,54 @@ export default function Sansrakshak() {
       </section>
 
       {/* ── Profile & Intro Section ─────────────────────────────────── */}
-      <section className="relative px-6 -mt-16 z-10">
-        <div className="max-w-6xl mx-auto">
-          <div className="bg-white border border-[#F0D5B8] rounded-3xl p-8 md:p-12 shadow-xl relative overflow-hidden card-shimmer">
-            
-
-            <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 lg:gap-12">
-              
-              {/* Profile Image Frame with Robust Placeholder handling */}
-              <div className="w-full max-w-sm lg:w-[350px] h-[350px] lg:h-[420px] rounded-3xl overflow-hidden shrink-0 border-4 border-[#E8622A] shadow-lg relative bg-gradient-to-br from-[#FFF9F2] to-[#FDF5EC] flex items-center justify-center group">
-                {!profileImageError ? (
-                  <img 
-                    src="/Swami yatindranand giri maharaj.jpeg" 
-                    alt={data.name} 
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                    onError={() => setProfileImageError(true)}
-                  />
-                ) : null}
-
-                {profileImageError && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center border-2 border-dashed border-[#E8622A]/30 m-2.5 rounded-xl bg-gradient-to-br from-[#FFF9F2] to-[#FDF5EC]">
-                    <div className="w-14 h-14 rounded-full bg-[#E8622A]/10 flex items-center justify-center text-[#E8622A] mb-3 relative animate-pulse">
-                      <Sun className="w-7 h-7 text-[#E8622A]" />
-                      <Flame className="w-4 h-4 text-[#E8622A] absolute bottom-1 right-1" />
-                    </div>
-                    <span className="text-[10px] font-bold text-[#E8622A] tracking-widest uppercase bg-[#E8622A]/10 px-2 py-0.5 rounded-full mb-1">
-                      Upload Portrait
-                    </span>
-                    <span className="text-[9px] text-[#7A5C45] font-mono leading-none bg-white border border-[#F0D5B8] px-1 py-0.5 rounded">
-                      sanrakshak_portrait.png
-                    </span>
-                  </div>
-                )}
+            <section className="relative px-6 -mt-16 z-10 mb-4">
+        <div className="max-w-5xl mx-auto bg-white/90 backdrop-blur-md border border-white/60 rounded-[2rem] p-6 md:p-10 shadow-[0_12px_40px_rgba(0,0,0,0.06)] relative overflow-hidden">
+          {/* Subtle accent line */}
+          <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-[#E8622A] to-[#D4880C]" />
+          
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 relative z-10">
+            {/* Left Col: Photo & Basics */}
+            <div className="md:col-span-4 flex flex-col items-center">
+              <div className="relative group rounded-2xl overflow-hidden shadow-md w-full max-w-[280px] aspect-[3/4] border-[4px] border-white bg-white">
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1E0F05]/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
+                <img 
+                  src={selectedImage || "/Swami yatindranand giri maharaj.jpeg"} 
+                  alt={data.name} 
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  onError={() => setProfileImageError(true)}
+                />
               </div>
+            </div>
 
-              {/* Profile Details */}
-              <div className="flex-1 text-center lg:text-left">
-                <h2 className="text-3xl md:text-4xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight">
-                  {data.name}
-                </h2>
-                
-                <p className="text-sm font-semibold text-[#E8622A] mt-2 inline-flex items-center bg-[#E8622A]/10 px-3 py-1 rounded-full border border-[#E8622A]/20">
-                  {data.degrees}
-                </p>
+            {/* Right Col: Details */}
+            <div className="md:col-span-8 flex flex-col justify-center">
+              <h2 className="text-2xl font-bold font-serif text-[#2C1810] mb-5 border-b-2 border-[#E8622A]/20 pb-3 inline-block">
+                {en ? 'व्यक्तिगत एवं संगठनात्मक विवरण (Personal & Organizational Profile)' : 'व्यक्तिगत एवं संगठनात्मक विवरण (Personal & Organizational Profile)'}
+              </h2>
 
-                <div className="w-full h-px bg-[#F0D5B8] my-6" />
-
-                <p className="text-[#1E0F05] text-base md:text-lg leading-relaxed text-justify relative pl-6 border-l-4 border-[#E8622A]">
+              <ul className="space-y-4 text-[#5C3A1E] text-[15px] md:text-base leading-relaxed">
+                <li className="flex items-start gap-3">
+                  <span className="text-[#E8622A] font-bold text-xl leading-none mt-1">•</span>
+                  <div>
+                    <strong className="font-bold">{en ? 'Designation:' : 'पद:'} </strong> 
+                    {data.degrees}
+                  </div>
+                </li>
+                {data.subtitles && data.subtitles.map((sub, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <span className="text-[#E8622A] font-bold text-xl leading-none mt-1">•</span>
+                    <div>
+                      <strong className="font-bold">{sub}</strong>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              
+              <div className="pt-6 mt-6 border-t border-[#F0D5B8]">
+                <p className="text-[#1E0F05] text-[15px] md:text-base leading-relaxed text-justify relative pl-4 border-l-4 border-[#E8622A]">
                   "{data.aboutText}"
                 </p>
               </div>
-
             </div>
           </div>
         </div>

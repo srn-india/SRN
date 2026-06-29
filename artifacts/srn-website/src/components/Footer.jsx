@@ -25,7 +25,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative bg-[#F0E1D2] text-[#2C1810] pt-[7px] pb-8 overflow-hidden font-sans border-t-2 border-[#5C3A1E]/30">
+    <footer className="relative bg-[#F0E1D2] text-[#2C1810] pt-[7px] pb-4 overflow-hidden font-sans border-t-2 border-[#5C3A1E]/30">
       {/* Subtle Immersive Background Effects for Light Theme */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#E8622A]/5 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#D4880C]/5 blur-[150px] rounded-full pointer-events-none" />
@@ -78,7 +78,7 @@ export default function Footer() {
         </motion.div>
 
         {/* Main Footer Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 mb-12 md:mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 mb-6 md:mb-8">
           {/* Brand Column */}
           <motion.div variants={itemVariants} className="md:col-span-5">
             <div className="flex items-center gap-4 mb-6">
@@ -168,7 +168,7 @@ export default function Footer() {
         </div>
 
         {/* Copyright */}
-        <motion.div variants={itemVariants} className="pt-8 border-t border-[#5C3A1E]/30 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+        <motion.div variants={itemVariants} className="pt-4 border-t border-[#5C3A1E]/30 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
           <p className="text-[#B89070] text-xs sm:text-sm font-medium px-4">{f.copyright}</p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 text-xs sm:text-sm font-medium text-[#B89070]">
             <Link to="#" className="hover:text-[#E8622A] transition-colors">{en ? "Privacy Policy" : "गोपनीयता नीति"}</Link>
