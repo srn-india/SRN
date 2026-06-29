@@ -29,28 +29,25 @@ function GalleryImageFrame({ src, alt, className = "", onClick, ratio }) {
   return (
     <div 
       onClick={onClick}
-      className={`relative group overflow-hidden rounded-3xl shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500 bg-[#FDF5EC]/50 border border-[#F0D5B8]/80 cursor-zoom-in w-full ${className}`}
+      className={`relative group overflow-hidden hover:z-10 hover:shadow-2xl hover:scale-[1.03] transition-all duration-300 cursor-zoom-in w-full ${className}`}
       style={{ aspectRatio: 1 }}
     >
       {!hasError ? (
         <img 
           src={src} 
           alt={alt} 
-          className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-[1.04] block"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.05] block"
           onError={() => setHasError(true)}
         />
       ) : (
-        <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-gradient-to-br from-[#FFF9F2] to-[#FDF5EC] rounded-3xl border border-[#F0D5B8]/40">
+        <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-gradient-to-br from-[#FFF9F2] to-[#FDF5EC]">
           <Camera className="w-8 h-8 text-[#E8622A]/40 mb-2" />
           <span className="text-xs font-bold text-[#E8622A]/60">Image Error</span>
         </div>
       )}
 
       {/* Elegant Hover Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#1E0F05]/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-      
-      {/* Sleek inner glowing border */}
-      <div className="absolute inset-0 border border-transparent group-hover:border-white/30 rounded-3xl transition-all duration-500 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#1E0F05]/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
     </div>
   );
 }
@@ -479,8 +476,8 @@ export default function Sansrakshak() {
             <div className="h-1 bg-gradient-to-r from-transparent via-[#E8622A] to-transparent mt-4 mx-auto w-32 rounded-full" />
           </div>
 
-          {/* Refined Photographic Gallery: Aligned Row & Column Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+          {/* Refined Photographic Gallery: Seamless 6-Column Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-0 overflow-hidden rounded-2xl shadow-lg">
             {[
               "/Narendra_Modi1.jpg",
               "/Narendra_Modi2.jpeg",
