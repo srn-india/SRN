@@ -104,15 +104,9 @@ export default function Events() {
     <div className="bg-[#FDF5EC] min-h-screen">
       
       {/* ── Banner ─────────────────────────────────────────────────── */}
-      <section className="relative bg-[#1E0F05] py-32 text-center px-6 overflow-hidden flex items-center justify-center min-h-[45vh]">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-35 mix-blend-screen"
-          style={{ backgroundImage: `url('/events_hero_bg_1779205425710.png')` }}
-        />
-        <div
-          className="absolute inset-0 opacity-[0.05]"
-          style={{ backgroundImage: `repeating-linear-gradient(-45deg, white, white 1px, transparent 1px, transparent 28px)` }}
-        />
+      <section className="bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6">
+        
+        
         <div className="absolute inset-0 bg-gradient-to-t from-[#1E0F05] via-transparent to-transparent opacity-90" />
         
         <motion.div

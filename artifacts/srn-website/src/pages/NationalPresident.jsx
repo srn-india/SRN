@@ -57,27 +57,18 @@ export default function NationalPresident() {
   }, []);
 
   return (
-    <div className="bg-[#FDF5EC] min-h-screen pb-20">
+    <div className="bg-[#FDF5EC] min-h-screen">
 
       {/* ── Banner ─────────────────────────────────────────────────── */}
-      <section className="relative bg-gradient-to-br from-[#FFF9F2] via-[#FDF5EC] to-[#FFF5EB] py-36 text-center px-6 overflow-hidden min-h-[44vh] flex items-center justify-center border-b border-[#F0D5B8]/40">
+      <section className="bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6">
 
-        {/* Static background hero */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat mix-blend-multiply opacity-30"
-          style={{ backgroundImage: "url('/president_monochrome_bg.png')" }}
-        />
-
-        <div
-          className="absolute inset-0 opacity-[0.06] mix-blend-overlay"
-          style={{ backgroundImage: `repeating-linear-gradient(-45deg, #E8622A, #E8622A 1px, transparent 1px, transparent 28px)` }}
-        />
+        
 
         {/* Colorful Light-Theme Glow accents */}
-        <div className="absolute inset-0 hero-glow pointer-events-none opacity-40 mix-blend-multiply" />
-        <div className="absolute top-8 left-12 w-48 h-48 rounded-full bg-[#E8622A]/15 blur-3xl" />
-        <div className="absolute bottom-8 right-12 w-40 h-40 rounded-full bg-[#D4880C]/15 blur-3xl" />
-        <div className="absolute top-1/2 left-1/3 w-32 h-32 rounded-full bg-[#5C1010]/5 blur-3xl" />
+        
+        
+        
+        
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -86,9 +77,9 @@ export default function NationalPresident() {
           className="relative max-w-4xl mx-auto"
         >
           <span className="inline-block bg-[#E8622A]/15 border border-[#E8622A]/30 text-[#E8622A] text-sm md:text-base font-bold uppercase tracking-widest px-5 py-1.5 rounded-full mb-4 shadow-sm">
-            ॥ राष्ट्र प्रथम ॥
+            ॥ राष्ट्रीय अध्यक्ष ॥
           </span>
-          <h1 className="text-4xl md:text-6xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
+          <h1 className="text-3xl md:text-5xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
             डॉ. मनोज कुमार शुक्ला
           </h1>
           <p className="text-lg md:text-xl italic text-[#7A5C45] font-medium mt-4 max-w-3xl mx-auto leading-relaxed">
@@ -105,12 +96,12 @@ export default function NationalPresident() {
       </section>
 
       {/* ── All Details in One Single Div ───────────────────────────── */}
-      <section className="relative px-6 -mt-16 z-10 mb-16">
+      <section className="relative px-6 -mt-16 z-10 mb-4">
         <div className="max-w-6xl mx-auto">
           <div className="bg-white border border-[#F0D5B8] rounded-3xl p-8 md:p-12 shadow-xl relative overflow-hidden card-shimmer space-y-12">
             
             {/* Background element */}
-            <div className="absolute right-0 top-0 w-64 h-64 bg-[#FDF5EC]/50 rounded-full blur-3xl -z-10" />
+            
 
             {/* Top Block: Profile Photo & Personal Profile Details */}
             <div className="flex flex-col lg:flex-row items-center lg:items-center gap-8 lg:gap-12 pb-10 border-b border-[#F0D5B8]">
@@ -376,8 +367,8 @@ export default function NationalPresident() {
       </section>
 
       {/* ── Photo Highlights Section (Gallery) ────────────────── */}
-      <section className="py-16 px-6 bg-[#FFF9F2] relative overflow-hidden border-t border-b border-[#F0D5B8]/50">
-        <div className="absolute left-0 top-0 w-64 h-64 bg-[#E8622A]/3 rounded-full blur-3xl" />
+      <section className="pt-6 pb-16 px-6 bg-[#FFF9F2] relative overflow-hidden border-t border-b border-[#F0D5B8]/50">
+        
 
         <div className="max-w-6xl mx-auto relative">
 

@@ -150,8 +150,8 @@ export default function Donate() {
   return (
     <div className="min-h-screen bg-[#FDF5EC] py-24 px-6 relative overflow-hidden">
       {/* Background Decor */}
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#E8622A]/5 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/3" />
-      <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-[#D4880C]/5 rounded-full blur-3xl pointer-events-none translate-y-1/3 -translate-x-1/3" />
+      
+      
 
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-start">

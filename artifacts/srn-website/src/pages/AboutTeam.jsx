@@ -69,16 +69,13 @@ export default function AboutTeam() {
   return (
     <div className="bg-[#FDF5EC] font-sans selection:bg-[#E8622A] selection:text-white min-h-screen">
       {/* ── Banner ───────────────────────────────────────────────────── */}
-      <section className="relative bg-gradient-to-br from-[#FFF9F2] via-[#FDF5EC] to-[#FDE8D7] pt-40 pb-32 text-center px-6 overflow-hidden">
+      <section className="bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6">
         {/* Immersive background glows */}
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#E8622A]/15 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#D4880C]/15 blur-[150px] rounded-full pointer-events-none" />
         
         {/* Photographic Background */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 mix-blend-multiply"
-          style={{ backgroundImage: `url('/team_hero_monochrome.png')` }}
-        />
+        
 
         {/* Subtle patterned overlay */}
         <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#E8622A_1px,transparent_1px)] [background-size:24px_24px]" />

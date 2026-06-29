@@ -321,27 +321,18 @@ export default function Sansrakshak() {
   }, [en]);
 
   return (
-    <div className="bg-[#FDF5EC] min-h-screen pb-20">
+    <div className="bg-[#FDF5EC] min-h-screen">
       
       {/* ── Banner ─────────────────────────────────────────────────── */}
-      <section className="relative bg-gradient-to-br from-[#FFF9F2] via-[#FDF5EC] to-[#FFF5EB] py-36 text-center px-6 overflow-hidden min-h-[44vh] flex items-center justify-center border-b border-[#F0D5B8]/40">
+      <section className="bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6">
         
-        {/* Static background hero */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat mix-blend-multiply opacity-30"
-          style={{ backgroundImage: "url('/sansrakshak_monochrome_bg.png')" }}
-        />
-
-        <div
-          className="absolute inset-0 opacity-[0.06] mix-blend-overlay"
-          style={{ backgroundImage: `repeating-linear-gradient(-45deg, #E8622A, #E8622A 1px, transparent 1px, transparent 28px)` }}
-        />
+        
         
         {/* Colorful Light-Theme Glow accents */}
-        <div className="absolute inset-0 hero-glow pointer-events-none opacity-40 mix-blend-multiply" />
-        <div className="absolute top-8 left-12 w-48 h-48 rounded-full bg-[#E8622A]/15 blur-3xl" />
-        <div className="absolute bottom-8 right-12 w-40 h-40 rounded-full bg-[#D4880C]/15 blur-3xl" />
-        <div className="absolute top-1/2 left-1/3 w-32 h-32 rounded-full bg-[#5C1010]/5 blur-3xl" />
+        
+        
+        
+        
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -349,9 +340,17 @@ export default function Sansrakshak() {
           transition={{ duration: 0.7, ease: "easeOut" }}
           className="relative max-w-4xl mx-auto"
         >
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
+          <span className="inline-block bg-[#E8622A]/15 border border-[#E8622A]/30 text-[#E8622A] text-sm md:text-base font-bold uppercase tracking-widest px-5 py-1.5 rounded-full mb-4 shadow-sm">
+            {en ? "Spiritual Guidance & Patronage" : "आध्यात्मिक मार्गदर्शन एवं संरक्षण"}
+          </span>
+          <h1 className="text-3xl md:text-5xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
             {en ? "Sanrakshak (Patron)" : "संरक्षक (Sanrakshak)"}
           </h1>
+          <p className="text-lg md:text-xl italic text-[#7A5C45] font-medium mt-4 max-w-3xl mx-auto leading-relaxed">
+            {en 
+              ? "\"Guiding the vision of holistic national development and spiritual awakening with divine blessings.\"" 
+              : "\"ईश्वरीय आशीर्वाद के साथ समग्र राष्ट्र निर्माण और आध्यात्मिक जागृति के दृष्टिकोण का मार्गदर्शन करते हुए।\""}
+          </p>
           
           <motion.div
             initial={{ scaleX: 0 }}
@@ -366,7 +365,7 @@ export default function Sansrakshak() {
       <section className="relative px-6 -mt-16 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="bg-white border border-[#F0D5B8] rounded-3xl p-8 md:p-12 shadow-xl relative overflow-hidden card-shimmer">
-            <div className="absolute right-0 top-0 w-64 h-64 bg-[#FDF5EC]/50 rounded-full blur-3xl -z-10" />
+            
 
             <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 lg:gap-12">
               
@@ -457,7 +456,7 @@ export default function Sansrakshak() {
 
       {/* ── Photo Highlights Section (User-Managed Empty Frame Gallery) ────────────────── */}
       <section className="py-16 px-6 bg-[#FFF9F2] relative overflow-hidden border-t border-b border-[#F0D5B8]/50">
-        <div className="absolute left-0 top-0 w-64 h-64 bg-[#E8622A]/3 rounded-full blur-3xl" />
+        
         
         <div className="max-w-6xl mx-auto relative">
           
@@ -563,9 +562,9 @@ export default function Sansrakshak() {
         <div className="max-w-4xl mx-auto">
           <FadeSection>
             <div className="relative rounded-3xl bg-white border border-[#F0D5B8] p-8 md:p-12 text-center overflow-hidden shadow-lg">
-              <div className="absolute -left-12 -bottom-12 w-48 h-48 rounded-full bg-[#E8622A]/10 blur-3xl" />
-              <div className="absolute -right-12 -top-12 w-48 h-48 rounded-full bg-[#D4880C]/10 blur-3xl" />
-              <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: `repeating-linear-gradient(-45deg, #E8622A, #E8622A 1px, transparent 1px, transparent 28px)` }} />
+              
+              
+              
               
               <span className="inline-block bg-[#E8622A]/10 border border-[#E8622A]/30 text-[#E8622A] text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">
                 {en ? "Legacy of Devotion" : "सनातन संस्कृति एवं अखंड सेवा"}

@@ -29,21 +29,15 @@ export default function Uddeshya() {
   }, []);
 
   return (
-    <div className="bg-[#FDF5EC] min-h-screen pb-20">
+    <div className="bg-[#FDF5EC] min-h-screen">
 
       {/* ── Banner ─────────────────────────────────────────────────── */}
-      <section className="relative bg-[#1E0F05] py-32 text-center px-6 overflow-hidden min-h-[42vh] flex items-center justify-center">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-25 mix-blend-screen"
-          style={{ backgroundImage: `url('/uddeshya-hero.png')` }}
-        />
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{ backgroundImage: `repeating-linear-gradient(-45deg, white, white 1px, transparent 1px, transparent 28px)` }}
-        />
-        <div className="absolute inset-0 hero-glow pointer-events-none opacity-60" />
-        <div className="absolute top-8 left-12 w-40 h-40 rounded-full bg-[#E8622A]/8 blur-3xl" />
-        <div className="absolute bottom-8 right-12 w-32 h-32 rounded-full bg-[#D4880C]/8 blur-3xl" />
+      <section className="bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6">
+        
+        
+        
+        
+        
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -80,12 +74,12 @@ export default function Uddeshya() {
       </section>
 
       {/* ── Objectives List ─────────────────────────────────────────── */}
-      <section className="py-16 px-4 sm:px-6 max-w-6xl mx-auto">
-        <div className="space-y-8 bg-white border border-[#F0D5B8] rounded-[2rem] p-3.5 sm:p-8 md:p-12 shadow-sm">
+      <section className="pt-16 pb-4 sm:pb-8 px-4 sm:px-6 max-w-6xl mx-auto">
+        <div className="space-y-6 sm:space-y-8 bg-white border border-[#F0D5B8] rounded-[2rem] p-4 sm:p-8 md:p-12 shadow-sm">
           {detailedObjectives.map((obj, index) => (
-            <div key={obj.id} className="flex gap-1.5 sm:gap-4 items-start text-[#1E0F05]">
-              <span className="font-serif font-bold text-sm sm:text-lg md:text-xl text-[#E8622A] pt-0.5 min-w-[1rem] sm:min-w-[2.5rem] text-left sm:text-right shrink-0">
-                {index + 1}.
+            <div key={obj.id} className="flex gap-2 sm:gap-4 items-start text-[#1E0F05]">
+              <span className="text-[#E8622A] text-[0.6em] sm:text-[0.7em] mt-[0.4rem] sm:mt-[0.55rem] shrink-0">
+                ●
               </span>
               <p className="text-sm sm:text-base md:text-lg leading-relaxed font-sans text-justify pt-0.5">
                 {en ? obj.en : obj.hi}
@@ -96,7 +90,7 @@ export default function Uddeshya() {
       </section>
 
       {/* ── Mission ────────────────────────────────────────────────── */}
-      <section className="py-20 px-6 bg-[#FFF9F2] relative overflow-hidden">
+      <section className="pt-8 pb-20 px-6 bg-[#FFF9F2] relative overflow-hidden">
         <div className="absolute right-6 top-1/2 -translate-y-1/2 text-[15rem] font-bold text-[#E8622A]/4 select-none pointer-events-none leading-none font-serif hidden md:block">
           M
         </div>
@@ -111,12 +105,12 @@ export default function Uddeshya() {
             {u.missionPoints.map((point, i) => (
               <div 
                 key={point} 
-                className="flex items-start gap-5 p-5 rounded-2xl bg-white border border-[#F0D5B8] hover:border-[#E8622A]/50 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 card-shimmer"
+                className="flex items-start gap-4 p-5 rounded-2xl bg-white border border-[#F0D5B8] hover:border-[#E8622A]/50 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 card-shimmer"
               >
-                <span className="text-4xl font-bold text-[#E8622A]/15 leading-none shrink-0 select-none w-10 text-right font-serif">
-                  {String(i + 1).padStart(2, "0")}
+                <span className="text-[#E8622A] text-[0.8em] mt-[0.35rem] shrink-0 select-none">
+                  ●
                 </span>
-                <p className="text-[#1E0F05] text-base leading-relaxed pt-1.5">{point}</p>
+                <p className="text-[#1E0F05] text-base leading-relaxed">{point}</p>
               </div>
             ))}
           </div>

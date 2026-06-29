@@ -20,14 +20,11 @@ export default function Media() {
   }, []);
 
   return (
-    <div className="bg-[#FDF5EC] min-h-screen pb-20">
+    <div className="bg-[#FDF5EC] min-h-screen">
       
       {/* ── Banner ─────────────────────────────────────────────────── */}
-      <section className="relative bg-[#1E0F05] py-32 text-center px-6 overflow-hidden flex items-center justify-center min-h-[45vh]">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 mix-blend-screen"
-          style={{ backgroundImage: `url('/media_hero_bg_1779216997567.png')` }}
-        />
+      <section className="bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6">
+        
         <div className="absolute inset-0 bg-gradient-to-t from-[#FDF5EC] via-[#1E0F05]/80 to-[#1E0F05]/40" />
         
         <motion.div
@@ -123,7 +120,7 @@ export default function Media() {
 
               {/* ITEM 6: Standard Graphic/Resource Block */}
               <div className="relative rounded-3xl overflow-hidden group shadow-lg bg-gradient-to-br from-[#E8622A] to-[#C04A18] p-6 flex flex-col justify-between text-white">
-                <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `repeating-linear-gradient(45deg, white, white 1px, transparent 1px, transparent 10px)`}}/>
+                
                 <div className="relative z-10 flex justify-between items-start">
                   <Download className="w-8 h-8" />
                   <span className="bg-white/20 text-xs px-2 py-1 rounded font-semibold">PDF</span>

@@ -25,7 +25,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative bg-[#F0E1D2] text-[#2C1810] pt-20 pb-8 overflow-hidden font-sans border-t-2 border-[#5C3A1E]/30">
+    <footer className="relative bg-[#F0E1D2] text-[#2C1810] pt-[7px] pb-8 overflow-hidden font-sans border-t-2 border-[#5C3A1E]/30">
       {/* Subtle Immersive Background Effects for Light Theme */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#E8622A]/5 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#D4880C]/5 blur-[150px] rounded-full pointer-events-none" />
@@ -41,7 +41,7 @@ export default function Footer() {
         className="max-w-7xl mx-auto px-6 relative z-10"
       >
         {/* Contact Banner (Glassmorphic Light) */}
-        <motion.div variants={itemVariants} className="mb-12 md:mb-20">
+        <motion.div variants={itemVariants} className="mb-8 md:mb-10">
           <div className="bg-white/70 backdrop-blur-xl border border-white rounded-3xl p-5 md:p-10 shadow-[0_8px_32px_rgba(0,0,0,0.05)] flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8 relative overflow-hidden">
             <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#E8622A]/10 blur-[60px] rounded-full" />
             

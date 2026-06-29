@@ -119,20 +119,14 @@ export default function Initiatives() {
   const secondaryList = en ? secondaryEn : secondaryHi;
 
   return (
-    <div className="bg-[#FDF5EC] min-h-screen pb-20 selection:bg-[#E8622A] selection:text-white">
+    <div className="bg-[#FDF5EC] min-h-screen selection:bg-[#E8622A] selection:text-white">
       
       {/* ── Banner Section ─────────────────────────────────────────── */}
-      <section className="relative bg-[#1E0F05] py-32 text-center px-6 overflow-hidden flex items-center justify-center min-h-[44vh] border-b border-[#F0D5B8]/20">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-35 mix-blend-multiply"
-          style={{ backgroundImage: `url('/init_hero_bg_1779216907662.png')` }}
-        />
+      <section className="bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6">
+        
         
         {/* Subtle grid pattern overlay */}
-        <div 
-          className="absolute inset-0 opacity-[0.05] pointer-events-none mix-blend-overlay"
-          style={{ backgroundImage: `repeating-linear-gradient(-45deg, #E8622A, #E8622A 1px, transparent 1px, transparent 28px)` }}
-        />
+        
 
         {/* Glow accents */}
         <div className="absolute top-12 left-16 w-56 h-56 rounded-full bg-[#E8622A]/10 blur-[100px] pointer-events-none" />
@@ -193,10 +187,11 @@ export default function Initiatives() {
           <h2 className="text-2xl md:text-3xl font-bold font-serif text-[#5C1010] mb-6 border-b border-[#F0D5B8] pb-2">
             {en ? "Secondary Initiatives" : "द्वितीयक पहल"}
           </h2>
-          <ul className="list-disc pl-6 space-y-3 text-base md:text-lg text-[#1E0F05] font-sans">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3 text-base md:text-lg text-[#1E0F05] font-sans">
             {secondaryList.map((item, idx) => (
-              <li key={idx} className="leading-relaxed">
-                {item}
+              <li key={idx} className="flex items-start gap-2.5">
+                <span className="text-[#E8622A] text-[0.6em] mt-[0.4rem]">●</span>
+                <span className="leading-relaxed">{item}</span>
               </li>
             ))}
           </ul>

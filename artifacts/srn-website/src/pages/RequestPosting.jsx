@@ -187,25 +187,19 @@ export default function RequestPosting() {
 
 
   return (
-    <div className="bg-[#FDF5EC] min-h-screen pb-20">
+    <div className="bg-[#FDF5EC] min-h-screen">
       
       {/* ── Hero Section with Monochromatic Pattern Background ───────── */}
-      <section className="relative bg-gradient-to-br from-[#FFF9F2] via-[#FDF5EC] to-[#FFF5EB] py-36 text-center px-6 overflow-hidden min-h-[44vh] flex items-center justify-center border-b border-[#F0D5B8]/40">
+      <section className="bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6">
         
         {/* Monochromatic styled background pattern */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat mix-blend-multiply opacity-35"
-          style={{ backgroundImage: "url('/jan_samwad_monochrome_bg.png')" }}
-        />
+        
 
-        <div
-          className="absolute inset-0 opacity-[0.06] mix-blend-overlay"
-          style={{ backgroundImage: `repeating-linear-gradient(-45deg, #E8622A, #E8622A 1px, transparent 1px, transparent 28px)` }}
-        />
+        
         
         {/* Glow accents */}
-        <div className="absolute top-8 left-12 w-48 h-48 rounded-full bg-[#E8622A]/10 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-8 right-12 w-40 h-40 rounded-full bg-[#D4880C]/10 blur-3xl pointer-events-none" />
+        
+        
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}

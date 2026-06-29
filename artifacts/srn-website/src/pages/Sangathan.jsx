@@ -33,15 +33,12 @@ export default function Sangathan() {
     <div className="bg-[#FDF5EC] font-sans selection:bg-[#E8622A] selection:text-white">
 
       {/* ── Banner ───────────────────────────────────────────────────── */}
-      <section className="relative bg-gradient-to-br from-[#FFF9F2] via-[#FDF5EC] to-[#FDE8D7] pt-40 pb-32 text-center px-6 overflow-hidden">
+      <section className="bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6">
         {/* Immersive background glows */}
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#E8622A]/10 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#D4880C]/10 blur-[150px] rounded-full pointer-events-none" />
         
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.25] mix-blend-multiply"
-          style={{ backgroundImage: `url('/sangathan-hero.png')` }}
-        />
+        
         
         {/* Gradient transition to next section */}
         <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-b from-transparent to-[#FDF5EC]" />

@@ -62,18 +62,12 @@ export default function Forums() {
   }, []);
 
   return (
-    <div className="bg-[#FFF9F2] min-h-screen pb-20">
+    <div className="bg-[#FFF9F2] min-h-screen">
       
       {/* ── Banner ─────────────────────────────────────────────────── */}
-      <section className="relative bg-[#1E0F05] py-32 text-center px-6 overflow-hidden flex items-center justify-center min-h-[45vh]">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 mix-blend-screen"
-          style={{ backgroundImage: `url('/forums_hero_bg_1779205444362.png')` }}
-        />
-        <div
-          className="absolute inset-0 opacity-[0.05]"
-          style={{ backgroundImage: `repeating-linear-gradient(-45deg, white, white 1px, transparent 1px, transparent 28px)` }}
-        />
+      <section className="bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6">
+        
+        
         <div className="absolute inset-0 bg-gradient-to-t from-[#FFF9F2] via-[#1E0F05]/80 to-[#1E0F05]/40" />
         
         <motion.div
@@ -188,7 +182,7 @@ export default function Forums() {
         <div className="space-y-6">
           <FadeSection delay={200}>
             <div className="bg-gradient-to-br from-[#E8622A] to-[#C04A18] rounded-2xl p-6 text-white shadow-lg shadow-orange-900/20 relative overflow-hidden">
-              <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `repeating-linear-gradient(45deg, white, white 1px, transparent 1px, transparent 10px)`}}/>
+              
               <div className="relative z-10">
                 <h3 className="font-serif font-bold text-xl mb-2">
                   {user 

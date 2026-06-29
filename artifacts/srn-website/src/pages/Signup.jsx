@@ -178,7 +178,7 @@ export default function Signup() {
   return (
     <div 
       className="min-h-screen relative flex flex-col lg:flex-row justify-center lg:justify-between items-center px-4 sm:px-6 md:px-16 lg:px-24 pt-24 pb-12 gap-8 lg:gap-16 overflow-y-auto overflow-x-hidden bg-cover bg-center"
-      style={{ backgroundImage: "url('/hero-bg-2.png')" }}
+      style={{ backgroundImage: "url('/plain-hero-bg.svg')" }}
     >
       {/* Dark gradient overlay for extreme contrast and premium feel */}
       <div className="fixed inset-0 bg-gradient-to-tr from-black/80 via-[#1E0A04]/70 to-[#E8622A]/20 pointer-events-none" />

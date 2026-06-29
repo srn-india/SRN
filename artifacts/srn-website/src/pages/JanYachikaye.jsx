@@ -135,18 +135,15 @@ export default function JanYachikaye() {
   });
 
   return (
-    <div className="bg-[#FDF5EC] min-h-screen pb-20">
+    <div className="bg-[#FDF5EC] min-h-screen">
       
       {/* ── Hero Section ─────────────────────────────────────────── */}
-      <section className="relative bg-[#1E0F05] py-36 text-center px-6 overflow-hidden min-h-[44vh] flex items-center justify-center border-b border-[#F0D5B8]/20">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30 mix-blend-multiply"
-          style={{ backgroundImage: "url('/jan_samwad_monochrome_bg.png')" }}
-        />
+      <section className="bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6">
+        
 
         {/* Glow accents */}
-        <div className="absolute top-8 left-12 w-48 h-48 rounded-full bg-[#E8622A]/10 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-8 right-12 w-40 h-40 rounded-full bg-[#D4880C]/10 blur-3xl pointer-events-none" />
+        
+        
 
         <div className="absolute inset-0 bg-gradient-to-t from-[#1E0F05] via-[#1E0F05]/60 to-[#1E0F05]/20 pointer-events-none" />
 
