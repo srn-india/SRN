@@ -32,27 +32,23 @@ export default function Uddeshya() {
     <div className="bg-[#FDF5EC] min-h-screen">
 
       {/* ── Banner ─────────────────────────────────────────────────── */}
-      <section className="bg-[#FFF5EB] pt-[96px] pb-2 text-center px-6">
-        
+      <section className="relative bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6 overflow-hidden">
+        {/* Background Image (Soft Orange Gradient) */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.22]"
+          style={{ backgroundImage: "url('/plain-hero-bg.svg')" }}
+        />
+
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
           className="relative max-w-4xl mx-auto z-10"
         >
-          <motion.span
-            initial={{ opacity: 0, scale: 0.85 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="inline-block bg-[#E8622A]/15 border border-[#E8622A]/30 text-[#E8622A] text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4"
-          >
-            {en ? "Detailed Objectives" : "न्यास के विस्तृत उद्देश्य"}
-          </motion.span>
-
-          <h1 className="text-4xl md:text-6xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
+          <h1 className="text-3xl md:text-5xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight">
             {en ? "Objectives of the Trust" : "न्यास के उद्देश्य"}
           </h1>
-          <p className="text-[#7A5C45] text-sm md:text-base mt-3 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-[#7A5C45] text-sm md:text-base mt-4 max-w-2xl mx-auto leading-relaxed font-medium">
             {en 
               ? "Sashakt Rashtra Nirman Trust has been established to drive holistic national development through these 48 core constitutional objectives."
               : "सशक्त राष्ट्र निर्माण न्यास की स्थापना राष्ट्र के समग्र विकास के लिए इन 48 मुख्य संवैधानिक उद्देश्यों को पूरा करने के लिए की गई है।"}

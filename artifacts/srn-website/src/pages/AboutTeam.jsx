@@ -69,19 +69,12 @@ export default function AboutTeam() {
   return (
     <div className="bg-[#FDF5EC] font-sans selection:bg-[#E8622A] selection:text-white min-h-screen">
       {/* ── Banner ───────────────────────────────────────────────────── */}
-      <section className="bg-[#FFF5EB] pt-[100px] pb-8 text-center px-6">
-        {/* Immersive background glows */}
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#E8622A]/15 blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#D4880C]/15 blur-[150px] rounded-full pointer-events-none" />
-        
-        {/* Photographic Background */}
-        
-
-        {/* Subtle patterned overlay */}
-        <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#E8622A_1px,transparent_1px)] [background-size:24px_24px]" />
-        
-        {/* Gradient transition to next section */}
-        <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-b from-transparent to-[#FDF5EC]" />
+      <section className="relative bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6 overflow-hidden">
+        {/* Background Image (Soft Orange Gradient) */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.22]"
+          style={{ backgroundImage: "url('/plain-hero-bg.svg')" }}
+        />
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -89,13 +82,13 @@ export default function AboutTeam() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="relative z-10 max-w-4xl mx-auto"
         >
-          <span className="inline-block px-5 py-2 rounded-full bg-white/60 border border-[#E8622A]/20 text-[#C04A18] text-xs font-bold uppercase tracking-widest mb-4 backdrop-blur-md shadow-sm">
+          <span className="inline-block px-5 py-2 rounded-full bg-white/60 border border-[#E8622A]/20 text-[#C04A18] text-xs font-bold uppercase tracking-widest mb-6 backdrop-blur-md shadow-sm">
             {en ? "Founding Members" : "संस्थापक सदस्य"}
           </span>
-          <h1 className="text-4xl md:text-6xl font-bold text-[#2C1810] font-serif tracking-tight drop-shadow-sm mb-4">
+          <h1 className="text-3xl md:text-5xl font-bold text-[#5C1010] font-serif tracking-tight drop-shadow-sm mb-6">
             {en ? "Founding Members" : "संस्थापक सदस्य"}
           </h1>
-          <p className="text-[#5C3A1E] text-lg md:text-xl max-w-2xl mx-auto font-medium leading-relaxed">
+          <p className="text-[#7A5C45] text-base md:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
             {en 
               ? "Meet the dedicated individuals who laid the foundation of Sashakt Rashtra Nirman and continue to guide our vision forward."
               : "सशक्त राष्ट्र निर्माण की नींव रखने वाले और हमारे विजन को आगे बढ़ाने वाले समर्पित व्यक्तियों से मिलें।"}
