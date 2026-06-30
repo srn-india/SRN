@@ -196,17 +196,12 @@ export default function Complaints() {
         )}
       </AnimatePresence>
 
-      {/* ── Hero Section with Monochromatic Pattern Background ───────── */}
-      <section className="bg-[#FFF5EB] pt-[96px] pb-5 text-center px-6">
-        
-        {/* Monochromatic styled background pattern */}
-        
-
-        
-        
-        {/* Glow accents */}
-        
-        
+      <section className="relative bg-[#FFF5EB] pt-[110px] pb-8 text-center px-6 overflow-hidden">
+        {/* Background Image (Soft Orange Gradient) */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.22]"
+          style={{ backgroundImage: "url('/plain-hero-bg.svg')" }}
+        />
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -221,7 +216,7 @@ export default function Complaints() {
           >
             {en ? "Public Grievance Portal" : "जन शिकायत निवारण पोर्टल"}
           </motion.span>
-          <h1 className="text-4xl md:text-6xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
+          <h1 className="text-3xl md:text-5xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
             {en ? "Register Your Complaint" : "जन शिकायत दर्ज करें"}
           </h1>
           <p className="text-[#7A5C45] text-base md:text-lg mt-4 max-w-2xl mx-auto font-medium leading-relaxed">
@@ -240,7 +235,7 @@ export default function Complaints() {
       </section>
 
       {/* ── Form & Content Section with Grid Stripes ───────────── */}
-      <section className="relative py-16 px-4 md:px-8 z-10">
+      <section className="relative pt-6 pb-16 px-4 md:px-8 z-10">
         
         {/* Grid Pattern Overlay */}
         <div 

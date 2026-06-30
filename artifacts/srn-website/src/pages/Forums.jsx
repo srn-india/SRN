@@ -65,10 +65,12 @@ export default function Forums() {
     <div className="bg-[#FFF9F2] min-h-screen">
       
       {/* ── Banner ─────────────────────────────────────────────────── */}
-      <section className="bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6">
-        
-        
-        <div className="absolute inset-0 bg-gradient-to-t from-[#FFF9F2] via-[#1E0F05]/80 to-[#1E0F05]/40" />
+      <section className="relative bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6 overflow-hidden">
+        {/* Background Image (Soft Orange Gradient) */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.22]"
+          style={{ backgroundImage: "url('/plain-hero-bg.svg')" }}
+        />
         
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -76,13 +78,13 @@ export default function Forums() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="relative max-w-4xl mx-auto z-10"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#E8622A]/10 border border-[#E8622A]/30 backdrop-blur-md mb-6 shadow-[0_0_15px_rgba(232,98,42,0.3)]">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#E8622A]/15 border border-[#E8622A]/30 mb-6 shadow-sm">
             <MessageSquare className="w-4 h-4 text-[#E8622A]" />
-            <span className="text-[#5C1010]/90 text-sm font-medium tracking-wide uppercase">
+            <span className="text-[#E8622A] text-sm font-semibold tracking-wide uppercase">
               {en ? "Community Forums" : "सामुदायिक मंच"}
             </span>
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold text-[#5C1010] font-serif leading-tight drop-shadow-lg">
+          <h1 className="text-3xl md:text-5xl font-bold text-[#5C1010] font-serif leading-tight drop-shadow-sm">
             {en ? (
               <>Raise Your <span className="text-[#E8622A]">Voice</span></>
             ) : (
@@ -95,10 +97,10 @@ export default function Forums() {
             <input 
               type="text" 
               placeholder={en ? "Search discussions, topics, or members..." : "चर्चाएँ, विषय या सदस्यों को खोजें..."}
-              className="w-full bg-white/10 backdrop-blur-xl border border-white/20 text-[#5C1010] placeholder-white/50 px-6 py-4 rounded-2xl focus:outline-none focus:border-[#E8622A] focus:ring-1 focus:ring-[#E8622A] transition-all shadow-lg"
+              className="w-full bg-white border border-[#F0D5B8] text-[#1E0F05] placeholder-[#7A5C45]/60 px-6 py-4 rounded-2xl focus:outline-none focus:border-[#E8622A] focus:ring-1 focus:ring-[#E8622A] transition-all shadow-md"
             />
             <button className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-[#E8622A] rounded-xl hover:bg-[#C04A18] transition-colors">
-              <Search className="w-5 h-5 text-[#5C1010]" />
+              <Search className="w-5 h-5 text-white" />
             </button>
           </div>
         </motion.div>

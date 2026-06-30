@@ -138,12 +138,12 @@ export default function JanYachikaye() {
     <div className="bg-[#FDF5EC] min-h-screen">
       
       {/* ── Hero Section ─────────────────────────────────────────── */}
-      <section className="bg-[#FFF5EB] pt-[96px] pb-5 text-center px-6">
-        
-
-        {/* Glow accents */}
-        
-        
+      <section className="relative bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6 overflow-hidden">
+        {/* Background Image (Soft Orange Gradient) */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.22]"
+          style={{ backgroundImage: "url('/plain-hero-bg.svg')" }}
+        />
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -158,7 +158,7 @@ export default function JanYachikaye() {
           >
             {en ? "Resolution Registry" : "निस्तारण विवरण पंजी"}
           </motion.span>
-          <h1 className="text-4xl md:text-6xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
+          <h1 className="text-3xl md:text-5xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
             {en ? "Jan Yachikaye (Solved)" : "जन याचिकाएं (निस्तारित)"}
           </h1>
           <p className="text-[#7A5C45] text-base md:text-lg mt-4 max-w-2xl mx-auto leading-relaxed">

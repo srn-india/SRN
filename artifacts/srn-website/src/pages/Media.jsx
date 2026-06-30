@@ -23,15 +23,20 @@ export default function Media() {
     <div className="bg-[#FDF5EC] min-h-screen">
       
       {/* ── Banner ─────────────────────────────────────────────────── */}
-      <section className="bg-[#FFF5EB] pt-[96px] pb-5 text-center px-6">
-        
+      <section className="relative bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6 overflow-hidden">
+        {/* Background Image (Soft Orange Gradient) */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.22]"
+          style={{ backgroundImage: "url('/plain-hero-bg.svg')" }}
+        />
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="relative max-w-4xl mx-auto z-10"
         >
-          <h1 className="text-4xl md:text-6xl font-bold text-[#5C1010] font-serif leading-tight drop-shadow-sm">
+          <h1 className="text-3xl md:text-5xl font-bold text-[#5C1010] font-serif leading-tight drop-shadow-sm">
             Media & <span className="text-[#E8622A]">Gallery</span>
           </h1>
           <p className="text-xl text-[#7A5C45] mt-3 font-medium tracking-wide mb-6">

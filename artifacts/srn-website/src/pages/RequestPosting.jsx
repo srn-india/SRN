@@ -190,17 +190,14 @@ export default function RequestPosting() {
     <div className="bg-[#FDF5EC] min-h-screen">
       
       {/* ── Hero Section with Monochromatic Pattern Background ───────── */}
-      <section className="bg-[#FFF5EB] pt-[96px] pb-5 text-center px-6">
+      <section className="relative bg-[#FFF5EB] pt-[110px] pb-8 text-center px-6 overflow-hidden">
         
-        {/* Monochromatic styled background pattern */}
+        {/* Background Image (Soft Orange Gradient) */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.22]"
+          style={{ backgroundImage: "url('/plain-hero-bg.svg')" }}
+        />
         
-
-        
-        
-        {/* Glow accents */}
-        
-        
-
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -214,7 +211,7 @@ export default function RequestPosting() {
           >
             {en ? "Join the Executive Committee" : "कार्यकारिणी में शामिल हों"}
           </motion.span>
-          <h1 className="text-4xl md:text-6xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
+          <h1 className="text-3xl md:text-5xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
             {en ? "Apply for a Post" : "पद के लिए आवेदन करें"}
           </h1>
           <p className="text-[#7A5C45] text-base md:text-lg mt-4 max-w-2xl mx-auto font-medium leading-relaxed">
@@ -233,7 +230,7 @@ export default function RequestPosting() {
       </section>
 
       {/* ── Form & Content Section with Grid Stripes ───────────── */}
-      <section className="relative py-16 px-4 md:px-8 z-10">
+      <section className="relative pt-6 pb-16 px-4 md:px-8 z-10">
         
         {/* Grid Pattern Overlay */}
         <div 

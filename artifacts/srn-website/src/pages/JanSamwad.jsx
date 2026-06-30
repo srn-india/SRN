@@ -89,16 +89,12 @@ export default function JanSamwad() {
     <div className="bg-[#FDF5EC] min-h-screen">
       
       {/* ── Hero Section with Monochromatic Pattern Background ───────── */}
-      <section className="bg-[#FFF5EB] pt-[96px] pb-5 text-center px-6">
-        
-        {/* Monochromatic styled background pattern */}
-        
-
-        
-        
-        {/* Glow accents */}
-        
-        
+      <section className="relative bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6 overflow-hidden">
+        {/* Background Image (Soft Orange Gradient) */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.22]"
+          style={{ backgroundImage: "url('/plain-hero-bg.svg')" }}
+        />
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -106,7 +102,7 @@ export default function JanSamwad() {
           transition={{ duration: 0.7, ease: "easeOut" }}
           className="relative max-w-4xl mx-auto"
         >
-          <h1 className="text-4xl md:text-6xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
+          <h1 className="text-3xl md:text-5xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
             {en ? "Jan Samwad (जन संवाद)" : "जन संवाद (Jan Samwad)"}
           </h1>
           <p className="text-[#7A5C45] text-base md:text-lg mt-4 max-w-2xl mx-auto font-medium leading-relaxed">

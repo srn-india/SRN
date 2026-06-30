@@ -54,18 +54,19 @@ export default function Contact() {
   return (
     <div className="min-h-screen bg-[#FDF5EC] font-sans selection:bg-[#E8622A] selection:text-white pb-24">
       {/* Hero Section */}
-      <div className="relative pt-32 pb-24 px-6 overflow-hidden">
-        <div className="absolute inset-0">
-          <img src="/events_hero_bg_1779205425710.png" alt="Contact Hero Background" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#1E0A04]/90 via-[#E8622A]/60 to-[#FDF5EC]" />
-        </div>
+      <section className="relative bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6 overflow-hidden">
+        {/* Background Image (Soft Orange Gradient) */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.22]"
+          style={{ backgroundImage: "url('/plain-hero-bg.svg')" }}
+        />
         
         <div className="relative z-10 max-w-4xl mx-auto text-center">
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-5xl md:text-6xl font-bold font-serif text-white mb-6 drop-shadow-md"
+            className="text-3xl md:text-5xl font-bold font-serif text-[#5C1010] mb-6 drop-shadow-sm"
           >
             {en ? "Get in Touch" : "संपर्क करें"}
           </motion.h1>
@@ -73,16 +74,16 @@ export default function Contact() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-xl text-white/90 font-medium max-w-2xl mx-auto drop-shadow-sm"
+            className="text-base md:text-lg text-[#7A5C45] font-medium max-w-2xl mx-auto"
           >
             {en 
               ? "Have questions about our initiatives or want to partner with us? We'd love to hear from you." 
               : "क्या हमारी पहलों के बारे में कोई प्रश्न हैं या हमारे साथ साझेदारी करना चाहते हैं? हमें आपसे सुनना अच्छा लगेगा।"}
           </motion.p>
         </div>
-      </div>
+      </section>
 
-      <div className="max-w-7xl mx-auto px-6 relative z-20 -mt-12">
+      <div className="max-w-7xl mx-auto px-6 relative z-20 mt-8">
         {/* Contact Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           {contactCards.map((card, idx) => {

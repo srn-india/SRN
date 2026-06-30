@@ -108,7 +108,7 @@ export default function Uddeshya() {
       </section>
 
       {/* ── Legal Framework ────────────────────────────────────────── */}
-      <section className="py-24 px-6 relative bg-[url('/hero-bg-3.png')] bg-fixed bg-cover bg-center overflow-hidden">
+      <section className="py-10 px-6 relative bg-[url('/hero-bg-3.png')] bg-fixed bg-cover bg-center overflow-hidden">
         {/* Premium Glass Overlay */}
         <div className="absolute inset-0 bg-[#1E0F05]/80 backdrop-blur-md" />
         
@@ -132,14 +132,14 @@ export default function Uddeshya() {
 
         <div className="relative max-w-4xl mx-auto text-center z-10">
           <FadeSection>
-            <span className="inline-block bg-[#E8622A]/15 border border-[#E8622A]/30 text-[#F47A3A] text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">
+            <span className="inline-block bg-[#E8622A]/15 border border-[#E8622A]/30 text-[#F47A3A] text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
               {en ? "Registered & Recognized" : "पंजीकृत एवं मान्यता प्राप्त"}
             </span>
             <h2 className="text-3xl md:text-4xl font-bold text-white font-serif">
               {en ? u.legalTitle : u.legalTitleHindi}
             </h2>
             <div className="mx-auto mt-4 h-1 w-20 rounded-full bg-gradient-to-r from-[#E8622A] to-[#D4880C]" />
-            <p className="text-white/50 text-sm mt-4 max-w-lg mx-auto">
+            <p className="text-white/50 text-sm mt-2 max-w-lg mx-auto">
               {en
                 ? "Fully registered and compliant under Indian law."
                 : "भारतीय कानून के अंतर्गत पूर्णतः पंजीकृत एवं अनुपालन में।"}
@@ -147,7 +147,7 @@ export default function Uddeshya() {
           </FadeSection>
 
           <FadeSection delay={150}>
-            <div className="flex flex-wrap gap-3 justify-center mt-10">
+            <div className="flex flex-wrap gap-3 justify-center mt-6">
               {u.legalBadges.map((badge, i) => (
                 <motion.span
                   key={badge}

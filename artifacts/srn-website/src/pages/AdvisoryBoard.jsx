@@ -65,17 +65,12 @@ export default function AdvisoryBoard() {
   return (
     <div className="bg-[#FDF5EC] min-h-screen pb-6">
       {/* ── Banner ─────────────────────────────────────────────────── */}
-      <section className="bg-[#FFF5EB] pt-[96px] pb-5 text-center px-6">
-        
-        {/* Monochromatic background image */}
-        
-
-        
-        
-        {/* Ambient glow accents */}
-        
-        
-        
+      <section className="relative bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6 overflow-hidden">
+        {/* Background Image (Soft Orange Gradient) */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.22]"
+          style={{ backgroundImage: "url('/plain-hero-bg.svg')" }}
+        />
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -84,7 +79,7 @@ export default function AdvisoryBoard() {
           className="relative max-w-4xl mx-auto"
         >
 
-          <h1 className="text-4xl md:text-6xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
+          <h1 className="text-3xl md:text-5xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
             {en ? "Advisory Board" : "सलाहकार मंडल"}
           </h1>
           
