@@ -122,7 +122,7 @@ export default function Initiatives() {
     <div className="bg-[#FDF5EC] min-h-screen selection:bg-[#E8622A] selection:text-white">
       
       {/* ── Banner Section ─────────────────────────────────────────── */}
-      <section className="bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6">
+      <section className="bg-[#FFF5EB] pt-[96px] pb-5 text-center px-6">
         
         
         {/* Subtle grid pattern overlay */}
@@ -132,25 +132,23 @@ export default function Initiatives() {
         <div className="absolute top-12 left-16 w-56 h-56 rounded-full bg-[#E8622A]/10 blur-[100px] pointer-events-none" />
         <div className="absolute bottom-12 right-16 w-48 h-48 rounded-full bg-[#D4880C]/10 blur-[80px] pointer-events-none" />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1E0F05]/90 via-[#1E0F05]/40 to-[#1E0F05]/10 pointer-events-none" />
-        
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
-          className="relative max-w-4xl mx-auto z-10 pt-10"
+          className="relative max-w-4xl mx-auto z-10"
         >
-          <h1 className="text-4xl md:text-6xl font-bold text-white font-serif tracking-tight leading-tight drop-shadow-md">
+          <h1 className="text-4xl md:text-6xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
             {en ? (
               <>Our <span className="text-[#E8622A]">Initiatives</span></>
             ) : (
               <>हमारी <span className="text-[#E8622A]">पहल</span></>
             )}
           </h1>
-          <p className="text-[#F47A3A] font-bold tracking-[0.15em] uppercase text-xs md:text-sm mt-3 mb-6">
+          <p className="text-[#E8622A] font-bold tracking-[0.15em] uppercase text-xs md:text-sm mt-3 mb-6">
             {en ? "Focus Sectors & Core Areas" : "मुख्य क्षेत्र एवं विकास आयाम"}
           </p>
-          <p className="text-white/80 text-base md:text-lg max-w-2xl mx-auto leading-relaxed font-sans">
+          <p className="text-[#7A5C45] text-base md:text-lg max-w-2xl mx-auto leading-relaxed font-sans">
             {en 
               ? "Driving systemic change through comprehensive programs designed to empower the youth, uplift the marginalized, and integrate the nation through core focus areas."
               : "युवाओं को सशक्त बनाने, वंचितों के उत्थान और व्यापक फोकस क्षेत्रों के माध्यम से राष्ट्र को एकीकृत करने के लिए डिज़ाइन किए गए रचनात्मक कार्यक्रमों द्वारा प्रणालीगत परिवर्तन लाना।"}
@@ -166,7 +164,7 @@ export default function Initiatives() {
       </section>
 
       {/* ── Initiatives Content ─────────────────────────────────────── */}
-      <div className="max-w-4xl mx-auto px-6 text-left mt-20">
+      <div className="max-w-4xl mx-auto px-6 text-left mt-8">
         
         {/* Primary Initiatives */}
         <div className="mb-16">

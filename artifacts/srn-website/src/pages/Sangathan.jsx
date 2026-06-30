@@ -62,7 +62,7 @@ export default function Sangathan() {
       </section>
 
       {/* ── Leadership ───────────────────────────────────────────────── */}
-      <section className="pb-24 px-6 relative z-20 -mt-16">
+      <section className="pt-6 pb-24 px-6 relative z-20">
         <div className="max-w-5xl mx-auto">
           <FadeSection>
             <SectionHeader

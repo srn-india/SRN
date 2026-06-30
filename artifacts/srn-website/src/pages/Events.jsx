@@ -107,28 +107,26 @@ export default function Events() {
       <section className="bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6">
         
         
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1E0F05] via-transparent to-transparent opacity-90" />
-        
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="relative max-w-4xl mx-auto z-10"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#E8622A]/15 border border-[#E8622A]/30 mb-6">
             <Calendar className="w-4 h-4 text-[#E8622A]" />
-            <span className="text-white/80 text-sm font-medium tracking-wide uppercase">
+            <span className="text-[#E8622A] text-sm font-medium tracking-wide uppercase">
               {en ? "Upcoming Events" : "आगामी कार्यक्रम"}
             </span>
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold text-white font-serif leading-tight drop-shadow-lg">
+          <h1 className="text-4xl md:text-6xl font-bold text-[#5C1010] font-serif leading-tight drop-shadow-sm">
             {en ? (
               <>Connect, Engage & <span className="text-[#E8622A]">Inspire</span></>
             ) : (
               <>जुड़ें, भाग लें और <span className="text-[#E8622A]">प्रेरित करें</span></>
             )}
           </h1>
-          <p className="text-white/70 mt-6 text-lg max-w-2xl mx-auto font-light leading-relaxed">
+          <p className="text-[#7A5C45] mt-6 text-lg max-w-2xl mx-auto font-normal leading-relaxed">
             {en ? "Join our nationwide movement. Participate in rallies, summits, and community discussions to shape the future of our nation." : "हमारे राष्ट्रव्यापी आंदोलन से जुड़ें। हमारे राष्ट्र के भविष्य को आकार देने के लिए रैलियों, शिखर सम्मेलनों और सामुदायिक चर्चाओं में भाग लें।"}
           </p>
         </motion.div>

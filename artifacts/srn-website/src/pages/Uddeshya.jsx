@@ -32,13 +32,8 @@ export default function Uddeshya() {
     <div className="bg-[#FDF5EC] min-h-screen">
 
       {/* ── Banner ─────────────────────────────────────────────────── */}
-      <section className="bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6">
+      <section className="bg-[#FFF5EB] pt-[96px] pb-2 text-center px-6">
         
-        
-        
-        
-        
-
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -49,16 +44,15 @@ export default function Uddeshya() {
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-1.5 bg-[#E8622A]/15 border border-[#E8622A]/30 text-[#F47A3A] text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6"
+            className="inline-block bg-[#E8622A]/15 border border-[#E8622A]/30 text-[#E8622A] text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4"
           >
-            <Sparkles className="w-3.5 h-3.5" />
             {en ? "Detailed Objectives" : "न्यास के विस्तृत उद्देश्य"}
           </motion.span>
 
-          <h1 className="text-4xl md:text-6xl font-bold text-white font-serif tracking-tight leading-tight">
+          <h1 className="text-4xl md:text-6xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
             {en ? "Objectives of the Trust" : "न्यास के उद्देश्य"}
           </h1>
-          <p className="text-orange-200/70 text-sm md:text-base mt-4 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-[#7A5C45] text-sm md:text-base mt-3 max-w-2xl mx-auto leading-relaxed">
             {en 
               ? "Sashakt Rashtra Nirman Trust has been established to drive holistic national development through these 48 core constitutional objectives."
               : "सशक्त राष्ट्र निर्माण न्यास की स्थापना राष्ट्र के समग्र विकास के लिए इन 48 मुख्य संवैधानिक उद्देश्यों को पूरा करने के लिए की गई है।"}
@@ -68,13 +62,13 @@ export default function Uddeshya() {
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ delay: 0.55, duration: 0.5 }}
-            className="h-1 bg-gradient-to-r from-[#E8622A] to-[#D4880C] mt-8 mx-auto w-24 rounded-full origin-center"
+            className="h-1 bg-gradient-to-r from-[#E8622A] to-[#D4880C] mt-6 mx-auto w-24 rounded-full origin-center"
           />
         </motion.div>
       </section>
 
       {/* ── Objectives List ─────────────────────────────────────────── */}
-      <section className="pt-16 pb-4 sm:pb-8 px-4 sm:px-6 max-w-6xl mx-auto">
+      <section className="pt-6 pb-4 sm:pb-6 px-4 sm:px-6 max-w-6xl mx-auto">
         <div className="space-y-6 sm:space-y-8 bg-white border border-[#F0D5B8] rounded-[2rem] p-4 sm:p-8 md:p-12 shadow-sm">
           {detailedObjectives.map((obj, index) => (
             <div key={obj.id} className="flex gap-2 sm:gap-4 items-start text-[#1E0F05]">
@@ -90,7 +84,7 @@ export default function Uddeshya() {
       </section>
 
       {/* ── Mission ────────────────────────────────────────────────── */}
-      <section className="pt-8 pb-20 px-6 bg-[#FFF9F2] relative overflow-hidden">
+      <section className="pt-6 pb-6 px-6 bg-[#FFF9F2] relative overflow-hidden">
         <div className="absolute right-6 top-1/2 -translate-y-1/2 text-[15rem] font-bold text-[#E8622A]/4 select-none pointer-events-none leading-none font-serif hidden md:block">
           M
         </div>

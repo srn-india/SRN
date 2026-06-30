@@ -308,29 +308,22 @@ const bioData = {
 export default function Sansrakshak() {
   const { lang } = useLanguage();
   const en = lang === "en";
-  const data = en ? bioData.en : bioData.hi;
+  const data = bioData.hi;
 
   const [profileImageError, setProfileImageError] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    document.title = en 
-      ? "Sashakt Rashtra Nirman – Patron (Sanrakshak)" 
-      : "सशक्त राष्ट्र निर्माण – संरक्षक (Sanrakshak)";
-  }, [en]);
+    document.title = "सशक्त राष्ट्र निर्माण – संरक्षक (Sanrakshak)";
+  }, []);
 
   return (
-    <div className="bg-[#FDF5EC] min-h-screen pb-20">
+    <div className="bg-[#FDF5EC] min-h-screen pb-4">
       
       {/* ── Banner ─────────────────────────────────────────────────── */}
-      <section className="relative bg-gradient-to-br from-[#FFF9F2] via-[#FDF5EC] to-[#FFF5EB] py-36 text-center px-6 overflow-hidden min-h-[44vh] flex items-center justify-center border-b border-[#F0D5B8]/40">
+      <section className="relative bg-gradient-to-br from-[#FFF9F2] via-[#FDF5EC] to-[#FFF5EB] py-20 md:py-24 text-center px-6 overflow-hidden flex items-center justify-center border-b border-[#F0D5B8]/40">
         
-        {/* Static background hero */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat mix-blend-multiply opacity-30"
-          style={{ backgroundImage: "url('/sansrakshak_monochrome_bg.png')" }}
-        />
 
         <div
           className="absolute inset-0 opacity-[0.06] mix-blend-overlay"
@@ -349,10 +342,18 @@ export default function Sansrakshak() {
           transition={{ duration: 0.7, ease: "easeOut" }}
           className="relative max-w-4xl mx-auto"
         >
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
-            {en ? "Sanrakshak (Patron)" : "संरक्षक (Sanrakshak)"}
+          <span className="inline-block bg-[#E8622A]/10 border border-[#E8622A]/30 text-[#E8622A] text-xs md:text-sm font-semibold uppercase tracking-widest px-6 py-1.5 rounded-full mb-5 shadow-sm">
+            ॥ संरक्षक ॥
+          </span>
+
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm mb-3">
+            पूज्य स्वामी यतींद्रानंद गिरी जी महाराज
           </h1>
           
+          <p className="text-lg md:text-xl text-[#7A5C45] font-serif font-semibold max-w-2xl mx-auto leading-relaxed">
+            वरिष्ठ महामंडलेश्वर
+          </p>
+
           <motion.div
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
@@ -362,16 +363,16 @@ export default function Sansrakshak() {
         </motion.div>
       </section>
 
-      {/* ── Profile & Intro Section ─────────────────────────────────── */}
-      <section className="relative px-6 -mt-16 z-10">
+      {/* ── All Details in One Single Div ───────────────────────────── */}
+      <section className="relative px-6 -mt-16 z-10 mb-4">
         <div className="max-w-6xl mx-auto">
-          <div className="bg-white border border-[#F0D5B8] rounded-3xl p-8 md:p-12 shadow-xl relative overflow-hidden card-shimmer">
-            <div className="absolute right-0 top-0 w-64 h-64 bg-[#FDF5EC]/50 rounded-full blur-3xl -z-10" />
-
-            <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 lg:gap-12">
+          <div className="bg-white border border-[#F0D5B8] rounded-3xl p-8 md:p-12 shadow-xl relative overflow-hidden card-shimmer space-y-12">
+            
+            {/* Top Block: Profile Photo & Personal Profile Details */}
+            <div className="flex flex-col lg:flex-row items-center lg:items-center gap-8 lg:gap-12 pb-10 border-b border-[#F0D5B8]">
               
-              {/* Profile Image Frame with Robust Placeholder handling */}
-              <div className="w-full max-w-sm lg:w-[350px] h-[350px] lg:h-[420px] rounded-3xl overflow-hidden shrink-0 border-4 border-[#E8622A] shadow-lg relative bg-gradient-to-br from-[#FFF9F2] to-[#FDF5EC] flex items-center justify-center group">
+              {/* Profile Image Frame */}
+              <div className="w-full max-w-[280px] lg:w-[280px] h-[320px] lg:h-[340px] rounded-3xl overflow-hidden shrink-0 border-4 border-[#E8622A] shadow-lg relative bg-gradient-to-br from-[#FFF9F2] to-[#FDF5EC] flex items-center justify-center group">
                 {!profileImageError ? (
                   <img 
                     src="/Swami yatindranand giri maharaj.jpeg" 
@@ -399,79 +400,109 @@ export default function Sansrakshak() {
 
               {/* Profile Details */}
               <div className="flex-1 text-center lg:text-left">
-                <h2 className="text-3xl md:text-4xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight">
-                  {data.name}
+                <h2 className="text-2xl md:text-3xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight mb-6">
+                  <u>व्यक्तिगत एवं संगठनात्मक विवरण (Personal & Organizational Profile)</u>
                 </h2>
-                
-                <p className="text-sm font-semibold text-[#E8622A] mt-2 inline-flex items-center bg-[#E8622A]/10 px-3 py-1 rounded-full border border-[#E8622A]/20">
-                  {data.degrees}
-                </p>
 
-                <div className="w-full h-px bg-[#F0D5B8] my-6" />
+                <div className="space-y-4 text-[#1E0F05] text-base md:text-lg leading-relaxed text-justify">
+                  <div className="flex items-start gap-3">
+                    <span className="text-[#E8622A] font-bold text-xl leading-none mt-1">•</span>
+                    <div>
+                      <strong className="font-bold">नाम एवं पदवी: </strong>
+                      {data.name} ({data.degrees})
+                    </div>
+                  </div>
 
-                <p className="text-[#1E0F05] text-base md:text-lg leading-relaxed text-justify relative pl-6 border-l-4 border-[#E8622A]">
-                  "{data.aboutText}"
-                </p>
+                  <div className="flex items-start gap-3">
+                    <span className="text-[#E8622A] font-bold text-xl leading-none mt-1">•</span>
+                    <div>
+                      <strong className="font-bold">
+                        परम आदरणीय वरिष्ठ आध्यात्मिक संत, जूना अखाड़े की प्रखर विभूति, धर्म एवं संस्कृति के संरक्षक, एवं अद्भुत वक्ता व परोपकारी मार्गदर्शक
+                      </strong>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <span className="text-[#E8622A] font-bold text-xl leading-none mt-1">•</span>
+                    <div>
+                      <strong className="font-bold">दायित्व एवं नेतृत्व: </strong>
+                      वरिष्ठ महामंडलेश्वर (श्री पंचदशनाम जूना अखाड़ा), उपाध्यक्ष (अखिल भारतीय संत समिति), जीवनदीप पीठाधीश्वर एवं पूर्व RSS प्रचारक
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <span className="text-[#E8622A] font-bold text-xl leading-none mt-1">•</span>
+                    <div>
+                      <strong className="font-bold">संस्थागत संरक्षण: </strong>
+                      संरक्षक - हिमालय परिवार, सिंधु दर्शन यात्रा समिति, एवं आर० आर० इन्टर कॉलेज हरदोई
+                    </div>
+                  </div>
+                </div>
               </div>
 
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* ── Interactive Accomplishments Tabbed Viewer ───────────────── */}
-      <section className="py-16 px-6">
-        <div className="max-w-6xl mx-auto">
-          
-          <div className="text-center mb-10">
-            <h3 className="text-2xl md:text-3xl font-bold text-[#5C1010] font-serif">
-              {en ? "Spiritual Legacy & Achievements" : "आध्यात्मिक यात्रा एवं प्रखर सेवा"}
-            </h3>
-            <div className="h-0.5 bg-gradient-to-r from-transparent via-[#E8622A] to-transparent mt-3 mx-auto w-48 rounded-full" />
-          </div>
+            {/* Accomplishments & Spiritual Sections */}
+            <div className="space-y-10">
+              <h3 className="text-2xl md:text-3xl font-bold text-[#5C1010] font-serif mb-6 pb-2 border-b border-[#F0D5B8]/60">
+                <u>आध्यात्मिक यात्रा एवं प्रखर सेवा</u>
+              </h3>
 
-          <div className="space-y-10">
-            {data.sections.map((sec) => {
-              return (
-                <div key={sec.id} className="text-left">
-                  <h4 className="text-xl md:text-2xl font-bold text-[#5C1010] font-serif mb-1">
-                    {sec.title}
-                  </h4>
-                  <p className="text-sm text-[#E8622A] mb-4 font-semibold">
-                    {sec.subtitle}
-                  </p>
+              <div className="space-y-10">
+                {data.sections.map((sec) => (
+                  <div key={sec.id} className="text-left">
+                    <h4 className="text-xl md:text-2xl font-bold text-[#5C1010] font-serif mb-1">
+                      <u>{sec.title}</u>
+                    </h4>
+                    <p className="text-sm text-[#E8622A] mb-4 font-semibold">
+                      {sec.subtitle}
+                    </p>
 
-                  <div className="space-y-3 pl-4 border-l-2 border-[#F0D5B8]">
-                    {sec.items.map((item, idx) => (
-                      <p key={idx} className="text-[#1E0F05] text-sm md:text-base leading-relaxed text-justify">
-                        <strong className="font-semibold">{item.title}:</strong> {item.desc}
-                      </p>
-                    ))}
+                    <ul className="space-y-4 text-[#1E0F05] text-base md:text-lg leading-relaxed text-justify pl-2">
+                      {sec.items.map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-3">
+                          <span className="text-[#E8622A] font-bold text-xl leading-none mt-1">•</span>
+                          <div>
+                            <strong className="font-bold">{item.title}: </strong>
+                            {item.desc}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                </div>
-              );
-            })}
+                ))}
+              </div>
+            </div>
+
+            {/* Footer Quote / Legacy Statement */}
+            <div className="pt-6 border-t border-[#F0D5B8] text-center">
+              <span className="inline-block bg-[#E8622A]/10 border border-[#E8622A]/30 text-[#E8622A] text-xs font-semibold uppercase tracking-widest px-4 py-1 rounded-full mb-4">
+                सनातन संस्कृति एवं अखंड सेवा
+              </span>
+              <h4 className="text-xl md:text-2xl font-serif font-bold text-[#5C1010] leading-tight italic max-w-3xl mx-auto">
+                "भारतीय संस्कृति, धर्म और राष्ट्रहित के संवर्धन हेतु जीवन का प्रत्येक क्षण समर्पित।"
+              </h4>
+            </div>
+
           </div>
         </div>
       </section>
 
       {/* ── Photo Highlights Section (User-Managed Empty Frame Gallery) ────────────────── */}
-      <section className="py-16 px-6 bg-[#FFF9F2] relative overflow-hidden border-t border-b border-[#F0D5B8]/50">
+      <section className="pt-6 pb-6 px-6 bg-[#FFF9F2] relative overflow-hidden border-t border-b border-[#F0D5B8]/50">
         <div className="absolute left-0 top-0 w-64 h-64 bg-[#E8622A]/3 rounded-full blur-3xl" />
         
         <div className="max-w-6xl mx-auto relative">
           
           <div className="text-center mb-12">
             <span className="inline-block bg-[#E8622A]/15 border border-[#E8622A]/30 text-[#F47A3A] text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-3">
-              {en ? "Divine Moments" : "दिव्य क्षण एवं संस्मरण"}
+              दिव्य क्षण एवं संस्मरण
             </span>
             <h3 className="text-3xl font-bold text-[#5C1010] font-serif">
-              {en ? "Historical Milestones & Gallery" : "ऐतिहासिक संस्मरण एवं चित्र दीर्घा"}
+              ऐतिहासिक संस्मरण एवं चित्र दीर्घा
             </h3>
             <p className="text-[#7A5C45] text-sm mt-3 max-w-xl mx-auto leading-relaxed">
-              {en
-                ? "A glimpse into the life of Swami Yatindranand Giri Maharaj, featuring key moments of national service, spiritual rituals, and meetings with distinguished leaders."
-                : "स्वामी यतीन्द्रानन्द गिरि महाराज की राष्ट्र सेवा, सघन साधना और देश के शीर्ष नेतृत्व के साथ ऐतिहासिक मुलाकातों की कुछ झलकियाँ।"}
+              स्वामी यतीन्द्रानन्द गिरि महाराज की राष्ट्र सेवा, सघन साधना और देश के शीर्ष नेतृत्व के साथ ऐतिहासिक मुलाकातों की कुछ झलकियाँ।
             </p>
             <div className="h-1 bg-gradient-to-r from-transparent via-[#E8622A] to-transparent mt-4 mx-auto w-32 rounded-full" />
           </div>
@@ -555,37 +586,6 @@ export default function Sansrakshak() {
             )}
           </AnimatePresence>
 
-        </div>
-      </section>
-
-      {/* ── Dynamic Antyodaya Footer Callout ─────────────────────────── */}
-      <section className="px-6 py-12 bg-[#FFF9F2]">
-        <div className="max-w-4xl mx-auto">
-          <FadeSection>
-            <div className="relative rounded-3xl bg-white border border-[#F0D5B8] p-8 md:p-12 text-center overflow-hidden shadow-lg">
-              <div className="absolute -left-12 -bottom-12 w-48 h-48 rounded-full bg-[#E8622A]/10 blur-3xl" />
-              <div className="absolute -right-12 -top-12 w-48 h-48 rounded-full bg-[#D4880C]/10 blur-3xl" />
-              <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: `repeating-linear-gradient(-45deg, #E8622A, #E8622A 1px, transparent 1px, transparent 28px)` }} />
-              
-              <span className="inline-block bg-[#E8622A]/10 border border-[#E8622A]/30 text-[#E8622A] text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">
-                {en ? "Legacy of Devotion" : "सनातन संस्कृति एवं अखंड सेवा"}
-              </span>
-
-              <h4 className="text-2xl md:text-3xl font-serif font-bold text-[#5C1010] leading-tight">
-                {en ? "Preserving Sanatana & Serving Humanity" : "सनातन का संरक्षण और मानवता की निस्वार्थ सेवा"}
-              </h4>
-              
-              <p className="text-[#7A5C45] text-sm md:text-base mt-4 max-w-2xl mx-auto leading-relaxed">
-                {en 
-                  ? "Mahamandaleshwar Swami Yatindranand Giri Maharaj stands as a beacon of light and inspiration, guiding countless souls on their spiritual journeys and igniting the flame of divine love and national duty."
-                  : "महामंडलेश्वर स्वामी यतीन्द्रानन्द गिरि महाराज का संपूर्ण जीवन साधना, राष्ट्र-भक्ति और लोक-कल्याण का एक अनुपम संगम है। वे निरंतर समाज में निस्वार्थ सेवा का प्रचार कर हर हृदय में दिव्य प्रेम एवं राष्ट्रधर्म की ज्योति प्रज्वलित कर रहे हैं।"}
-              </p>
-              
-              <div className="mt-8 flex justify-center">
-                <div className="w-16 h-0.5 rounded-full bg-gradient-to-r from-[#E8622A] to-[#D4880C]" />
-              </div>
-            </div>
-          </FadeSection>
         </div>
       </section>
 

@@ -367,7 +367,7 @@ export default function NationalPresident() {
       </section>
 
       {/* ── Photo Highlights Section (Gallery) ────────────────── */}
-      <section className="pt-6 pb-16 px-6 bg-[#FFF9F2] relative overflow-hidden border-t border-b border-[#F0D5B8]/50">
+      <section className="pt-6 pb-6 px-6 bg-[#FFF9F2] relative overflow-hidden border-t border-b border-[#F0D5B8]/50">
         
 
         <div className="max-w-6xl mx-auto relative">

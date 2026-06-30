@@ -23,9 +23,7 @@ export default function Media() {
     <div className="bg-[#FDF5EC] min-h-screen">
       
       {/* ── Banner ─────────────────────────────────────────────────── */}
-      <section className="bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6">
-        
-        <div className="absolute inset-0 bg-gradient-to-t from-[#FDF5EC] via-[#1E0F05]/80 to-[#1E0F05]/40" />
+      <section className="bg-[#FFF5EB] pt-[96px] pb-5 text-center px-6">
         
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -33,20 +31,20 @@ export default function Media() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="relative max-w-4xl mx-auto z-10"
         >
-          <h1 className="text-4xl md:text-6xl font-bold text-white font-serif leading-tight drop-shadow-lg">
+          <h1 className="text-4xl md:text-6xl font-bold text-[#5C1010] font-serif leading-tight drop-shadow-sm">
             Media & <span className="text-[#E8622A]">Gallery</span>
           </h1>
-          <p className="text-xl text-[#F47A3A] mt-3 font-medium tracking-wide drop-shadow mb-6">
+          <p className="text-xl text-[#7A5C45] mt-3 font-medium tracking-wide mb-6">
             मीडिया और गैलरी
           </p>
           <div className="flex flex-wrap justify-center gap-4 mt-6">
-            <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/10 hover:bg-[#E8622A] border border-white/20 transition-colors text-white font-medium text-sm backdrop-blur-md">
+            <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FFF9F2] hover:bg-[#E8622A] border border-[#F0D5B8]/60 hover:border-[#E8622A] transition-all text-[#7A5C45] hover:text-white font-medium text-sm shadow-sm">
               <Camera className="w-4 h-4" /> Photo Gallery
             </button>
-            <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/10 hover:bg-[#E8622A] border border-white/20 transition-colors text-white font-medium text-sm backdrop-blur-md">
+            <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FFF9F2] hover:bg-[#E8622A] border border-[#F0D5B8]/60 hover:border-[#E8622A] transition-all text-[#7A5C45] hover:text-white font-medium text-sm shadow-sm">
               <Video className="w-4 h-4" /> Video Archives
             </button>
-            <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/10 hover:bg-[#E8622A] border border-white/20 transition-colors text-white font-medium text-sm backdrop-blur-md">
+            <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FFF9F2] hover:bg-[#E8622A] border border-[#F0D5B8]/60 hover:border-[#E8622A] transition-all text-[#7A5C45] hover:text-white font-medium text-sm shadow-sm">
               <Newspaper className="w-4 h-4" /> Press Releases
             </button>
           </div>
@@ -54,7 +52,7 @@ export default function Media() {
       </section>
 
       {/* ── Bento Grid Gallery ─────────────────────────────────────── */}
-      <section className="px-6 relative z-20 -mt-10">
+      <section className="px-6 relative z-20 pt-8 pb-16">
         <div className="max-w-7xl mx-auto">
           
           <FadeSection>

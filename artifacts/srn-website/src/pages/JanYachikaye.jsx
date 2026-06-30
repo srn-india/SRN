@@ -138,14 +138,12 @@ export default function JanYachikaye() {
     <div className="bg-[#FDF5EC] min-h-screen">
       
       {/* ── Hero Section ─────────────────────────────────────────── */}
-      <section className="bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6">
+      <section className="bg-[#FFF5EB] pt-[96px] pb-5 text-center px-6">
         
 
         {/* Glow accents */}
         
         
-
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1E0F05] via-[#1E0F05]/60 to-[#1E0F05]/20 pointer-events-none" />
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -156,14 +154,14 @@ export default function JanYachikaye() {
           <motion.span
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="inline-block bg-[#E8622A]/20 border border-[#E8622A]/40 text-[#F47A3A] text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4"
+            className="inline-block bg-[#E8622A]/15 border border-[#E8622A]/30 text-[#E8622A] text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4"
           >
             {en ? "Resolution Registry" : "निस्तारण विवरण पंजी"}
           </motion.span>
-          <h1 className="text-4xl md:text-6xl font-bold text-white font-serif tracking-tight leading-tight drop-shadow-sm">
+          <h1 className="text-4xl md:text-6xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
             {en ? "Jan Yachikaye (Solved)" : "जन याचिकाएं (निस्तारित)"}
           </h1>
-          <p className="text-white/80 text-base md:text-lg mt-4 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-[#7A5C45] text-base md:text-lg mt-4 max-w-2xl mx-auto leading-relaxed">
             {en 
               ? "Showcasing the grievances and public complaints registered by citizens that have been successfully resolved by the Sashakt Rashtra Nirman Trust."
               : "नागरिकों द्वारा दर्ज की गई उन जन शिकायतों और समस्याओं का प्रदर्शन जिनका सशक्त राष्ट्र निर्माण न्यास द्वारा सफलतापूर्वक समाधान किया गया है।"}

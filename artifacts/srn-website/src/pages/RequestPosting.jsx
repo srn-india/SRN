@@ -190,7 +190,7 @@ export default function RequestPosting() {
     <div className="bg-[#FDF5EC] min-h-screen">
       
       {/* ── Hero Section with Monochromatic Pattern Background ───────── */}
-      <section className="bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6">
+      <section className="bg-[#FFF5EB] pt-[96px] pb-5 text-center px-6">
         
         {/* Monochromatic styled background pattern */}
         

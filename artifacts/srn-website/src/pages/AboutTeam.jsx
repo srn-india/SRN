@@ -69,7 +69,7 @@ export default function AboutTeam() {
   return (
     <div className="bg-[#FDF5EC] font-sans selection:bg-[#E8622A] selection:text-white min-h-screen">
       {/* ── Banner ───────────────────────────────────────────────────── */}
-      <section className="bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6">
+      <section className="bg-[#FFF5EB] pt-[100px] pb-8 text-center px-6">
         {/* Immersive background glows */}
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#E8622A]/15 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#D4880C]/15 blur-[150px] rounded-full pointer-events-none" />
@@ -89,15 +89,10 @@ export default function AboutTeam() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="relative z-10 max-w-4xl mx-auto"
         >
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-white/60 border border-[#E8622A]/20 rounded-2xl flex items-center justify-center text-[#C04A18] backdrop-blur-md shadow-sm">
-              <Users className="w-8 h-8" />
-            </div>
-          </div>
-          <span className="inline-block px-5 py-2 rounded-full bg-white/60 border border-[#E8622A]/20 text-[#C04A18] text-xs font-bold uppercase tracking-widest mb-6 backdrop-blur-md shadow-sm">
+          <span className="inline-block px-5 py-2 rounded-full bg-white/60 border border-[#E8622A]/20 text-[#C04A18] text-xs font-bold uppercase tracking-widest mb-4 backdrop-blur-md shadow-sm">
             {en ? "Founding Members" : "संस्थापक सदस्य"}
           </span>
-          <h1 className="text-5xl md:text-7xl font-bold text-[#2C1810] font-serif tracking-tight drop-shadow-sm mb-6">
+          <h1 className="text-4xl md:text-6xl font-bold text-[#2C1810] font-serif tracking-tight drop-shadow-sm mb-4">
             {en ? "Founding Members" : "संस्थापक सदस्य"}
           </h1>
           <p className="text-[#5C3A1E] text-lg md:text-xl max-w-2xl mx-auto font-medium leading-relaxed">
@@ -109,7 +104,7 @@ export default function AboutTeam() {
       </section>
 
       {/* ── Founding Members Table ────────────────────────────────────── */}
-      <section className="pb-32 px-6 relative z-20 -mt-12">
+      <section className="pt-6 pb-24 px-6 relative z-20">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white border border-[#F0D5B8] rounded-3xl overflow-hidden shadow-xl">
             <div className="overflow-x-auto">

@@ -63,9 +63,9 @@ export default function AdvisoryBoard() {
   }, [en]);
 
   return (
-    <div className="bg-[#FDF5EC] min-h-screen pb-24">
+    <div className="bg-[#FDF5EC] min-h-screen pb-6">
       {/* ── Banner ─────────────────────────────────────────────────── */}
-      <section className="bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6">
+      <section className="bg-[#FFF5EB] pt-[96px] pb-5 text-center px-6">
         
         {/* Monochromatic background image */}
         
@@ -109,7 +109,7 @@ export default function AdvisoryBoard() {
       </section>
 
       {/* ── Members Section ────────────────────────────────────────── */}
-      <section className="px-6 py-20 relative z-10">
+      <section className="px-6 pt-8 pb-12 relative z-10">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 md:gap-x-16 md:gap-y-20">
             {boardMembers.map((member, idx) => (
