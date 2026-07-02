@@ -15,7 +15,10 @@ WORKDIR /app
 
 COPY package*.json prisma.config.js ./
 COPY prisma ./prisma
-RUN npm install
+RUN npm config set fetch-retry-maxtimeout 600000 && \
+    npm config set fetch-retry-mintimeout 10000 && \
+    npm config set fetch-retries 5 && \
+    npm ci
 RUN npx prisma generate --schema=./prisma/schema.prisma
 
 # Copy source files and configuration required for build
@@ -41,7 +44,10 @@ WORKDIR /app
 COPY package*.json prisma.config.js ./
 COPY prisma ./prisma
 # Install only production dependencies
-RUN npm install --production
+RUN npm config set fetch-retry-maxtimeout 600000 && \
+    npm config set fetch-retry-mintimeout 10000 && \
+    npm config set fetch-retries 5 && \
+    npm ci --omit=dev
 # Generate Prisma Client explicitly
 RUN npx prisma generate --schema=./prisma/schema.prisma
 
