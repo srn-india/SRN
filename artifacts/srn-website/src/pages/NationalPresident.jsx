@@ -444,10 +444,16 @@ export default function NationalPresident() {
           "/National President/WhatsApp Image 2026-06-29 at 13.01.06.jpeg",
           "/National President/WhatsApp Image 2026-06-29 at 13.01.07 (1).jpeg",
           "/National President/WhatsApp Image 2026-06-29 at 13.01.07 (2).jpeg",
-          "/National President/WhatsApp Image 2026-06-29 at 13.01.07 (3).jpeg",
+          "/National President/WhatsApp Image 2026-07-01 at 11.00.12.jpeg",
           "/National President/WhatsApp Image 2026-06-29 at 13.01.07.jpeg",
           "/National President/WhatsApp Image 2026-06-29 at 13.01.08 (1).jpeg",
-          "/National President/WhatsApp Image 2026-06-29 at 13.01.08 (2).jpeg"
+          "/National President/WhatsApp Image 2026-06-29 at 13.01.08 (2).jpeg",
+          "/National President/WhatsApp Image 2026-07-01 at 11.00.12(1).jpeg",
+          "/National President/WhatsApp Image 2026-07-01 at 11.00.12(2).jpeg",
+          "/National President/WhatsApp Image 2026-07-01 at 11.00.12(3).jpeg",
+          "/National President/WhatsApp Image 2026-07-01 at 11.00.12(4).jpeg",
+          "/National President/WhatsApp Image 2026-07-01 at 11.00.12(5).jpeg",
+          "/National President/WhatsApp Image 2026-07-01 at 11.00.12(6).jpeg"
 
             ].map((src, idx) => (
               <GalleryImageFrame 
