@@ -62,6 +62,7 @@ const categoryColors = {
   women: "from-pink-500/10 to-purple-500/10 border-pink-200 text-pink-700",
   infradev: "from-cyan-500/10 to-blue-500/10 border-cyan-200 text-cyan-700",
   agriculture: "from-amber-500/10 to-yellow-500/10 border-amber-200 text-amber-700",
+  civic: "from-purple-500/10 to-indigo-500/10 border-purple-200 text-purple-700",
   other: "from-gray-500/10 to-slate-500/10 border-gray-200 text-gray-700"
 };
 
@@ -113,6 +114,7 @@ export default function JanYachikaye() {
 
   const categories = [
     { value: "all", en: "All Grievances", hi: "सभी मामले" },
+    { value: "civic", en: "Civic Issues", hi: "नागरिक मुद्दे" },
     { value: "agriculture", en: "Agriculture", hi: "कृषि मुद्दे" },
     { value: "educational", en: "Education", hi: "शिक्षा" },
     { value: "infradev", en: "Infrastructure", hi: "बुनियादी ढांचा" },
@@ -231,7 +233,8 @@ export default function JanYachikaye() {
                       {yachika.category === "agriculture" ? (en ? "Agriculture" : "कृषि") :
                        yachika.category === "educational" ? (en ? "Education" : "शिक्षा") :
                        yachika.category === "infradev" ? (en ? "Infrastructure" : "बुनियादी ढांचा") :
-                       yachika.category === "women" ? (en ? "Women Welfare" : "महिला कल्याण") : (en ? "General" : "सामान्य")}
+                       yachika.category === "women" ? (en ? "Women Welfare" : "महिला कल्याण") :
+                       yachika.category === "civic" ? (en ? "Civic Issues" : "नागरिक मुद्दे") : (en ? "General" : "सामान्य")}
                     </span>
                     <span className="flex items-center gap-1 text-xs text-[#7A5C45] font-semibold bg-[#FDF5EC] border border-[#F0D5B8]/40 px-2.5 py-1 rounded-lg">
                       <Calendar className="w-3.5 h-3.5 text-[#E8622A]" />

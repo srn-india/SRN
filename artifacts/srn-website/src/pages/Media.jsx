@@ -117,7 +117,7 @@ export default function Media() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                 <div className="absolute bottom-6 left-6 right-6">
                   <div className="bg-[#1E0F05]/60 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full inline-block mb-2 border border-white/20 uppercase tracking-wider">Press Conference</div>
-                  <h3 className="text-white text-xl font-serif font-bold leading-tight">Announcement of New National Education Policies</h3>
+                  <h3 className="text-white text-xl font-serif font-bold leading-tight">Discussion of New National Education Policies</h3>
                 </div>
               </div>
 
