@@ -183,7 +183,7 @@ export default function NationalPresident() {
               <h3 className="text-2xl md:text-3xl font-bold text-[#5C1010] font-serif mb-3">
                 <u>नीति, प्रशासन एवं शासकीय निकायों में भूमिकाएँ (Policy & Governance)</u>
               </h3>
-              <p className="text-base text-[#7A5C45] italic font-medium mb-6">
+              <p className="text-base text-[#E8622A] italic font-medium mb-6">
                 भारत सरकार और देश के शीर्ष नीति-नियामक एवं प्रशासनिक निकायों द्वारा सौंपी गई महत्वपूर्ण जिम्मेदारियाँ:
               </p>
 
@@ -276,7 +276,7 @@ export default function NationalPresident() {
               <h3 className="text-2xl md:text-3xl font-bold text-[#5C1010] font-serif mb-3">
                 <u>शोध, तकनीकी नवाचार एवं वैश्विक पहचान (Research & Global Recognition)</u>
               </h3>
-              <p className="text-base text-[#7A5C45] italic font-medium mb-6">
+              <p className="text-base text-[#E8622A] italic font-medium mb-6">
                 एक कंप्यूटर वैज्ञानिक और शोधकर्ता के रूप में अंतर्राष्ट्रीय स्तर पर सुस्थापित पहचान:
               </p>
 

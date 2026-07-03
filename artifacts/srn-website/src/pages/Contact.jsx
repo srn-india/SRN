@@ -37,7 +37,7 @@ export default function Contact() {
     {
       icon: Phone,
       title: en ? "Phone Support" : "फ़ोन समर्थन",
-      content: "+91 98765 43210\n+91 11 2345 6789"
+      content: "+91 7652012487"
     },
     {
       icon: Mail,
