@@ -38,7 +38,7 @@ import ApplicationDetails from "./pages/ApplicationDetails";
 import ArticleDetails from "./pages/ArticleDetails";
 import RequestPosting from "./pages/RequestPosting";
 import JanSamwad from "./pages/JanSamwad";
-import JanmantAapKiAawaz from "./pages/JanmantAapKiAawaz";
+import JanmatAapKiAawaz from "./pages/JanmatAapKiAawaz";
 import JanYachikaye from "./pages/JanYachikaye";
 import { Phone, X } from "lucide-react";
 import { useLanguage } from "./context/LanguageContext";
@@ -181,7 +181,7 @@ export default function App() {
               <Route path="/complaints" element={<Layout onPhoneClick={() => setShowPhonePopup(true)}><Complaints /></Layout>} />
               <Route path="/request-posting" element={<Layout onPhoneClick={() => setShowPhonePopup(true)}><RequestPosting /></Layout>} />
               <Route path="/jan-samwad" element={<Layout onPhoneClick={() => setShowPhonePopup(true)}><JanSamwad /></Layout>} />
-              <Route path="/janmant-aap-ki-aawaz" element={<Layout onPhoneClick={() => setShowPhonePopup(true)}><JanmantAapKiAawaz /></Layout>} />
+              <Route path="/janmat-aap-ki-aawaz" element={<Layout onPhoneClick={() => setShowPhonePopup(true)}><JanmatAapKiAawaz /></Layout>} />
               <Route path="/jan-yachikaye" element={<Layout onPhoneClick={() => setShowPhonePopup(true)}><JanYachikaye /></Layout>} />
 
               {/* Auth pages — no Navbar, no Footer */}

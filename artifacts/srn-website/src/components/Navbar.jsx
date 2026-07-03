@@ -37,7 +37,7 @@ const menuCategories = [
     links: [
       { path: "/jan-samwad", hindiName: "जन संवाद", englishName: "Jan Samwad" },
       { path: "/complaints", hindiName: "जन शिकायत दर्ज करें", englishName: "Jan Shikayat Darj Kare" },
-      { path: "/janmant-aap-ki-aawaz", hindiName: "जनमत आपकी आवाज़", englishName: "Janmant Aap Ki Aawaz" },
+      { path: "/janmat-aap-ki-aawaz", hindiName: "जनमत आपकी आवाज़", englishName: "Janmat Aap Ki Aawaz" },
       { path: "/jan-yachikaye", hindiName: "जन याचिकाएं (निस्तारित)", englishName: "Jan Yachikaye (Solved)" },
       { path: "/request-posting", hindiName: "पद के लिए आवेदन करें", englishName: "Apply for a Post" },
       { path: "/media", hindiName: "मीडिया और गैलरी", englishName: "Media & Gallery" },

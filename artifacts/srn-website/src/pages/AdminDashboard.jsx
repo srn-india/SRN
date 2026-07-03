@@ -802,7 +802,7 @@ export default function AdminDashboard() {
                         Manage Submitted Articles
                         <span className="bg-[#E8622A] text-white text-sm px-2 py-0.5 rounded-full">{articles.length}</span>
                       </h2>
-                      <p className="text-sm text-[#7A5C45] mt-1">Review articles submitted via the "Janmant: Aap Ki Aawaz" portal.</p>
+                      <p className="text-sm text-[#7A5C45] mt-1">Review articles submitted via the "Janmat: Aap Ki Aawaz" portal.</p>
                     </div>
                     <button 
                       onClick={fetchArticles}

@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { BookOpen, Send, CheckCircle, Upload, AlertCircle, FileText, User, Mail, Tag, X } from "lucide-react";
 
-export default function JanmantAapKiAawaz() {
+export default function JanmatAapKiAawaz() {
   const { lang } = useLanguage();
   const { user, API_BASE } = useAuth();
   const navigate = useNavigate();
@@ -13,7 +13,7 @@ export default function JanmantAapKiAawaz() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    document.title = en ? "Janmant Aap Ki Aawaz – SRN" : "जनमत आपकी आवाज़ – SRN";
+    document.title = en ? "Janmat Aap Ki Aawaz – SRN" : "जनमत आपकी आवाज़ – SRN";
   }, [en]);
 
   useEffect(() => {
@@ -176,7 +176,7 @@ export default function JanmantAapKiAawaz() {
             {en ? "Public Journalism Portal" : "सार्वजनिक पत्रकारिता पोर्टल"}
           </motion.span>
           <h1 className="text-3xl md:text-5xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm">
-            {en ? "Janmant: Aap Ki Aawaz" : "जनमत: आपकी आवाज़"}
+            {en ? "Janmat: Aap Ki Aawaz" : "जनमत: आपकी आवाज़"}
           </h1>
           <p className="text-[#7A5C45] text-base md:text-lg mt-4 max-w-2xl mx-auto font-medium leading-relaxed">
             {en 
