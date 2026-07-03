@@ -59,8 +59,12 @@ export default function NationalPresident() {
   return (
     <div className="bg-[#FDF5EC] min-h-screen">
 
-      {/* ── Banner ─────────────────────────────────────────────────── */}
-      <section className="bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6">
+      <section className="relative overflow-hidden bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6">
+        {/* Background Image (Soft Orange Gradient) */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.32]"
+          style={{ backgroundImage: "url('/plain-hero-bg.svg')" }}
+        />
 
         
 
@@ -233,6 +237,14 @@ export default function NationalPresident() {
               </h3>
 
               <ul className="space-y-4 text-[#1E0F05] text-base md:text-lg leading-relaxed text-justify pl-2">
+                <li className="flex items-start gap-3">
+                  <span className="text-[#E8622A] font-bold text-xl leading-none mt-1">•</span>
+                  <div>
+                    <strong className="font-bold">कोविड-19 महामारी सेवा: </strong>
+                    संकट की कठिन घड़ी में संवेदनशीलता का परिचय देते हुए प्रतिदिन 1000 से अधिक लोगों तक भोजन पहुँचाने की सक्रिय व्यवस्था की, वंचितों को राहत दी तथा उनके आवागमन का समुचित प्रबंध किया ।
+                  </div>
+                </li>
+
                 <li className="flex items-start gap-3">
                   <span className="text-[#E8622A] font-bold text-xl leading-none mt-1">•</span>
                   <div>

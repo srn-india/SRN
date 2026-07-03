@@ -68,7 +68,7 @@ export default function AdvisoryBoard() {
       <section className="relative bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6 overflow-hidden">
         {/* Background Image (Soft Orange Gradient) */}
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.22]"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.32]"
           style={{ backgroundImage: "url('/plain-hero-bg.svg')" }}
         />
 
@@ -116,20 +116,27 @@ export default function AdvisoryBoard() {
                 transition={{ duration: 0.6, delay: (idx % 3) * 0.1 }}
                 className="flex flex-col items-center text-center space-y-3 group"
               >
-                {/* Name - Regular font size, semibold/medium */}
-                <h3 className="text-xl md:text-2xl font-medium text-[#2C1810] font-serif group-hover:text-[#E8622A] transition-colors duration-300">
+                {/* Name - Regular font size, light weight */}
+                <h3 className="text-xl md:text-2xl font-light text-[#2C1810] font-serif group-hover:text-[#E8622A] transition-colors duration-300">
                   {member.name}
                 </h3>
                 
-                {/* Highlight/Designation - Bold text */}
-                <p className="text-base font-bold text-[#5C1010] leading-snug">
+                {/* Highlight/Designation - Bold text (except for idx === 4 where it is a degree) */}
+                <p className={`text-base leading-snug ${
+                  idx === 4 ? "text-sm md:text-base text-[#7A5C45] font-medium" : "font-bold text-[#5C1010]"
+                }`}>
                   {member.highlight}
                 </p>
                 
                 {/* Details - Normal text */}
                 <div className="space-y-1.5 pt-1">
                   {member.details.map((detail, dIdx) => (
-                    <p key={dIdx} className="text-sm md:text-base text-[#7A5C45] leading-relaxed">
+                    <p 
+                      key={dIdx} 
+                      className={`text-sm md:text-base text-[#7A5C45] leading-relaxed ${
+                        (idx === 0 && dIdx === member.details.length - 1) || idx !== 0 ? "font-bold text-[#5C1010]" : ""
+                      }`}
+                    >
                       {detail}
                     </p>
                   ))}

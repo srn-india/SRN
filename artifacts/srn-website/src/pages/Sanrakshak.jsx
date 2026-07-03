@@ -70,14 +70,10 @@ const bioData = {
         id: "education",
         title: "Education & National Service",
         shortTitle: "Education & RSS",
-        subtitle: "A foundation of scientific logic and 14 years of dedicated RSS service",
+        subtitle: "14 years of dedicated RSS service",
         icon: GraduationCap,
         colorClass: "from-blue-500/10 to-indigo-500/10 border-blue-200/50 text-blue-600",
         items: [
-          {
-            title: "Bachelor of Science (B.Sc)",
-            desc: "Completed higher education with a Bachelor of Science degree, forming a strong analytical and logical framework before stepping fully into public service."
-          },
           {
             title: "14 Years of Dedicated RSS Service",
             desc: "Dedicated himself to the Rashtriya Swayamsevak Sangh (RSS) for 14 years, serving as a committed volunteer and pracharak (propagator). This rigorous tenure instilled deep values of discipline, selflessness, and nation-first service."
@@ -181,7 +177,7 @@ const bioData = {
   hi: {
     name: "महामंडलेश्वर स्वामी यतीन्द्रानन्द गिरि महाराज",
     titleBadge: "संरक्षक / Sanrakshak",
-    degrees: "विज्ञान स्नातक (B.Sc) | श्री पंचदशनाम जूना अखाड़ा के वरिष्ठ आध्यात्मिक संत",
+    degrees: "श्री पंचदशनाम जूना अखाड़ा के वरिष्ठ आध्यात्मिक संत",
     subtitles: [
       "परम आदरणीय वरिष्ठ आध्यात्मिक संत",
       "जूना अखाड़े की प्रखर विभूति",
@@ -195,14 +191,10 @@ const bioData = {
         id: "education",
         title: "शिक्षा एवं राष्ट्रीय स्वयंसेवक संघ (RSS) सेवा",
         shortTitle: "शिक्षा एवं संघ सेवा",
-        subtitle: "तार्किक विज्ञान स्नातक की शिक्षा और १४ वर्षों का अखंड राष्ट्रीय सेवा काल",
+        subtitle: "१४ वर्षों का अखंड राष्ट्रीय सेवा काल",
         icon: GraduationCap,
         colorClass: "from-blue-500/10 to-indigo-500/10 border-blue-200/50 text-blue-600",
         items: [
-          {
-            title: "विज्ञान स्नातक (B.Sc) उपाधि",
-            desc: "विज्ञान स्नातक की डिग्री के साथ अपनी उच्च शिक्षा पूर्ण की, जिसने लोक सेवा और समाज कल्याण के पथ पर आगे बढ़ने से पूर्व एक मजबूत तार्किक और वैज्ञानिक दृष्टिकोण प्रदान किया।"
-          },
           {
             title: "१४ वर्षों की अखंड राष्ट्रीय सेवा (RSS)",
             desc: "राष्ट्रीय स्वयंसेवक संघ (RSS) में लगातार १४ वर्षों तक स्वयंसेवक एवं पूर्णकालिक प्रचारक के रूप में अपनी सेवाएँ अर्पित कीं। इस कठोर साधना काल ने उनके भीतर अटूट अनुशासन, निस्वार्थता और देश-प्रथम के संस्कारों को रोपित किया।"
@@ -321,8 +313,12 @@ export default function Sansrakshak() {
   return (
     <div className="bg-[#FDF5EC] min-h-screen pb-4">
       
-      {/* ── Banner ─────────────────────────────────────────────────── */}
       <section className="relative bg-gradient-to-br from-[#FFF9F2] via-[#FDF5EC] to-[#FFF5EB] py-20 md:py-24 text-center px-6 overflow-hidden flex items-center justify-center border-b border-[#F0D5B8]/40">
+        {/* Background Image (Soft Orange Gradient) */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.32]"
+          style={{ backgroundImage: "url('/plain-hero-bg.svg')" }}
+        />
         
 
         <div
@@ -346,12 +342,12 @@ export default function Sansrakshak() {
             ॥ संरक्षक ॥
           </span>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm mb-3">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight drop-shadow-sm mb-3 lg:whitespace-nowrap">
             पूज्य स्वामी यतींद्रानंद गिरी जी महाराज
           </h1>
           
           <p className="text-lg md:text-xl text-[#7A5C45] font-serif font-semibold max-w-2xl mx-auto leading-relaxed">
-            वरिष्ठ महामंडलेश्वर
+            वरिष्ठ महामंडलेश्वर, {data.degrees}
           </p>
 
           <motion.div
@@ -408,14 +404,6 @@ export default function Sansrakshak() {
                   <div className="flex items-start gap-3">
                     <span className="text-[#E8622A] font-bold text-xl leading-none mt-1">•</span>
                     <div>
-                      <strong className="font-bold">नाम एवं पदवी: </strong>
-                      {data.name} ({data.degrees})
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <span className="text-[#E8622A] font-bold text-xl leading-none mt-1">•</span>
-                    <div>
                       <strong className="font-bold">
                         परम आदरणीय वरिष्ठ आध्यात्मिक संत, जूना अखाड़े की प्रखर विभूति, धर्म एवं संस्कृति के संरक्षक, एवं अद्भुत वक्ता व परोपकारी मार्गदर्शक
                       </strong>
@@ -426,7 +414,7 @@ export default function Sansrakshak() {
                     <span className="text-[#E8622A] font-bold text-xl leading-none mt-1">•</span>
                     <div>
                       <strong className="font-bold">दायित्व एवं नेतृत्व: </strong>
-                      वरिष्ठ महामंडलेश्वर (श्री पंचदशनाम जूना अखाड़ा), उपाध्यक्ष (अखिल भारतीय संत समिति), जीवनदीप पीठाधीश्वर एवं पूर्व RSS प्रचारक
+                      पूर्व RSS प्रचारक एवं जीवनदीप पीठाधीश्वर, उपाध्यक्ष (अखिल भारतीय संत समिति)
                     </div>
                   </div>
 

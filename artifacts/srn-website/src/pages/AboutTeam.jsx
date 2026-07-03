@@ -72,7 +72,7 @@ export default function AboutTeam() {
       <section className="relative bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6 overflow-hidden">
         {/* Background Image (Soft Orange Gradient) */}
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.22]"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.32]"
           style={{ backgroundImage: "url('/plain-hero-bg.svg')" }}
         />
 
@@ -82,9 +82,6 @@ export default function AboutTeam() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="relative z-10 max-w-4xl mx-auto"
         >
-          <span className="inline-block px-5 py-2 rounded-full bg-white/60 border border-[#E8622A]/20 text-[#C04A18] text-xs font-bold uppercase tracking-widest mb-6 backdrop-blur-md shadow-sm">
-            {en ? "Founding Members" : "संस्थापक सदस्य"}
-          </span>
           <h1 className="text-3xl md:text-5xl font-bold text-[#5C1010] font-serif tracking-tight drop-shadow-sm mb-6">
             {en ? "Founding Members" : "संस्थापक सदस्य"}
           </h1>

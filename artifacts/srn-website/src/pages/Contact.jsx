@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Phone, Mail, Send, CheckCircle2 } from "lucide-react";
+import { MapPin, Phone, Mail, Send, CheckCircle2, Building2 } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 
 export default function Contact() {
@@ -35,11 +35,6 @@ export default function Contact() {
 
   const contactCards = [
     {
-      icon: MapPin,
-      title: en ? "Headquarters" : "मुख्यालय",
-      content: en ? "Sashakt Rashtra Nirman Bhawan\nSector 18, New Delhi, India 110001" : "सशक्त राष्ट्र निर्माण भवन\nसेक्टर 18, नई दिल्ली, भारत 110001"
-    },
-    {
       icon: Phone,
       title: en ? "Phone Support" : "फ़ोन समर्थन",
       content: "+91 98765 43210\n+91 11 2345 6789"
@@ -47,7 +42,7 @@ export default function Contact() {
     {
       icon: Mail,
       title: en ? "Email Address" : "ईमेल पता",
-      content: "contact@srnindia.org\nsupport@srnindia.org"
+      content: "info@srnindia.org\nsrnindia@yahoo.com"
     }
   ];
 
@@ -57,7 +52,7 @@ export default function Contact() {
       <section className="relative bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6 overflow-hidden">
         {/* Background Image (Soft Orange Gradient) */}
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.22]"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.32]"
           style={{ backgroundImage: "url('/plain-hero-bg.svg')" }}
         />
         
@@ -85,7 +80,7 @@ export default function Contact() {
 
       <div className="max-w-7xl mx-auto px-6 relative z-20 mt-8">
         {/* Contact Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
           {contactCards.map((card, idx) => {
             const Icon = card.icon;
             return (
@@ -107,6 +102,51 @@ export default function Contact() {
             );
           })}
         </div>
+
+        {/* Regional Offices Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="bg-white/70 backdrop-blur-xl border border-white rounded-[2rem] p-8 md:p-10 shadow-xl mb-16 relative overflow-hidden group hover:shadow-2xl transition-all duration-300"
+        >
+          <div className="flex items-center gap-3 mb-8 border-b border-[#F0D5B8]/40 pb-4">
+            <div className="w-12 h-12 rounded-full bg-[#FEF0E6] flex items-center justify-center text-[#E8622A] group-hover:scale-110 group-hover:bg-[#E8622A] group-hover:text-white transition-all duration-300">
+              <Building2 className="w-6 h-6 transition-colors duration-300" />
+            </div>
+            <h3 className="text-xl font-bold font-serif text-[#2C1810]">
+              {en ? "Offices" : "कार्यालय"}
+            </h3>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              {
+                city: en ? "NPO Office" : "NPO कार्यालय",
+                address: "Saket Nagar East, Near Maharana Pratap College, Deoria - 274001"
+              },
+              {
+                city: en ? "Delhi Office" : "दिल्ली कार्यालय",
+                address: "KH. No. 20/2, 12/2, Singhu, Delhi"
+              },
+              {
+                city: en ? "Noida Office" : "नोएडा कार्यालय",
+                address: "Base Floor, D-220, Sector-63, NOIDA"
+              },
+              {
+                city: en ? "Lucknow Office" : "लखनऊ कार्यालय",
+                address: "Plot N-10\nAwadh Dhodhan Khera\nAwadh Vihar Extension\nLUCKNOW UP 226002"
+              }
+            ].map((office, idx) => (
+              <div key={idx} className="space-y-3">
+                <h4 className="font-bold text-base text-[#E8622A] border-b border-[#F0D5B8]/30 pb-1.5">{office.city}</h4>
+                <p className="text-[#7A5C45] text-sm font-medium leading-relaxed whitespace-pre-line">
+                  {office.address}
+                </p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
 
         {/* Main Content Area: Form & Map */}
         <div className="bg-white/60 backdrop-blur-2xl border border-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col lg:flex-row">
@@ -185,7 +225,7 @@ export default function Contact() {
           {/* Map Side */}
           <div className="lg:w-1/2 min-h-[400px] lg:min-h-full bg-gray-200 relative">
             <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d112061.09262729906!2d77.1582209!3d28.63243!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd5b347eb62d%3A0x37205b715389640!2sNew%20Delhi%2C%20Delhi!5e0!3m2!1sen!2sin!4v1716910241029!5m2!1sen!2sin" 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d300000!2d77.1582209!3d28.63243!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd5b347eb62d%3A0x37205b715389640!2sNew%20Delhi%2C%20Delhi!5e0!3m2!1sen!2sin!4v1716910241029!5m2!1sen!2sin" 
               width="100%" 
               height="100%" 
               style={{ border: 0, position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }} 

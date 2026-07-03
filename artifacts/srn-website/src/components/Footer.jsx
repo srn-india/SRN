@@ -127,7 +127,7 @@ export default function Footer() {
             <ul className="space-y-4">
               {[
                 { to: "/", label: en ? "Home" : "मुखपृष्ठ" },
-                { to: "/sangathan", label: en ? "Sangathan" : "संगठन" },
+                { to: "/initiatives", label: en ? "Initiatives" : "हमारी पहल" },
                 { to: "/uddeshya", label: en ? "Objectives" : "उद्देश्य" },
                 { to: "/contact", label: en ? "Contact Us" : "संपर्क" },
               ].map((link) => (

@@ -107,7 +107,7 @@ export default function Events() {
       <section className="relative bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6 overflow-hidden">
         {/* Background Image (Soft Orange Gradient) */}
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.22]"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.32]"
           style={{ backgroundImage: "url('/plain-hero-bg.svg')" }}
         />
         

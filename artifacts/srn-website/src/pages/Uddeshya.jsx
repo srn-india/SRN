@@ -35,7 +35,7 @@ export default function Uddeshya() {
       <section className="relative bg-[#FFF5EB] pt-[120px] pb-10 text-center px-6 overflow-hidden">
         {/* Background Image (Soft Orange Gradient) */}
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.22]"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.32]"
           style={{ backgroundImage: "url('/plain-hero-bg.svg')" }}
         />
 
@@ -84,23 +84,22 @@ export default function Uddeshya() {
         <div className="absolute right-6 top-1/2 -translate-y-1/2 text-[15rem] font-bold text-[#E8622A]/4 select-none pointer-events-none leading-none font-serif hidden md:block">
           M
         </div>
-        <div className="max-w-4xl mx-auto relative">
+        <div className="max-w-6xl mx-auto relative">
           <FadeSection>
             <SectionHeader
               hindi={u.missionTitleHindi}
               english={u.missionTitle}
             />
           </FadeSection>
-          <div className="mt-8 grid grid-cols-1 gap-4">
+          <div className="space-y-6 sm:space-y-8 bg-white border border-[#F0D5B8] rounded-[2rem] p-4 sm:p-8 md:p-12 shadow-sm mt-8">
             {u.missionPoints.map((point, i) => (
-              <div 
-                key={point} 
-                className="flex items-start gap-4 p-5 rounded-2xl bg-white border border-[#F0D5B8] hover:border-[#E8622A]/50 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 card-shimmer"
-              >
-                <span className="text-[#E8622A] text-[0.8em] mt-[0.35rem] shrink-0 select-none">
+              <div key={i} className="flex gap-2 sm:gap-4 items-start text-[#1E0F05]">
+                <span className="text-[#E8622A] text-[0.6em] sm:text-[0.7em] mt-[0.4rem] sm:mt-[0.55rem] shrink-0">
                   ●
                 </span>
-                <p className="text-[#1E0F05] text-base leading-relaxed">{point}</p>
+                <p className="text-sm sm:text-base md:text-lg leading-relaxed font-sans text-justify pt-0.5">
+                  {point}
+                </p>
               </div>
             ))}
           </div>
