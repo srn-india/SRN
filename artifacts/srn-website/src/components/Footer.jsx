@@ -1,12 +1,14 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Phone, Mail, ArrowRight, Facebook, Instagram, Youtube } from "lucide-react";
-import { motion } from "framer-motion";
+import { Phone, Mail, ArrowRight, Facebook, Instagram, Youtube, ChevronDown, ChevronUp } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "../context/LanguageContext";
 
 export default function Footer() {
   const { t, lang } = useLanguage();
   const f = t.footer;
   const en = lang === "en";
+  const [isSangathanExpanded, setIsSangathanExpanded] = useState(false);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -127,22 +129,94 @@ export default function Footer() {
               {f.quickLinks}
             </h3>
             <ul className="space-y-4">
-              {[
-                { to: "/", label: en ? "Home" : "मुखपृष्ठ" },
-                { to: "/initiatives", label: en ? "Initiatives" : "हमारी पहल" },
-                { to: "/uddeshya", label: en ? "Objectives" : "उद्देश्य" },
-                { to: "/contact", label: en ? "Contact Us" : "संपर्क" },
-              ].map((link) => (
-                <li key={link.to}>
-                  <Link to={link.to} className="group flex items-center text-[#7A5C45] hover:text-[#E8622A] font-medium transition-colors duration-300">
-                    <span className="relative">
-                      {link.label}
-                      <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#E8622A] transition-all duration-300 group-hover:w-full" />
-                    </span>
-                    <ArrowRight className="w-4 h-4 ml-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-[#E8622A]" />
-                  </Link>
-                </li>
-              ))}
+              {/* About Us (Formerly Home) */}
+              <li>
+                <Link to="/" className="group flex items-center text-[#7A5C45] hover:text-[#E8622A] font-medium transition-colors duration-300">
+                  <span className="relative">
+                    {en ? "About Us" : "हमारे बारे में"}
+                    <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#E8622A] transition-all duration-300 group-hover:w-full" />
+                  </span>
+                  <ArrowRight className="w-4 h-4 ml-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-[#E8622A]" />
+                </Link>
+              </li>
+
+              {/* Initiatives */}
+              <li>
+                <Link to="/initiatives" className="group flex items-center text-[#7A5C45] hover:text-[#E8622A] font-medium transition-colors duration-300">
+                  <span className="relative">
+                    {en ? "Initiatives" : "हमारी पहल"}
+                    <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#E8622A] transition-all duration-300 group-hover:w-full" />
+                  </span>
+                  <ArrowRight className="w-4 h-4 ml-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-[#E8622A]" />
+                </Link>
+              </li>
+
+              {/* Objectives */}
+              <li>
+                <Link to="/uddeshya" className="group flex items-center text-[#7A5C45] hover:text-[#E8622A] font-medium transition-colors duration-300">
+                  <span className="relative">
+                    {en ? "Objectives" : "उद्देश्य"}
+                    <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#E8622A] transition-all duration-300 group-hover:w-full" />
+                  </span>
+                  <ArrowRight className="w-4 h-4 ml-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-[#E8622A]" />
+                </Link>
+              </li>
+
+              {/* Sangathan Dropdown */}
+              <li>
+                <button
+                  onClick={() => setIsSangathanExpanded(!isSangathanExpanded)}
+                  className="group flex items-center justify-between w-full text-[#7A5C45] hover:text-[#E8622A] font-medium transition-colors duration-300 text-left focus:outline-none"
+                >
+                  <span className="relative flex items-center gap-1.5">
+                    {en ? "Sangathan" : "संगठन"}
+                    {isSangathanExpanded ? (
+                      <ChevronUp className="w-3.5 h-3.5 text-[#E8622A] transition-transform duration-300" />
+                    ) : (
+                      <ChevronDown className="w-3.5 h-3.5 text-[#B89070] transition-transform duration-300" />
+                    )}
+                  </span>
+                </button>
+
+                <AnimatePresence initial={false}>
+                  {isSangathanExpanded && (
+                    <motion.ul
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25, ease: "easeInOut" }}
+                      className="pl-4 mt-3 space-y-3 overflow-hidden border-l-2 border-[#F0D5B8]/50"
+                    >
+                      {[
+                        { to: "/organisation/sansrakshak", label: en ? "Sanrakshak" : "संरक्षक" },
+                        { to: "/organisation/national-president", label: en ? "National President" : "राष्ट्रीय अध्यक्ष" },
+                        { to: "/organisation/advisory-board", label: en ? "Advisory Board" : "सलाहकार मंडल" },
+                      ].map((subLink) => (
+                        <li key={subLink.to}>
+                          <Link to={subLink.to} className="group flex items-center text-sm text-[#7A5C45] hover:text-[#E8622A] font-medium transition-colors duration-300">
+                            <span className="relative">
+                              {subLink.label}
+                              <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-[#E8622A] transition-all duration-300 group-hover:w-full" />
+                            </span>
+                            <ArrowRight className="w-3.5 h-3.5 ml-1.5 opacity-0 -translate-x-1.5 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-[#E8622A]" />
+                          </Link>
+                        </li>
+                      ))}
+                    </motion.ul>
+                  )}
+                </AnimatePresence>
+              </li>
+
+              {/* Contact Us */}
+              <li>
+                <Link to="/contact" className="group flex items-center text-[#7A5C45] hover:text-[#E8622A] font-medium transition-colors duration-300">
+                  <span className="relative">
+                    {en ? "Contact Us" : "संपर्क"}
+                    <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#E8622A] transition-all duration-300 group-hover:w-full" />
+                  </span>
+                  <ArrowRight className="w-4 h-4 ml-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-[#E8622A]" />
+                </Link>
+              </li>
             </ul>
           </motion.div>
 
