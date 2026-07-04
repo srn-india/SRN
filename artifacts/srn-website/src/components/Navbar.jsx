@@ -9,12 +9,14 @@ const menuCategories = [
   {
     titleEn: "About Us",
     titleHi: "हमारे बारे में",
-    links: [
+    isAboutCategory: true,
+    dropdownLinks: [
       { path: "/", hindiName: "मुखपृष्ठ", englishName: "Home" },
       { path: "/uddeshya", hindiName: "उद्देश्य", englishName: "Our Aim & Objectives" },
       { path: "/about-team", hindiName: "संस्थापक सदस्य", englishName: "Founding Members" },
       { path: "/initiatives", hindiName: "हमारी पहल", englishName: "Our Initiatives" },
     ],
+    links: [],
   },
   {
     titleEn: "Organisation",
@@ -63,6 +65,7 @@ export default function Navbar({ isOpen, setIsOpen, onPhoneClick }) {
   const { user } = useAuth();
   const en = lang === "en";
   const [showOrgDropdown, setShowOrgDropdown] = useState(false);
+  const [showAboutDropdown, setShowAboutDropdown] = useState(false);
   
   const isHome = location.pathname === "/";
   const isDashboard = location.pathname === "/dashboard";
@@ -322,7 +325,37 @@ export default function Navbar({ isOpen, setIsOpen, onPhoneClick }) {
                         </h2>
                         
                         <ul className="flex flex-col gap-1.5">
-                          {category.isOrgCategory ? (
+                          {category.isAboutCategory ? (
+                            <>
+                              <li>
+                                <button
+                                  onClick={() => setShowAboutDropdown(!showAboutDropdown)}
+                                  className="flex items-center justify-between w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-[#E8622A]/50 hover:shadow-lg transition-all duration-300 font-semibold text-white text-base"
+                                >
+                                  <span>{en ? "About Us" : "हमारे बारे में"}</span>
+                                  {showAboutDropdown ? (
+                                    <ChevronUp className="w-5 h-5 text-[#E8622A]" />
+                                  ) : (
+                                    <ChevronDown className="w-5 h-5 text-[#E8622A]" />
+                                  )}
+                                </button>
+                              </li>
+                              
+                              <AnimatePresence initial={false}>
+                                {showAboutDropdown && (
+                                  <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                                    className="flex flex-col gap-1.5 overflow-hidden pl-3 mt-1.5 border-l-2 border-[#E8622A]/40 mb-3"
+                                  >
+                                    {category.dropdownLinks.map((link, linkIdx) => renderLink(link, linkIdx))}
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </>
+                          ) : category.isOrgCategory ? (
                             <>
                               <li>
                                 <button
