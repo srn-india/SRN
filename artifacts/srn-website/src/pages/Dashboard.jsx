@@ -163,9 +163,9 @@ export default function Dashboard() {
                 </div>
                 <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden mt-4">
                   <motion.div 
-                    className="h-full bg-gradient-to-r from-[#E8622A] to-[#C04A18]" 
-                    initial={{ width: 0 }}
-                    animate={{ width: "40%" }}
+                    className="h-full w-full bg-gradient-to-r from-[#E8622A] to-[#C04A18] origin-left" 
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 0.4 }}
                     transition={{ duration: 1, delay: 0.5, ease: "easeOut" }}
                   />
                 </div>

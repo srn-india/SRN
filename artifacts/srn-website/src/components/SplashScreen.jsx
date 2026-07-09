@@ -61,8 +61,8 @@ export default function SplashScreen({ onDone }) {
           सशक्त राष्ट्र निर्माण
         </p>
         <motion.div
-          className="mt-3 h-0.5 bg-gradient-to-r from-transparent via-[#E8622A] to-transparent rounded-full"
-          animate={{ width: ["0%", "0%", "100%", "100%", "0%"] }}
+          className="mt-3 h-0.5 w-full bg-gradient-to-r from-transparent via-[#E8622A] to-transparent rounded-full origin-left"
+          animate={{ scaleX: [0, 0, 1, 1, 0] }}
           transition={{ duration: DURATION, times: T, ease: "easeOut" }}
           style={{ width: 160 }}
         />
