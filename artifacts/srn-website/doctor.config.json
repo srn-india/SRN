@@ -1,6 +1,7 @@
 {
   "$schema": "https://react.doctor/schema/config.json",
   "rules": {
-    "react-doctor/no-layout-property-animation": "warn"
+    "react-doctor/no-layout-property-animation": "warn",
+    "react-doctor/no-impure-state-updater": "warn"
   }
 }
