@@ -221,7 +221,7 @@ export default function Complaints() {
           </h1>
           <p className="text-[#7A5C45] text-base md:text-lg mt-4 max-w-2xl mx-auto font-medium leading-relaxed">
             {en 
-              ? "Submit your grievances, social problems or community concerns directly to the Sashakt Rashtra Nirman Trust administration."
+              ? "Submit your grievances, social problems or community concerns directly to the Sashakt Rashtra Nirman administration."
               : "अपनी समस्याओं, सामाजिक चिंताओं या सामुदायिक मुद्दों को सीधे सशक्त राष्ट्र निर्माण न्यास के प्रशासन के समक्ष प्रस्तुत करें।"}
           </p>
           

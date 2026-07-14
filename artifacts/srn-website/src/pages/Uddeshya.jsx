@@ -46,12 +46,12 @@ export default function Uddeshya() {
           className="relative max-w-4xl mx-auto z-10"
         >
           <h1 className="text-3xl md:text-5xl font-bold text-[#5C1010] font-serif tracking-tight leading-tight">
-            {en ? "Objectives of the Trust" : "न्यास के उद्देश्य"}
+            {en ? "Objectives of SRN" : "SRN के उद्देश्य"}
           </h1>
           <p className="text-[#7A5C45] text-sm md:text-base mt-4 max-w-2xl mx-auto leading-relaxed font-medium">
             {en 
-              ? "Sashakt Rashtra Nirman Trust has been established to drive holistic national development through these core constitutional objectives."
-              : "सशक्त राष्ट्र निर्माण न्यास की स्थापना राष्ट्र के समग्र विकास के लिए इन मुख्य संवैधानिक उद्देश्यों को पूरा करने के लिए की गई है।"}
+              ? "Sashakt Rashtra Nirman has been established to drive holistic national development through these core constitutional objectives."
+              : "सशक्त राष्ट्र निर्माण की स्थापना राष्ट्र के समग्र विकास के लिए इन मुख्य संवैधानिक उद्देश्यों को पूरा करने के लिए की गई है।"}
           </p>
 
           <motion.div
