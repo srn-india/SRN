@@ -148,6 +148,22 @@ export default function Navbar({ isOpen, setIsOpen, onPhoneClick }) {
   const isProfile = location.pathname === "/profile";
   if (isDashboard || isProfile) return null;
 
+  const isAdmin = user?.role === "ADMIN";
+  const processedMenuCategories = menuCategories.map(category => {
+    if (category.titleEn === "Action & Contact") {
+      return {
+        ...category,
+        links: category.links.map(link => {
+          if (link.path === "/become-member" || link.path === "/donate") {
+            return { ...link, isLocked: !isAdmin };
+          }
+          return link;
+        })
+      };
+    }
+    return category;
+  });
+
   return (
     <>
       {/* ── Global Header ─────────────────────────────────────── */}
@@ -240,7 +256,7 @@ export default function Navbar({ isOpen, setIsOpen, onPhoneClick }) {
               <div className="max-w-7xl mx-auto w-full">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-6">
                   
-                  {menuCategories.map((category, colIdx) => {
+                  {processedMenuCategories.map((category, colIdx) => {
                     let linksToRender = category.links;
                     // Add Dashboard button to Action & Contact if user is logged in
                     if (category.titleEn === "Action & Contact" && user) {
@@ -252,24 +268,6 @@ export default function Navbar({ isOpen, setIsOpen, onPhoneClick }) {
                     const renderLink = (link, linkIdx) => {
                       const isActive = location.pathname === link.path;
                       
-                      if (link.isButton) {
-                        return (
-                          <li key={link.path}>
-                            <Link
-                              to={link.path}
-                              onClick={handleLinkClick}
-                              className={`flex items-center justify-center w-full px-3 py-2.5 md:py-2 mt-1 rounded-xl font-semibold backdrop-blur-md transition-all duration-300 border hover:scale-[1.02] text-base ${
-                                isActive
-                                  ? "bg-[#E8622A]/25 border-[#E8622A]/60 text-white shadow-[0_0_15px_rgba(232,98,42,0.2)]"
-                                  : "bg-[#E8622A]/10 border-[#E8622A]/30 text-[#F47A3A] hover:bg-[#E8622A]/20 hover:border-[#E8622A]/50 hover:text-white"
-                              }`}
-                            >
-                              {en ? link.englishName : link.hindiName}
-                            </Link>
-                          </li>
-                        );
-                      }
-
                       if (link.isLocked) {
                         return (
                           <li key={link.path}>
@@ -291,6 +289,25 @@ export default function Navbar({ isOpen, setIsOpen, onPhoneClick }) {
                           </li>
                         );
                       }
+
+                      if (link.isButton) {
+                        return (
+                          <li key={link.path}>
+                            <Link
+                              to={link.path}
+                              onClick={handleLinkClick}
+                              className={`flex items-center justify-center w-full px-3 py-2.5 md:py-2 mt-1 rounded-xl font-semibold backdrop-blur-md transition-all duration-300 border hover:scale-[1.02] text-base ${
+                                isActive
+                                  ? "bg-[#E8622A]/25 border-[#E8622A]/60 text-white shadow-[0_0_15px_rgba(232,98,42,0.2)]"
+                                  : "bg-[#E8622A]/10 border-[#E8622A]/30 text-[#F47A3A] hover:bg-[#E8622A]/20 hover:border-[#E8622A]/50 hover:text-white"
+                              }`}
+                            >
+                              {en ? link.englishName : link.hindiName}
+                            </Link>
+                          </li>
+                        );
+                      }
+
 
                       return (
                         <li key={link.path}>
