@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   MapPin, BadgeCheck, FileText, BookOpen, Heart, Users, User, Star,
-  Leaf, Home as HomeIcon, Eye, Target, Phone, Mail, ArrowRight,
+  Leaf, Home as HomeIcon, Eye, Target, Phone, Mail, ArrowRight, Lock
 } from "lucide-react";
 import SectionHeader from "../components/SectionHeader";
 import { useLanguage } from "../context/LanguageContext";
@@ -132,12 +132,12 @@ export default function Home() {
               {lang === "en" ? h.ctaKnowMore : h.ctaKnowMoreHindi}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <Link
-              to="/become-member"
-              className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full border-2 border-white/40 text-white font-semibold backdrop-blur-sm hover:bg-white/10 hover:border-[#F47A3A] hover:-translate-y-0.5 transition-all duration-300 text-sm w-full sm:w-auto"
+            <div
+              className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full border-2 border-white/20 text-white/40 font-semibold backdrop-blur-sm cursor-not-allowed select-none text-sm w-full sm:w-auto"
             >
               {lang === "en" ? h.ctaJoin : h.ctaJoinHindi}
-            </Link>
+              <Lock className="w-3.5 h-3.5 text-white/30" />
+            </div>
           </motion.div>
         </motion.div>
 

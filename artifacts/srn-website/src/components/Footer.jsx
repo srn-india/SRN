@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Phone, Mail, ArrowRight, Facebook, Instagram, Youtube, ChevronDown, ChevronUp } from "lucide-react";
+import { Phone, Mail, ArrowRight, Facebook, Instagram, Youtube, ChevronDown, ChevronUp, Lock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "../context/LanguageContext";
 
@@ -227,17 +227,23 @@ export default function Footer() {
               {f.contact} {en ? "& Info" : "और जानकारी"}
             </h3>
             <div className="space-y-6">
-              <div className="bg-white/60 rounded-2xl p-5 border border-[#E8D5B8]/50 shadow-sm hover:shadow-md hover:bg-white/80 transition-all duration-300">
-                <p className="text-[#B89070] text-sm font-bold mb-2">{en ? "Support Our Cause" : "हमारे उद्देश्य का समर्थन करें"}</p>
-                <Link to="/donate" className="inline-flex items-center text-[#2C1810] text-sm font-bold hover:text-[#E8622A] transition-colors">
-                  {en ? "Make a Donation" : "दान करें"} <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
+              <div className="bg-white/60 rounded-2xl p-5 border border-[#E8D5B8]/50 shadow-sm text-black/40 cursor-not-allowed select-none flex items-center justify-between">
+                <div>
+                  <p className="text-black/40 text-sm font-bold mb-2">{en ? "Support Our Cause" : "हमारे उद्देश्य का समर्थन करें"}</p>
+                  <span className="inline-flex items-center text-black/30 text-sm font-bold">
+                    {en ? "Make a Donation" : "दान करें"}
+                  </span>
+                </div>
+                <Lock className="w-4 h-4 text-[#E8622A]/70" />
               </div>
-              <div className="bg-gradient-to-r from-[#E8622A]/5 to-transparent rounded-2xl p-5 border border-[#E8622A]/20">
-                <p className="text-[#E8622A] text-sm font-bold mb-2">{en ? "Join the Movement" : "आंदोलन में शामिल हों"}</p>
-                <Link to="/become-member" className="inline-flex items-center text-[#2C1810] text-sm font-bold hover:text-[#E8622A] transition-colors">
-                  {en ? "Become a Member" : "सदस्य बनें"} <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
+              <div className="bg-gradient-to-r from-[#E8622A]/5 to-transparent rounded-2xl p-5 border border-[#E8622A]/20 cursor-not-allowed select-none flex items-center justify-between">
+                <div>
+                  <p className="text-[#E8622A]/40 text-sm font-bold mb-2">{en ? "Join the Movement" : "आंदोलन में शामिल हों"}</p>
+                  <span className="inline-flex items-center text-black/30 text-sm font-bold">
+                    {en ? "Become a Member" : "सदस्य बनें"}
+                  </span>
+                </div>
+                <Lock className="w-4 h-4 text-[#E8622A]/70" />
               </div>
             </div>
           </motion.div>

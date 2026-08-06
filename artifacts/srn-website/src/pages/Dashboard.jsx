@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, useAnimation } from "framer-motion";
-import { LogOut, User, Activity, Bell, CreditCard, ArrowLeft, Heart, Calendar, MessageSquare, ChevronRight, Settings, Star, TrendingUp, ShieldCheck } from "lucide-react";
+import { LogOut, User, Activity, Bell, CreditCard, ArrowLeft, Heart, Calendar, MessageSquare, ChevronRight, Settings, Star, TrendingUp, ShieldCheck, Lock } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const containerVariants = {
@@ -196,22 +196,41 @@ export default function Dashboard() {
               <h2 className="text-2xl font-bold text-[#2C1810] font-serif mb-6 pl-2">Quick Access</h2>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {[
-                  { icon: Heart, label: "Donate", desc: "Support cause", to: "/donate", gradient: "from-rose-400 to-rose-600" },
+                  { icon: Heart, label: "Donate", desc: "Support cause", to: "/donate", gradient: "from-rose-400 to-rose-600", isLocked: true },
                   { icon: Calendar, label: "Events", desc: "Join rallies", to: "/events", gradient: "from-blue-400 to-blue-600" },
                   { icon: MessageSquare, label: "Forums", desc: "Discussions", to: "/forums", gradient: "from-emerald-400 to-emerald-600" },
                   { icon: Activity, label: "Initiatives", desc: "Our work", to: "/initiatives", gradient: "from-amber-400 to-orange-500" },
-                ].map((action) => (
-                  <Link key={action.to} to={action.to} className="group relative bg-white/60 backdrop-blur-md rounded-[1.5rem] p-5 border border-white/80 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden">
-                    <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                      <action.icon className="w-16 h-16 text-gray-900" />
-                    </div>
-                    <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${action.gradient} flex items-center justify-center text-white shadow-md mb-4 group-hover:scale-110 transition-transform`}>
-                      <action.icon className="w-6 h-6" />
-                    </div>
-                    <h3 className="font-bold text-[#2C1810]">{action.label}</h3>
-                    <p className="text-xs text-[#7A5C45] font-medium mt-1">{action.desc}</p>
-                  </Link>
-                ))}
+                ].map((action) => {
+                  if (action.isLocked) {
+                    return (
+                      <div key={action.to} className="relative bg-white/40 backdrop-blur-md rounded-[1.5rem] p-5 border border-white/40 shadow-sm cursor-not-allowed select-none overflow-hidden">
+                        <div className="absolute top-3 right-3 text-[#E8622A]/70 z-10">
+                          <Lock className="w-4 h-4" />
+                        </div>
+                        <div className="absolute top-0 right-0 p-4 opacity-5">
+                          <action.icon className="w-16 h-16 text-gray-950" />
+                        </div>
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center text-white/50 shadow-sm mb-4">
+                          <action.icon className="w-6 h-6" />
+                        </div>
+                        <h3 className="font-bold text-[#2C1810]/40">{action.label}</h3>
+                        <p className="text-xs text-[#7A5C45]/40 font-medium mt-1">{action.desc}</p>
+                      </div>
+                    );
+                  }
+                  return (
+                    <Link key={action.to} to={action.to} className="group relative bg-white/60 backdrop-blur-md rounded-[1.5rem] p-5 border border-white/80 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+                      <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <action.icon className="w-16 h-16 text-gray-900" />
+                      </div>
+                      <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${action.gradient} flex items-center justify-center text-white shadow-md mb-4 group-hover:scale-110 transition-transform`}>
+                        <action.icon className="w-6 h-6" />
+                      </div>
+                      <h3 className="font-bold text-[#2C1810]">{action.label}</h3>
+                      <p className="text-xs text-[#7A5C45] font-medium mt-1">{action.desc}</p>
+                    </Link>
+                  );
+                })}
               </div>
             </motion.div>
             
@@ -272,10 +291,10 @@ export default function Dashboard() {
                   Active Member
                 </div>
               ) : (
-                <Link to="/become-member" className="mt-4 flex items-center justify-center w-full px-5 py-3.5 bg-white border border-[#E8D5B8] rounded-[1.25rem] text-[#E8622A] font-bold hover:bg-[#FEF0E6] transition-colors shadow-sm gap-2">
+                <div className="mt-4 flex items-center justify-center w-full px-5 py-3.5 bg-white/40 border border-[#E8D5B8]/50 rounded-[1.25rem] text-[#E8622A]/40 font-bold cursor-not-allowed select-none gap-2">
                   Activate Membership
-                  <ChevronRight className="w-4 h-4" />
-                </Link>
+                  <Lock className="w-4 h-4 text-[#E8622A]/70" />
+                </div>
               )}
             </motion.div>
 

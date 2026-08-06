@@ -26,7 +26,7 @@ const menuCategories = [
       { path: "/organisation/sansrakshak", hindiName: "संरक्षक", englishName: "Sanrakshak" },
       { path: "/organisation/national-president", hindiName: "राष्ट्रीय अध्यक्ष", englishName: "National President" },
       { path: "/organisation/advisory-board", hindiName: "सलाहकार मंडल", englishName: "Salahkar Mandal/Advisory board" },
-      { path: "/organisation/national-office-bearers", hindiName: "राष्ट्रीय पदाधिकारी", englishName: "National office bearers", isLocked: true },
+      { path: "/organisation/national-office-bearers", hindiName: "राष्ट्रीय पदाधिकारी", englishName: "National office bearers" },
       { path: "/organisation/morcha", hindiName: "मोर्चा", englishName: "Morcha", isLocked: true },
       { path: "/organisation/department", hindiName: "विभाग/प्रभारी", englishName: "Department/Prabhari", isLocked: true },
       { path: "/organisation/state-bearers", hindiName: "राज्य पदाधिकारी", englishName: "State bearers", isLocked: true },
@@ -148,14 +148,13 @@ export default function Navbar({ isOpen, setIsOpen, onPhoneClick }) {
   const isProfile = location.pathname === "/profile";
   if (isDashboard || isProfile) return null;
 
-  const isAdmin = user?.role === "ADMIN";
   const processedMenuCategories = menuCategories.map(category => {
     if (category.titleEn === "Action & Contact") {
       return {
         ...category,
         links: category.links.map(link => {
           if (link.path === "/become-member" || link.path === "/donate") {
-            return { ...link, isLocked: !isAdmin };
+            return { ...link, isLocked: true };
           }
           return link;
         })
