@@ -197,7 +197,7 @@ export const focusAreasData = [
   {
     id: 40,
     hi: "किसी एन०जी०ओ० द्वारा दिये गये कार्यों को भी न्यास के माध्यम से सम्पादित करना।",
-    en: "To execute assignments or projects delegated by any NGO through this Trust."
+    en: "To execute assignments or projects delegated by any NGO through SRN."
   },
   {
     id: 41,
@@ -222,7 +222,7 @@ export const focusAreasData = [
   {
     id: 45,
     hi: "संस्था के उद्देश्य की प्राप्ति के लिये इसके शाखा या इसके क्रिया-कलापों को आवश्यकतानुसार अन्य जिला / प्रदेशों में स्थापित करना या फैलाना।",
-    en: "To open branches or expand the activities of the Trust into other districts and states as necessary to achieve its core objectives."
+    en: "To open branches or expand the activities of the SRN into other districts and states as necessary to achieve its core objectives."
   },
   {
     id: 46,

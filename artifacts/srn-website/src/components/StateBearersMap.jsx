@@ -20,11 +20,14 @@ export default function StateBearersMap({ lang }) {
 
   // Directly attach native listeners to SVG paths after map renders
   useEffect(() => {
+    let active = true;
+    const handlers = [];
+
     // Small delay to ensure the @react-map/india SVG has mounted in the DOM
     const timer = setTimeout(() => {
+      if (!active) return;
       const paths = document.querySelectorAll(".state-map-wrapper svg path");
 
-      const handlers = [];
       paths.forEach((path) => {
         // Add class for CSS-based hover highlighting
         path.classList.add("state-path");
@@ -46,17 +49,16 @@ export default function StateBearersMap({ lang }) {
         path.addEventListener("mouseout", onOut);
         handlers.push({ path, onOver, onOut });
       });
-
-      // Cleanup
-      return () => {
-        handlers.forEach(({ path, onOver, onOut }) => {
-          path.removeEventListener("mouseover", onOver);
-          path.removeEventListener("mouseout", onOut);
-        });
-      };
     }, 500);
 
-    return () => clearTimeout(timer);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+      handlers.forEach(({ path, onOver, onOut }) => {
+        path.removeEventListener("mouseover", onOver);
+        path.removeEventListener("mouseout", onOut);
+      });
+    };
   }, [mapSize]);
 
   const en = lang === "en";

@@ -249,7 +249,7 @@ export const detailedObjectives = [
     id: 40,
     category: "institutional",
     hi: "किसी एन०जी०ओ० द्वारा दिये गये कार्यों को भी न्यास के माध्यम से सम्पादित करना।",
-    en: "To execute assignments or projects delegated by any NGO through this Trust."
+    en: "To execute assignments or projects delegated by any NGO through SRN."
   },
   {
     id: 41,
@@ -267,7 +267,7 @@ export const detailedObjectives = [
     id: 43,
     category: "institutional",
     hi: "सरकारी तथा गैर सरकारी लोगों/संस्थाओं/तंत्रों / कम्पनी/दुकानों से आर्थिक सहायता लेकर संस्था के उद्देश्य की पूर्ति करना। इसमें विभिन्न प्रकार के डोनेशन, ग्रान्ट, गिफ्ट, चल एवं अचल सम्पत्ति सम्मिलित हैं।",
-    en: "To accept financial aid, donations, grants, gifts, and both movable and immovable assets from government and non-governmental individuals, institutions, corporations, or commercial shops to advance the Trust's goals."
+    en: "To accept financial aid, donations, grants, gifts, and both movable and immovable assets from government and non-governmental individuals, institutions, corporations, or commercial shops to advance the SRN's goals."
   },
   {
     id: 44,
@@ -279,7 +279,7 @@ export const detailedObjectives = [
     id: 45,
     category: "institutional",
     hi: "संस्था के उद्देश्य की प्राप्ति के लिये इसके शाखा या इसके क्रिया-कलापों को आवश्यकतानुसार अन्य जिला / प्रदेशों में स्थापित करना या फैलाना।",
-    en: "To open branches or expand the activities of the Trust into other districts and states as necessary to achieve its core objectives."
+    en: "To open branches or expand the activities of SRN into other districts and states as necessary to achieve its core objectives."
   },
   {
     id: 46,

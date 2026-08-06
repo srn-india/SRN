@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, ShieldCheck, IndianRupee, ArrowRight, CheckCircle2, ChevronDown } from "lucide-react";
+import { Heart, ShieldCheck, IndianRupee, ArrowRight, CheckCircle2, ChevronDown, Lock, ArrowLeft } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 import { useAuth } from "../context/AuthContext";
 import ProfileCompletionModal from "../components/ProfileCompletionModal";
@@ -146,6 +146,46 @@ export default function Donate() {
       setLoading(false);
     }
   };
+
+  const isAdmin = user?.role === "ADMIN";
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-[#FFF8F2] flex items-center justify-center px-6 py-12 relative overflow-hidden">
+        {/* Decorative background elements matching the site's rich aesthetics */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#E8622A]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#8C5D3A]/5 rounded-full blur-3xl pointer-events-none" />
+        
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="max-w-md w-full text-center relative z-10 bg-white/70 backdrop-blur-md rounded-3xl p-8 border border-[#E8D5B8]/50 shadow-xl"
+        >
+          <div className="w-16 h-16 bg-[#E8622A]/10 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-[#E8622A]/20">
+            <Lock className="w-8 h-8 text-[#E8622A]" />
+          </div>
+          
+          <h2 className="text-3xl font-bold text-[#2C1A0E] font-serif mb-4 leading-tight">
+            {en ? "Restricted Access" : "प्रतिबंधित पहुंच"}
+          </h2>
+          
+          <p className="text-[#8C5D3A] text-base mb-8 leading-relaxed font-medium">
+            {en 
+              ? "This section is currently under maintenance and locked for updates. Please check back later." 
+              : "यह अनुभाग वर्तमान में रखरखाव के अंतर्गत है और अपडेट के लिए लॉक है। कृपया बाद में पुनः प्रयास करें।"}
+          </p>
+
+          <Link
+            to="/"
+            className="inline-flex items-center justify-center w-full px-6 py-3.5 bg-[#E8622A] text-white font-bold rounded-2xl shadow-lg shadow-[#E8622A]/25 hover:shadow-xl hover:shadow-[#E8622A]/35 hover:bg-[#D5531E] transition-all duration-300 gap-2 hover:scale-[1.02]"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            {en ? "Back to Home" : "मुखपृष्ठ पर वापस जाएं"}
+          </Link>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FDF5EC] py-24 px-6 relative overflow-hidden">

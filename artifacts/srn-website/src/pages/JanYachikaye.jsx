@@ -165,7 +165,7 @@ export default function JanYachikaye() {
           </h1>
           <p className="text-[#7A5C45] text-base md:text-lg mt-4 max-w-2xl mx-auto leading-relaxed">
             {en 
-              ? "Showcasing the grievances and public complaints registered by citizens that have been successfully resolved by the Sashakt Rashtra Nirman Trust."
+              ? "Showcasing the grievances and public complaints registered by citizens that have been successfully resolved by the Sashakt Rashtra Nirman."
               : "नागरिकों द्वारा दर्ज की गई उन जन शिकायतों और समस्याओं का प्रदर्शन जिनका सशक्त राष्ट्र निर्माण न्यास द्वारा सफलतापूर्वक समाधान किया गया है।"}
           </p>
           

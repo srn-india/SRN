@@ -27,7 +27,7 @@ export const content = {
       },
       aboutTitle: "About Us",
       aboutTitleHindi: "हमारे बारे में",
-      aboutText: "Sashakt Rashtra Nirman Trust is a national non-profit organization established to empower every section of Indian society through education, health, women empowerment, youth development, environmental protection, and rural-urban development. Founded with a spirit of service and determination, the Trust operates across the entire Indian subcontinent, working at the grassroots level to bring meaningful change in the lives of the underprivileged and marginalized communities.",
+      aboutText: "Sashakt Rashtra Nirman  is a national non-profit organization established to empower every section of Indian society through education, health, women empowerment, youth development, environmental protection, and rural-urban development. Founded with a spirit of service and determination, the Trust operates across the entire Indian subcontinent, working at the grassroots level to bring meaningful change in the lives of the underprivileged and marginalized communities.",
       aboutQuote: "A nation becomes strong only when every individual in society is empowered.",
       aboutQuoteHindi: "जब समाज का प्रत्येक व्यक्ति सशक्त होता है, तभी राष्ट्र सशक्त होता है।",
       visionTitle: "Vision",
@@ -157,9 +157,9 @@ export const content = {
       ],
     },
     uddeshya: {
-      bannerTitle: "Objectives of the Trust",
-      bannerTitleHindi: "न्यास के उद्देश्य",
-      bannerSubtitle: "Sashakt Rashtra Nirman Trust has been established to fulfill the following objectives",
+      bannerTitle: "Objectives of SRN",
+      bannerTitleHindi: "एसआरएन के उद्देश्य",
+      bannerSubtitle: "Sashakt Rashtra Nirman  has been established to fulfill the following objectives",
       objectivesTitle: "Core Objectives",
       objectivesTitleHindi: "मुख्य उद्देश्य",
       objectives: [
@@ -247,7 +247,7 @@ export const content = {
           titleHindi: "सहभागिता एवं सहयोग",
           points: [
             "Work with government bodies, NGOs, educational institutions, CSR units, experts",
-            "Obtain grants, donations, assistance, and support from legal sources for Trust activities",
+            "Obtain grants, donations, assistance, and support from legal sources for SRN's activities",
           ],
         },
         {
@@ -268,7 +268,7 @@ export const content = {
         "Implement welfare programs for upliftment of underprivileged, marginalized, disadvantaged sections",
         "Actively engage youth through leadership development, value-based training, innovation, social participation",
         "Undertake healthcare, sanitation, environmental protection, women empowerment, rural/urban development projects",
-        "Ensure transparency, integrity, financial probity, and accountability in all Trust activities",
+        "Ensure transparency, integrity, financial probity, and accountability in all SRN's activities",
         "Collaborate with government bodies, educational institutions, civil society, experts for effective implementation",
         "Fulfill all objectives responsibly, ethically, in public interest within the legal framework",
       ],
@@ -318,7 +318,7 @@ export const content = {
       npoId: "NPO ID: UP/2026/0964183",
       quickLinks: "Quick Links",
       contact: "Contact",
-      copyright: "© 2026 Sashakt Rashtra Nirman Trust. All rights reserved.",
+      copyright: "© 2026 Sashakt Rashtra Nirman . All rights reserved.",
     },
   },
   hi: {

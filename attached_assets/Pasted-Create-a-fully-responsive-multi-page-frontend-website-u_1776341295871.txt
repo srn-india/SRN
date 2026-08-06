@@ -270,8 +270,8 @@ Values: ईमानदारी/Integrity, पारदर्शिता/Trans
 Page Banner
 
 Same style as Sangathan banner
-Title: न्यास के उद्देश्य / Objectives of the Trust
-Subtitle: Sashakt Rashtra Nirman Trust has been established to fulfill the following objectives
+Title: SRN के उद्देश्य / Objectives of SRN
+Subtitle: Sashakt Rashtra Nirman has been established to fulfill the following objectives
 
 Objectives Accordion Section
 
@@ -354,7 +354,7 @@ Obtain grants, donations, assistance, and support from legal sources for Trust a
 
 Conduct all activities without discrimination based on caste, religion, gender, or region
 Ensure transparency, accountability, ethical conduct, financial integrity in all processes
-Carry out all necessary legal and welfare activities to fulfill Trust objectives
+Carry out all necessary legal and welfare activities to fulfill trusts objectives
 
 
 

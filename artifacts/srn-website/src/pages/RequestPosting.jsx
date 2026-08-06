@@ -216,7 +216,7 @@ export default function RequestPosting() {
           </h1>
           <p className="text-[#7A5C45] text-base md:text-lg mt-4 max-w-2xl mx-auto font-medium leading-relaxed">
             {en 
-              ? "Submit your application request for volunteer executive positions or state/district roles in Sashakt Rashtra Nirman Trust."
+              ? "Submit your application request for volunteer executive positions or state/district roles in Sashakt Rashtra Nirman ."
               : "सशक्त राष्ट्र निर्माण न्यास में स्वयंसेवक कार्यकारी पदों या राज्य/जिला भूमिकाओं के लिए अपना आवेदन अनुरोध सबमिट करें।"}
           </p>
           
@@ -273,7 +273,7 @@ export default function RequestPosting() {
                       : `बधाई हो! "${existingApp.appliedPosition}" के लिए आपका आवेदन स्वीकृत कर लिया गया है। हमारी टीम जल्द ही आपसे संपर्क करेगी।`)
                   : existingApp.status === 'Rejected'
                   ? (en 
-                      ? `Thank you for applying for "${existingApp.appliedPosition}". After careful review, we are unable to proceed with your application at this time. We appreciate your interest in Sashakt Rashtra Nirman Trust.` 
+                      ? `Thank you for applying for "${existingApp.appliedPosition}". After careful review, we are unable to proceed with your application at this time. We appreciate your interest in Sashakt Rashtra Nirman .` 
                       : `"${existingApp.appliedPosition}" के लिए आवेदन करने के लिए धन्यवाद। सावधानीपूर्वक समीक्षा के बाद, हम इस समय आपके आवेदन के साथ आगे बढ़ने में असमर्थ हैं।`)
                   : (en 
                       ? `You have already applied for the position of "${existingApp.appliedPosition}". Your application is currently pending review by our team. We will notify you once a decision is made.` 
@@ -531,7 +531,7 @@ export default function RequestPosting() {
                           {/* Why Join */}
                           <div>
                             <label className="block text-sm font-semibold text-[#1E0F05] mb-2">
-                              {en ? "Why do you want to join Sashakt Rashtra Nirman Trust? *" : "आप सशक्त राष्ट्र निर्माण न्यास में क्यों शामिल होना चाहते हैं? *"}
+                              {en ? "Why do you want to join Sashakt Rashtra Nirman ? *" : "आप सशक्त राष्ट्र निर्माण न्यास में क्यों शामिल होना चाहते हैं? *"}
                             </label>
                             <textarea
                               name="whyJoin"
@@ -635,7 +635,7 @@ export default function RequestPosting() {
                     </h2>
                     <p className="text-[#7A5C45] text-sm md:text-base max-w-md mx-auto mb-8">
                       {en 
-                        ? "Thank you for expressing your interest to hold a position in Sashakt Rashtra Nirman Trust. We will verify your contributions and credentials before getting back to you." 
+                        ? "Thank you for expressing your interest to hold a position in Sashakt Rashtra Nirman . We will verify your contributions and credentials before getting back to you." 
                         : "सशक्त राष्ट्र निर्माण न्यास में पद धारण करने की इच्छा के लिए धन्यवाद। हम आपके क्रेडेंशियल और सामाजिक कार्यों की पुष्टि करने के बाद आपसे संपर्क करेंगे।"}
                     </p>
 
