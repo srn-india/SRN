@@ -1,103 +1,158 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { UserRound } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 
 const bearersData = {
   president: {
-    titleEn: "National President",
     titleHi: "राष्ट्रीय अध्यक्ष",
     members: [
       {
         nameEn: "Dr. Manoj Kumar Shukla",
         nameHi: "डॉ. मनोज कुमार शुक्ला",
         descEn: "National President",
-        descHi: "राष्ट्रीय अध्यक्ष"
+        descHi: "राष्ट्रीय अध्यक्ष",
+        image: "/Dr.Manoj Kumar Shukla sir main.jpeg"
       }
     ]
   },
   vicePresidents: {
-    titleEn: "Vice Presidents",
     titleHi: "राष्ट्रीय उपाध्यक्ष",
     members: [
       {
         nameEn: "Shri Pawan Sharma",
-        nameHi: "श्री पवन शर्मा",
-        descEn: "Lok Sabha TV - Himachal Pradesh",
-        descHi: "लोक सभा टीवी - हिमाचल प्रदेश"
+        nameHi: "डॉ. पवन शर्मा",
+        descEn: "Himachal Pradesh",
+        descHi: "हिमाचल प्रदेश"
       },
       {
         nameEn: "Shri Mukesh Narwal",
         nameHi: "श्री मुकेश नरवाल",
-        descEn: "Ex. Spokesperson, K.M - BJP Haryana",
-        descHi: "पूर्व प्रवक्ता, K.M - भाजपा हरियाणा"
+        descEn: "Haryana",
+        descHi: "हरियाणा"
       },
       {
-        nameEn: "Shri B.K Verma",
-        nameHi: "श्री बी.के. वर्मा",
-        descEn: "President, Delhi-NCR Jewellers Association (Delhi)",
-        descHi: "अध्यक्ष, दिल्ली-एनसीआर ज्वेलर्स एसोसिएशन (दिल्ली)"
+        nameEn: "Shri T. Ammi Reddy",
+        nameHi: "श्री टी. अम्मी रेड्डी",
+        descEn: "Andhra Pradesh",
+        descHi: "आंध्र प्रदेश"
+      },
+      {
+        nameEn: "Shri Balendra Kumar Verma",
+        nameHi: "श्री बालेन्द्र कुमार वर्मा",
+        descEn: "Delhi, NCR",
+        descHi: "दिल्ली, एनसीआर"
       },
       {
         nameEn: "Shri Bhola Pahlwan",
         nameHi: "श्री भोला पहलवान",
-        descEn: "General Secretary, Kisan Union (West UP)",
-        descHi: "महासचिव, किसान यूनियन (पश्चिम उ.प्र.)"
+        descEn: "Uttar Pradesh",
+        descHi: "उत्तर प्रदेश"
+      }
+    ]
+  },
+  seniorGeneralSecretary: {
+    titleHi: "मुख्य महासचिव",
+    members: [
+      {
+        nameEn: "Shri B.K. Shukla",
+        nameHi: "श्री बी.के. शुक्ला",
+        descEn: "",
+        descHi: ""
       }
     ]
   },
   generalSecretaries: {
-    titleEn: "General Secretaries",
     titleHi: "राष्ट्रीय महासचिव",
     members: [
       {
-        nameEn: "Shri K.S Awasthi",
-        nameHi: "श्री के.एस. अवस्थी",
-        descEn: "Ex. Bureaucrat & OSD (Uttar Pradesh)",
-        descHi: "पूर्व नौकरशाह एवं ओएसडी (उत्तर प्रदेश)"
+        nameEn: "Shri Kirti Shankar Awasthi",
+        nameHi: "श्री कीर्ति शंकर अवस्थी",
+        descEn: "Uttar Pradesh",
+        descHi: "उत्तर प्रदेश"
       },
       {
         nameEn: "Shri Alok Kumar",
         nameHi: "श्री आलोक कुमार",
-        descEn: "Renowned News Anchor & Editor, Sayonjit (Bihar)",
-        descHi: "प्रख्यात समाचार एंकर एवं संपादक, सायुंज्य (बिहार)"
+        descEn: "Bihar",
+        descHi: "बिहार"
       }
     ]
   },
   secretaries: {
-    titleEn: "Secretaries",
     titleHi: "राष्ट्रीय सचिव",
     members: [
       {
-        nameEn: "Shri Kripa Shankar",
-        nameHi: "श्री कृपा शंकर",
-        descEn: "Ex. Secretary, INC (Uttar Pradesh)",
-        descHi: "पूर्व सचिव, कांग्रेस (उत्तर प्रदेश)"
+        nameEn: "Advocate Kripa Shankar",
+        nameHi: "अधिवक्ता कृपा शंकर",
+        descEn: "Delhi",
+        descHi: "दिल्ली"
       },
       {
         nameEn: "Shri Vikash Shankar",
-        nameHi: "श्री विकास शंकर",
-        descEn: "Spokesperson, VHP Delhi & Entrepreneur",
-        descHi: "प्रवक्ता, विहिप दिल्ली एवं उद्यमी"
+        nameHi: "श्री विकाश शंकर",
+        descEn: "Uttarakhand",
+        descHi: "उत्तराखंड"
       },
       {
         nameEn: "Shri Rajesh Mehta",
         nameHi: "श्री राजेश मेहता",
-        descEn: "President, Badrinath Hotel Association (Uttarakhand)",
-        descHi: "अध्यक्ष, बद्रीनाथ होटल एसोसिएशन (उत्तराखंड)"
-      },
-      {
-        nameEn: "Shri Krishnendu Dhananjaya",
-        nameHi: "श्री कृष्णेंदु धनंजय",
-        descEn: "Social Worker, Tirupati (Andhra Pradesh)",
-        descHi: "सामाजिक कार्यकर्ता, तिरुपति (आंध्र प्रदेश)"
+        descEn: "Uttarakhand",
+        descHi: "उत्तराखंड"
       }
     ]
   },
   jointSecretaries: {
-    titleEn: "Joint Secretaries",
     titleHi: "राष्ट्रीय सह-सचिव",
-    members: [] // Show placeholder
+    members: [
+      {
+        nameEn: "Shri Krishnadu Dhananjaya",
+        nameHi: "श्री कृष्णदु धनंजय",
+        descEn: "Andhra Pradesh",
+        descHi: "आंध्र प्रदेश"
+      }
+    ]
+  },
+  advisory: {
+    titleHi: "सलाहकार",
+    members: [
+      {
+        nameEn: "Shailendra Kumar Joshi, IAS",
+        nameHi: "शैलेन्द्र कुमार जोशी, आईएएस",
+        descEn: "",
+        descHi: ""
+      },
+      {
+        nameEn: "Bibhuti Bhusan Pradhan",
+        nameHi: "विभूति भूषण प्रधान",
+        descEn: "",
+        descHi: ""
+      },
+      {
+        nameEn: "B.L. Kotriwala",
+        nameHi: "बी.एल. कोटरीवाला",
+        descEn: "",
+        descHi: ""
+      },
+      {
+        nameEn: "Arun Kumar Shukla",
+        nameHi: "अरुण कुमार शुक्ल",
+        descEn: "",
+        descHi: ""
+      },
+      {
+        nameEn: "Vinod Kohali",
+        nameHi: "विनोद कोहली",
+        descEn: "",
+        descHi: ""
+      },
+      {
+        nameEn: "Niraj Singh",
+        nameHi: "नीरज सिंह",
+        descEn: "",
+        descHi: ""
+      }
+    ]
   }
 };
 
@@ -105,6 +160,7 @@ function MemberCard({ member, lang }) {
   const en = lang === "en";
   const name = en ? member.nameEn : member.nameHi;
   const desc = en ? member.descEn : member.descHi;
+  const [imageError, setImageError] = useState(false);
 
   return (
     <motion.div
@@ -114,22 +170,35 @@ function MemberCard({ member, lang }) {
       transition={{ duration: 0.5 }}
       className="flex flex-col items-center text-center w-full max-w-[210px] group"
     >
-      {/* 3:4 Aspect Ratio Blank Space Placeholder */}
+      {/* 3:4 Aspect Ratio Image/Placeholder */}
       <div className="w-full aspect-[3/4] rounded-2xl bg-white border border-[#E8D5B8] flex flex-col items-center justify-center relative overflow-hidden transition-all duration-300 group-hover:border-[#E8622A]/40 group-hover:shadow-md">
-        <div className="absolute inset-0 bg-[#FDF5EC]/30 pointer-events-none" />
-        <UserRound className="w-12 h-12 text-[#B89070]/30 transition-transform duration-300 group-hover:scale-105" />
-        <span className="text-[10px] uppercase tracking-widest text-[#B89070]/40 font-bold mt-2 select-none">
-          {en ? "No Image" : "चित्र नहीं है"}
-        </span>
+        {member.image && !imageError ? (
+          <img
+            src={member.image}
+            alt={name}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <>
+            <div className="absolute inset-0 bg-[#FDF5EC]/30 pointer-events-none" />
+            <UserRound className="w-12 h-12 text-[#B89070]/30 transition-transform duration-300 group-hover:scale-105" />
+            <span className="text-[10px] uppercase tracking-widest text-[#B89070]/40 font-bold mt-2 select-none">
+              {en ? "No Image" : "चित्र नहीं है"}
+            </span>
+          </>
+        )}
       </div>
 
       {/* Name and Designation */}
       <h3 className="mt-4 text-base md:text-lg font-bold font-serif text-[#2C1810] leading-tight transition-colors duration-300 group-hover:text-[#E8622A]">
         {name}
       </h3>
-      <p className="mt-1 text-xs md:text-sm text-[#7A5C45] font-medium leading-normal">
-        {desc}
-      </p>
+      {desc && (
+        <p className="mt-1 text-xs md:text-sm text-[#7A5C45] font-medium leading-normal">
+          {desc}
+        </p>
+      )}
     </motion.div>
   );
 }
@@ -190,7 +259,7 @@ export default function NationalOfficeBearers() {
           <div className="inline-flex items-center gap-3 mb-10 border-b border-[#E8622A]/20 pb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
             <h2 className="text-xl md:text-2xl font-bold font-serif text-[#5C1010] tracking-wide">
-              {en ? bearersData.president.titleEn : bearersData.president.titleHi}
+              {bearersData.president.titleHi}
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
@@ -206,23 +275,39 @@ export default function NationalOfficeBearers() {
           <div className="inline-flex items-center gap-3 mb-10 border-b border-[#E8622A]/20 pb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
             <h2 className="text-xl md:text-2xl font-bold font-serif text-[#5C1010] tracking-wide">
-              {en ? bearersData.vicePresidents.titleEn : bearersData.vicePresidents.titleHi}
+              {bearersData.vicePresidents.titleHi}
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 w-full justify-items-center justify-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 md:gap-12 w-full justify-items-center justify-center">
             {bearersData.vicePresidents.members.map((member, i) => (
               <MemberCard key={i} member={member} lang={lang} />
             ))}
           </div>
         </section>
 
-        {/* 3. General Secretaries */}
+        {/* 3. Senior General Secretary */}
         <section className="flex flex-col items-center">
           <div className="inline-flex items-center gap-3 mb-10 border-b border-[#E8622A]/20 pb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
             <h2 className="text-xl md:text-2xl font-bold font-serif text-[#5C1010] tracking-wide">
-              {en ? bearersData.generalSecretaries.titleEn : bearersData.generalSecretaries.titleHi}
+              {bearersData.seniorGeneralSecretary.titleHi}
+            </h2>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
+          </div>
+          <div className="flex justify-center w-full">
+            {bearersData.seniorGeneralSecretary.members.map((member, i) => (
+              <MemberCard key={i} member={member} lang={lang} />
+            ))}
+          </div>
+        </section>
+
+        {/* 4. General Secretaries */}
+        <section className="flex flex-col items-center">
+          <div className="inline-flex items-center gap-3 mb-10 border-b border-[#E8622A]/20 pb-3">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
+            <h2 className="text-xl md:text-2xl font-bold font-serif text-[#5C1010] tracking-wide">
+              {bearersData.generalSecretaries.titleHi}
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
@@ -233,43 +318,52 @@ export default function NationalOfficeBearers() {
           </div>
         </section>
 
-        {/* 4. Secretaries */}
+        {/* 5. Secretaries */}
         <section className="flex flex-col items-center">
           <div className="inline-flex items-center gap-3 mb-10 border-b border-[#E8622A]/20 pb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
             <h2 className="text-xl md:text-2xl font-bold font-serif text-[#5C1010] tracking-wide">
-              {en ? bearersData.secretaries.titleEn : bearersData.secretaries.titleHi}
+              {bearersData.secretaries.titleHi}
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 w-full justify-items-center justify-center">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-12 w-full justify-items-center justify-center max-w-3xl">
             {bearersData.secretaries.members.map((member, i) => (
               <MemberCard key={i} member={member} lang={lang} />
             ))}
           </div>
         </section>
 
-        {/* 5. Joint Secretaries */}
+        {/* 6. Joint Secretaries */}
         <section className="flex flex-col items-center">
-          <div className="inline-flex items-center gap-3 mb-8 border-b border-[#E8622A]/20 pb-3">
+          <div className="inline-flex items-center gap-3 mb-10 border-b border-[#E8622A]/20 pb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
             <h2 className="text-xl md:text-2xl font-bold font-serif text-[#5C1010] tracking-wide">
-              {en ? bearersData.jointSecretaries.titleEn : bearersData.jointSecretaries.titleHi}
+              {bearersData.jointSecretaries.titleHi}
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="w-full max-w-md bg-white/40 border border-dashed border-[#E8D5B8] rounded-2xl p-6 text-center shadow-sm"
-          >
-            <p className="text-sm font-medium text-[#7A5C45]/80 italic">
-              {en 
-                ? "Nominations are currently underway. Office bearers list will be updated soon." 
-                : "मनोनयन प्रक्रिया वर्तमान में गतिमान है। पदाधिकारियों की सूची शीघ्र ही अपडेट की जाएगी।"}
-            </p>
-          </motion.div>
+          <div className="grid grid-cols-1 gap-8 md:gap-12 w-full justify-items-center justify-center">
+            {bearersData.jointSecretaries.members.map((member, i) => (
+              <MemberCard key={i} member={member} lang={lang} />
+            ))}
+          </div>
+        </section>
+
+        {/* 7. Advisory */}
+        <section className="flex flex-col items-center">
+          <div className="inline-flex items-center gap-3 mb-10 border-b border-[#E8622A]/20 pb-3">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
+            <h2 className="text-xl md:text-2xl font-bold font-serif text-[#5C1010] tracking-wide">
+              {bearersData.advisory.titleHi}
+            </h2>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 w-full justify-items-center justify-center max-w-4xl mx-auto">
+            {bearersData.advisory.members.map((member, i) => (
+              <MemberCard key={i} member={member} lang={lang} />
+            ))}
+          </div>
         </section>
 
       </div>
