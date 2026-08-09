@@ -23,31 +23,36 @@ const bearersData = {
         nameEn: "Shri Pawan Sharma",
         nameHi: "डॉ. पवन शर्मा",
         descEn: "Himachal Pradesh",
-        descHi: "हिमाचल प्रदेश"
+        descHi: "हिमाचल प्रदेश",
+        image: "/national_bearers/pawan_sharma.jpeg"
       },
       {
         nameEn: "Shri Mukesh Narwal",
         nameHi: "श्री मुकेश नरवाल",
         descEn: "Haryana",
-        descHi: "हरियाणा"
+        descHi: "हरियाणा",
+        image: "/national_bearers/mukesh_narwal.jpeg"
       },
       {
         nameEn: "Shri T. Ammi Reddy",
         nameHi: "श्री टी. अम्मी रेड्डी",
         descEn: "Andhra Pradesh",
-        descHi: "आंध्र प्रदेश"
+        descHi: "आंध्र प्रदेश",
+        image: "/national_bearers/t-reddy.jpeg"
       },
       {
         nameEn: "Shri Balendra Kumar Verma",
         nameHi: "श्री बालेन्द्र कुमार वर्मा",
         descEn: "Delhi, NCR",
-        descHi: "दिल्ली, एनसीआर"
+        descHi: "दिल्ली, एनसीआर",
+        image: "/national_bearers/balendra-kumar-verma.jpeg"
       },
       {
         nameEn: "Shri Bhola Pahlwan",
         nameHi: "श्री भोला पहलवान",
         descEn: "Uttar Pradesh",
-        descHi: "उत्तर प्रदेश"
+        descHi: "उत्तर प्रदेश",
+        image: "/national_bearers/bhola-pahalwan.jpeg"
       }
     ]
   },
@@ -58,7 +63,8 @@ const bearersData = {
         nameEn: "Shri B.K. Shukla",
         nameHi: "श्री बी.के. शुक्ला",
         descEn: "",
-        descHi: ""
+        descHi: "",
+        image: "/national_bearers/b-k-shukla.jpeg"
       }
     ]
   },
@@ -69,13 +75,15 @@ const bearersData = {
         nameEn: "Shri Kirti Shankar Awasthi",
         nameHi: "श्री कीर्ति शंकर अवस्थी",
         descEn: "Uttar Pradesh",
-        descHi: "उत्तर प्रदेश"
+        descHi: "उत्तर प्रदेश",
+        image: "/national_bearers/kirti-shankar-awasthi.jpeg"
       },
       {
         nameEn: "Shri Alok Kumar",
         nameHi: "श्री आलोक कुमार",
         descEn: "Bihar",
-        descHi: "बिहार"
+        descHi: "बिहार",
+        image: "/national_bearers/alok-kumar.jpeg"
       }
     ]
   },
@@ -86,19 +94,22 @@ const bearersData = {
         nameEn: "Advocate Kripa Shankar",
         nameHi: "अधिवक्ता कृपा शंकर",
         descEn: "Delhi",
-        descHi: "दिल्ली"
+        descHi: "दिल्ली",
+        image: "/national_bearers/adhivakta-kripa-shankar.jpeg"
       },
       {
         nameEn: "Shri Vikash Shankar",
         nameHi: "श्री विकाश शंकर",
         descEn: "Uttarakhand",
-        descHi: "उत्तराखंड"
+        descHi: "उत्तराखंड",
+        image: "/national_bearers/vikas-shankar.jpeg"
       },
       {
         nameEn: "Shri Rajesh Mehta",
         nameHi: "श्री राजेश मेहता",
         descEn: "Uttarakhand",
-        descHi: "उत्तराखंड"
+        descHi: "उत्तराखंड",
+        image: "/national_bearers/rajesh-mehta.jpeg"
       }
     ]
   },
@@ -109,7 +120,8 @@ const bearersData = {
         nameEn: "Shri Krishnadu Dhananjaya",
         nameHi: "श्री कृष्णदु धनंजय",
         descEn: "Andhra Pradesh",
-        descHi: "आंध्र प्रदेश"
+        descHi: "आंध्र प्रदेश",
+        image: "/national_bearers/krishnadu-dhananjaya.jpeg"
       }
     ]
   },
@@ -120,37 +132,43 @@ const bearersData = {
         nameEn: "Shailendra Kumar Joshi, IAS",
         nameHi: "शैलेन्द्र कुमार जोशी, आईएएस",
         descEn: "",
-        descHi: ""
+        descHi: "",
+        image: "/national_bearers/shailendra-kumar-joshi.jpeg"
       },
       {
         nameEn: "Bibhuti Bhusan Pradhan",
         nameHi: "विभूति भूषण प्रधान",
         descEn: "",
-        descHi: ""
+        descHi: "",
+        image: "/national_bearers/bibuthi-bhusan-pradhan.jpeg"
       },
       {
         nameEn: "B.L. Kotriwala",
         nameHi: "बी.एल. कोटरीवाला",
         descEn: "",
-        descHi: ""
+        descHi: "",
+        image: "/national_bearers/b-l-kotriwala.jpeg"
       },
       {
         nameEn: "Arun Kumar Shukla",
         nameHi: "अरुण कुमार शुक्ल",
         descEn: "",
-        descHi: ""
+        descHi: "",
+        image: "/national_bearers/arun-kumar-shukla.jpeg"
       },
       {
         nameEn: "Vinod Kohali",
         nameHi: "विनोद कोहली",
         descEn: "",
-        descHi: ""
+        descHi: "",
+        image: "/national_bearers/vinod-kohali.jpeg"
       },
       {
         nameEn: "Niraj Singh",
         nameHi: "नीरज सिंह",
         descEn: "",
-        descHi: ""
+        descHi: "",
+        image: "/national_bearers/niraj-singh.jpeg"
       }
     ]
   }
@@ -252,11 +270,11 @@ export default function NationalOfficeBearers() {
       </section>
 
       {/* ── Sections and grids ───────────────────────────────────────── */}
-      <div className="max-w-6xl mx-auto px-6 py-16 relative z-10 space-y-20">
+      <div className="max-w-6xl mx-auto px-6 py-16 relative z-10 space-y-14">
         
         {/* 1. National President */}
         <section className="flex flex-col items-center">
-          <div className="inline-flex items-center gap-3 mb-10 border-b border-[#E8622A]/20 pb-3">
+          <div className="inline-flex items-center gap-3 mb-6 border-b border-[#E8622A]/20 pb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
             <h2 className="text-xl md:text-2xl font-bold font-serif text-[#5C1010] tracking-wide">
               {bearersData.president.titleHi}
@@ -272,7 +290,7 @@ export default function NationalOfficeBearers() {
 
         {/* 2. Vice Presidents */}
         <section className="flex flex-col items-center">
-          <div className="inline-flex items-center gap-3 mb-10 border-b border-[#E8622A]/20 pb-3">
+          <div className="inline-flex items-center gap-3 mb-6 border-b border-[#E8622A]/20 pb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
             <h2 className="text-xl md:text-2xl font-bold font-serif text-[#5C1010] tracking-wide">
               {bearersData.vicePresidents.titleHi}
@@ -288,7 +306,7 @@ export default function NationalOfficeBearers() {
 
         {/* 3. Senior General Secretary */}
         <section className="flex flex-col items-center">
-          <div className="inline-flex items-center gap-3 mb-10 border-b border-[#E8622A]/20 pb-3">
+          <div className="inline-flex items-center gap-3 mb-6 border-b border-[#E8622A]/20 pb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
             <h2 className="text-xl md:text-2xl font-bold font-serif text-[#5C1010] tracking-wide">
               {bearersData.seniorGeneralSecretary.titleHi}
@@ -304,7 +322,7 @@ export default function NationalOfficeBearers() {
 
         {/* 4. General Secretaries */}
         <section className="flex flex-col items-center">
-          <div className="inline-flex items-center gap-3 mb-10 border-b border-[#E8622A]/20 pb-3">
+          <div className="inline-flex items-center gap-3 mb-6 border-b border-[#E8622A]/20 pb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
             <h2 className="text-xl md:text-2xl font-bold font-serif text-[#5C1010] tracking-wide">
               {bearersData.generalSecretaries.titleHi}
@@ -320,7 +338,7 @@ export default function NationalOfficeBearers() {
 
         {/* 5. Secretaries */}
         <section className="flex flex-col items-center">
-          <div className="inline-flex items-center gap-3 mb-10 border-b border-[#E8622A]/20 pb-3">
+          <div className="inline-flex items-center gap-3 mb-6 border-b border-[#E8622A]/20 pb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
             <h2 className="text-xl md:text-2xl font-bold font-serif text-[#5C1010] tracking-wide">
               {bearersData.secretaries.titleHi}
@@ -336,7 +354,7 @@ export default function NationalOfficeBearers() {
 
         {/* 6. Joint Secretaries */}
         <section className="flex flex-col items-center">
-          <div className="inline-flex items-center gap-3 mb-10 border-b border-[#E8622A]/20 pb-3">
+          <div className="inline-flex items-center gap-3 mb-6 border-b border-[#E8622A]/20 pb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
             <h2 className="text-xl md:text-2xl font-bold font-serif text-[#5C1010] tracking-wide">
               {bearersData.jointSecretaries.titleHi}
@@ -352,7 +370,7 @@ export default function NationalOfficeBearers() {
 
         {/* 7. Advisory */}
         <section className="flex flex-col items-center">
-          <div className="inline-flex items-center gap-3 mb-10 border-b border-[#E8622A]/20 pb-3">
+          <div className="inline-flex items-center gap-3 mb-6 border-b border-[#E8622A]/20 pb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
             <h2 className="text-xl md:text-2xl font-bold font-serif text-[#5C1010] tracking-wide">
               {bearersData.advisory.titleHi}
