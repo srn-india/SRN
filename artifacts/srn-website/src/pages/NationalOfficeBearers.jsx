@@ -56,21 +56,16 @@ const bearersData = {
       }
     ]
   },
-  seniorGeneralSecretary: {
-    titleHi: "मुख्य महासचिव",
+  generalSecretaries: {
+    titleHi: "राष्ट्रीय महासचिव",
     members: [
       {
         nameEn: "Shri B.K. Shukla",
         nameHi: "श्री बी.के. शुक्ला",
-        descEn: "",
-        descHi: "",
+        descEn: "मुख्य महासचिव",
+        descHi: "मुख्य महासचिव",
         image: "/national_bearers/b-k-shukla.jpeg"
-      }
-    ]
-  },
-  generalSecretaries: {
-    titleHi: "राष्ट्रीय महासचिव",
-    members: [
+      },
       {
         nameEn: "Shri Kirti Shankar Awasthi",
         nameHi: "श्री कीर्ति शंकर अवस्थी",
@@ -257,22 +252,6 @@ export default function NationalOfficeBearers() {
           </div>
         </section>
 
-        {/* 3. Senior General Secretary */}
-        <section className="flex flex-col items-center">
-          <div className="inline-flex items-center gap-3 mb-6 border-b border-[#E8622A]/20 pb-3">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
-            <h2 className="text-xl md:text-2xl font-bold font-serif text-[#5C1010] tracking-wide">
-              {bearersData.seniorGeneralSecretary.titleHi}
-            </h2>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
-          </div>
-          <div className="flex justify-center w-full">
-            {bearersData.seniorGeneralSecretary.members.map((member, i) => (
-              <MemberCard key={i} member={member} lang={lang} />
-            ))}
-          </div>
-        </section>
-
         {/* 4. General Secretaries */}
         <section className="flex flex-col items-center">
           <div className="inline-flex items-center gap-3 mb-6 border-b border-[#E8622A]/20 pb-3">
@@ -282,7 +261,7 @@ export default function NationalOfficeBearers() {
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12 w-full justify-items-center justify-center max-w-xl">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-12 w-full justify-items-center justify-center max-w-3xl">
             {bearersData.generalSecretaries.members.map((member, i) => (
               <MemberCard key={i} member={member} lang={lang} />
             ))}
