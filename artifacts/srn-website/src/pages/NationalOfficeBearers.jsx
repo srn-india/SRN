@@ -124,53 +124,6 @@ const bearersData = {
         image: "/national_bearers/krishnadu-dhananjaya.jpeg"
       }
     ]
-  },
-  advisory: {
-    titleHi: "सलाहकार",
-    members: [
-      {
-        nameEn: "Shailendra Kumar Joshi, IAS",
-        nameHi: "शैलेन्द्र कुमार जोशी, आईएएस",
-        descEn: "",
-        descHi: "",
-        image: "/national_bearers/shailendra-kumar-joshi.jpeg"
-      },
-      {
-        nameEn: "Bibhuti Bhusan Pradhan",
-        nameHi: "विभूति भूषण प्रधान",
-        descEn: "",
-        descHi: "",
-        image: "/national_bearers/bibuthi-bhusan-pradhan.jpeg"
-      },
-      {
-        nameEn: "B.L. Kotriwala",
-        nameHi: "बी.एल. कोटरीवाला",
-        descEn: "",
-        descHi: "",
-        image: "/national_bearers/b-l-kotriwala.jpeg"
-      },
-      {
-        nameEn: "Arun Kumar Shukla",
-        nameHi: "अरुण कुमार शुक्ल",
-        descEn: "",
-        descHi: "",
-        image: "/national_bearers/arun-kumar-shukla.jpeg"
-      },
-      {
-        nameEn: "Vinod Kohali",
-        nameHi: "विनोद कोहली",
-        descEn: "",
-        descHi: "",
-        image: "/national_bearers/vinod-kohali.jpeg"
-      },
-      {
-        nameEn: "Niraj Singh",
-        nameHi: "नीरज सिंह",
-        descEn: "",
-        descHi: "",
-        image: "/national_bearers/niraj-singh.jpeg"
-      }
-    ]
   }
 };
 
@@ -363,22 +316,6 @@ export default function NationalOfficeBearers() {
           </div>
           <div className="grid grid-cols-1 gap-8 md:gap-12 w-full justify-items-center justify-center">
             {bearersData.jointSecretaries.members.map((member, i) => (
-              <MemberCard key={i} member={member} lang={lang} />
-            ))}
-          </div>
-        </section>
-
-        {/* 7. Advisory */}
-        <section className="flex flex-col items-center">
-          <div className="inline-flex items-center gap-3 mb-6 border-b border-[#E8622A]/20 pb-3">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
-            <h2 className="text-xl md:text-2xl font-bold font-serif text-[#5C1010] tracking-wide">
-              {bearersData.advisory.titleHi}
-            </h2>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 w-full justify-items-center justify-center max-w-4xl mx-auto">
-            {bearersData.advisory.members.map((member, i) => (
               <MemberCard key={i} member={member} lang={lang} />
             ))}
           </div>
