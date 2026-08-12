@@ -60,13 +60,6 @@ const bearersData = {
     titleHi: "राष्ट्रीय महासचिव",
     members: [
       {
-        nameEn: "Shri B.K. Shukla",
-        nameHi: "श्री बी.के. शुक्ला",
-        descEn: "मुख्य महासचिव",
-        descHi: "मुख्य महासचिव",
-        image: "/national_bearers/b-k-shukla.jpeg"
-      },
-      {
         nameEn: "Shri Kirti Shankar Awasthi",
         nameHi: "श्री कीर्ति शंकर अवस्थी",
         descEn: "Uttar Pradesh",
@@ -79,6 +72,13 @@ const bearersData = {
         descEn: "Bihar",
         descHi: "बिहार",
         image: "/national_bearers/alok-kumar.jpeg"
+      },
+      {
+        nameEn: "Shri B.K. Shukla",
+        nameHi: "श्री बी.के. शुक्ला",
+        descEn: "मुख्य महासचिव",
+        descHi: "मुख्य महासचिव",
+        image: "/national_bearers/b-k-shukla.jpeg"
       }
     ]
   },
