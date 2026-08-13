@@ -20,10 +20,10 @@ const bearersData = {
     titleHi: "राष्ट्रीय उपाध्यक्ष",
     members: [
       {
-        nameEn: "Shri Pawan Sharma",
-        nameHi: "डॉ. पवन शर्मा",
-        descEn: "Himachal Pradesh",
-        descHi: "हिमाचल प्रदेश",
+        nameEn: "Dr. Pawan K Sharma",
+        nameHi: "डॉ. पवन के. शर्मा",
+        descEn: "B.Sc. (Computers), B.Ed, BJMC, MJMC, PhD",
+        descHi: "बी.एससी. (कंप्यूटर्स), बी.एड., बी.जे.एम.सी., एम.जे.एम.सी., पीएच.डी.",
         image: "/national_bearers/pawan_sharma.jpeg"
       },
       {
