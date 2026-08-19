@@ -147,6 +147,7 @@ export default function Donate() {
     }
   };
 
+
   return (
     <div className="min-h-screen bg-[#FDF5EC] py-24 px-6 relative overflow-hidden">
       {/* Background Decor */}
@@ -345,13 +346,7 @@ export default function Donate() {
         onClose={() => setIsModalOpen(false)} 
         onComplete={() => {
           setIsModalOpen(false);
-          // Simulate successful payment directly after modal completes
-          setSubmitted(true);
-          setTimeout(() => {
-            setSubmitted(false);
-            setAmount(1000);
-            setCustomAmount("");
-          }, 4000);
+          // Allow user to click 'Make a Secure Donation' again manually
         }} 
       />
     </div>

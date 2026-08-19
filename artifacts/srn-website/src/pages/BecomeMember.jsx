@@ -21,6 +21,7 @@ export default function BecomeMember() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [currentStep, setCurrentStep] = useState(1);
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     firstName: user?.firstName || "", 
     lastName: user?.lastName || "", 
@@ -51,21 +52,40 @@ export default function BecomeMember() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (errors[e.target.name]) {
+      setErrors({ ...errors, [e.target.name]: false });
+    }
   };
 
-  const handleNext = () => setCurrentStep((prev) => Math.min(prev + 1, steps.length));
+  const handleNext = () => {
+    let newErrors = {};
+    if (currentStep === 1) {
+      if (!formData.firstName) newErrors.firstName = true;
+      if (!formData.lastName) newErrors.lastName = true;
+      if (!formData.email) newErrors.email = true;
+      if (!formData.phone) newErrors.phone = true;
+      
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        return;
+      }
+    }
+    if (currentStep === 2) {
+      if (!formData.state) newErrors.state = true;
+      if (!formData.city) newErrors.city = true;
+      
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        return;
+      }
+    }
+    setCurrentStep((prev) => Math.min(prev + 1, steps.length));
+  };
   const handlePrev = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (
-      !user ||
-      !formData.firstName ||
-      !formData.lastName ||
-      !formData.phone ||
-      !formData.state ||
-      !formData.city
-    ) {
+    if (!user || !user.profilePicture) {
       setIsModalOpen(true);
       return;
     }
@@ -169,8 +189,13 @@ export default function BecomeMember() {
     }
   };
 
-  const inputClass = "w-full px-5 py-4 rounded-xl bg-white/60 border border-[#E8D5B8]/80 text-[#2C1810] placeholder-[#B89070] focus:outline-none focus:ring-2 focus:ring-[#E8622A]/50 focus:border-[#E8622A] shadow-sm backdrop-blur-sm transition-all";
+  const getInputClass = (fieldName) => `w-full px-5 py-4 rounded-xl bg-white/60 text-[#2C1810] placeholder-[#B89070] focus:outline-none focus:ring-2 shadow-sm backdrop-blur-sm transition-all ${
+    errors[fieldName] 
+      ? "border-2 border-red-500 focus:ring-red-500/50" 
+      : "border border-[#E8D5B8]/80 focus:ring-[#E8622A]/50 focus:border-[#E8622A]"
+  }`;
   const labelClass = "block text-xs font-bold text-[#5C3A1E] uppercase tracking-wider mb-2 ml-1";
+
 
   return (
     <div className="min-h-screen bg-[#FDF5EC] py-24 px-6 relative overflow-hidden font-sans selection:bg-[#E8622A] selection:text-white">
@@ -312,11 +337,11 @@ export default function BecomeMember() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div>
                             <label className={labelClass}>{en ? "First Name" : "पहला नाम"} *</label>
-                            <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} className={inputClass} placeholder="John" />
+                            <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} className={getInputClass("firstName")} placeholder="John" />
                           </div>
                           <div>
                             <label className={labelClass}>{en ? "Last Name" : "अंतिम नाम"} *</label>
-                            <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} className={inputClass} placeholder="Doe" />
+                            <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} className={getInputClass("lastName")} placeholder="Doe" />
                           </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -324,13 +349,13 @@ export default function BecomeMember() {
                             <label className={labelClass}>
                               <span className="flex items-center gap-2"><Mail className="w-3.5 h-3.5" /> {en ? "Email Address" : "ईमेल"} *</span>
                             </label>
-                            <input type="email" name="email" value={formData.email} onChange={handleChange} className={inputClass} placeholder="john@example.com" />
+                            <input type="email" name="email" value={formData.email} onChange={handleChange} className={getInputClass("email")} placeholder="john@example.com" />
                           </div>
                           <div>
                             <label className={labelClass}>
                               <span className="flex items-center gap-2"><Phone className="w-3.5 h-3.5" /> {en ? "Phone Number" : "फ़ोन नंबर"} *</span>
                             </label>
-                            <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className={inputClass} placeholder="+91 98765 43210" />
+                            <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className={getInputClass("phone")} placeholder="+91 98765 43210" />
                           </div>
                         </div>
                       </div>
@@ -351,21 +376,21 @@ export default function BecomeMember() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div>
                             <label className={labelClass}>{en ? "State" : "राज्य"} *</label>
-                            <input type="text" name="state" value={formData.state} onChange={handleChange} className={inputClass} placeholder="Maharashtra" />
+                            <input type="text" name="state" value={formData.state} onChange={handleChange} className={getInputClass("state")} placeholder="Maharashtra" />
                           </div>
                           <div>
                             <label className={labelClass}>{en ? "City / District" : "शहर / जिला"} *</label>
-                            <input type="text" name="city" value={formData.city} onChange={handleChange} className={inputClass} placeholder="Mumbai" />
+                            <input type="text" name="city" value={formData.city} onChange={handleChange} className={getInputClass("city")} placeholder="Mumbai" />
                           </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div>
                             <label className={labelClass}>{en ? "Profession" : "पेशा"}</label>
-                            <input type="text" name="profession" value={formData.profession} onChange={handleChange} className={inputClass} placeholder="Software Engineer" />
+                            <input type="text" name="profession" value={formData.profession} onChange={handleChange} className={getInputClass("profession")} placeholder="Software Engineer" />
                           </div>
                           <div>
                             <label className={labelClass}>{en ? "Area of Interest" : "रुचि का क्षेत्र"}</label>
-                            <select name="interest" value={formData.interest} onChange={handleChange} className={inputClass}>
+                            <select name="interest" value={formData.interest} onChange={handleChange} className={getInputClass("interest")}>
                               <option value="volunteer">{en ? "Active Volunteer" : "सक्रिय स्वयंसेवक"}</option>
                               <option value="leadership">{en ? "Leadership & Strategy" : "नेतृत्व और रणनीति"}</option>
                               <option value="donor">{en ? "Donor / Supporter" : "दानकर्ता / समर्थक"}</option>
@@ -455,7 +480,7 @@ export default function BecomeMember() {
         onClose={() => setIsModalOpen(false)} 
         onComplete={() => {
           setIsModalOpen(false);
-          setSubmitted(true);
+          // Wait briefly for AuthContext to sync before they click 'Pay' again
         }} 
       />
     </div>
