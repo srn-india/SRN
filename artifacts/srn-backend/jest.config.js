@@ -9,4 +9,5 @@ module.exports = {
   resetModules: true,
   restoreMocks: true,
   setupFiles: ['<rootDir>/jest.setup.js'],
+  transformIgnorePatterns: ['node_modules/(?!(sanitize-html)/)'],
 };

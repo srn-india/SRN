@@ -1,9 +1,15 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.SUPABASE_URL || '';
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
-const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
+let supabase: SupabaseClient | null = null;
+function getSupabase() {
+  if (!supabase) {
+    supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
+  }
+  return supabase;
+}
 
 const BUCKET = 'payment-reports';
 const SIGNED_URL_EXPIRY_SECONDS = 30 * 24 * 60 * 60; // 30 days
@@ -19,9 +25,11 @@ export async function uploadPaymentReport(filename: string, buffer: Buffer): Pro
     throw new Error('Supabase credentials are not configured in environment variables.');
   }
 
+  const client = getSupabase();
+
   const path = `reports/${filename}`;
 
-  const { error: uploadError } = await supabase.storage
+  const { error: uploadError } = await client.storage
     .from(BUCKET)
     .upload(path, buffer, {
       contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -32,7 +40,7 @@ export async function uploadPaymentReport(filename: string, buffer: Buffer): Pro
     throw new Error(`Failed to upload payment report: ${uploadError.message}`);
   }
 
-  const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+  const { data: signedUrlData, error: signedUrlError } = await client.storage
     .from(BUCKET)
     .createSignedUrl(path, SIGNED_URL_EXPIRY_SECONDS);
 
