@@ -227,5 +227,8 @@ export const verifyPayment = async (paymentData: { razorpay_order_id: string, ra
     notifyUserOfPayment(paymentDetails).catch(console.error);
   }
 
+  // 4. Artificial delay to allow the loading UI to display and background tasks to boot
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
   return result;
 };

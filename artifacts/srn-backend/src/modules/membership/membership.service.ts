@@ -20,8 +20,8 @@ export const subscribeUser = async (userId: string, plan: MembershipPlan, durati
     },
   });
 
-  // 3. Generate and upload the ID card (run in background)
-  generateAndUploadIdCard(membership.id).catch(console.error);
+  // 3. Generate and upload the ID card (await so it is ready before the user reaches the dashboard)
+  await generateAndUploadIdCard(membership.id).catch(console.error);
 
   return membership;
 };
