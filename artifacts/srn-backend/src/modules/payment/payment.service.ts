@@ -220,10 +220,11 @@ export const verifyPayment = async (paymentData: { razorpay_order_id: string, ra
     membershipId: result.membershipId,
   };
 
-  await notifyAdminOfPayment(paymentDetails);
+  // 3. Notify Admin (run in background, do NOT await so API returns instantly)
+  notifyAdminOfPayment(paymentDetails).catch(console.error);
   
   if (user?.email) {
-    await notifyUserOfPayment(paymentDetails);
+    notifyUserOfPayment(paymentDetails).catch(console.error);
   }
 
   return result;
