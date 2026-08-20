@@ -386,7 +386,7 @@ importers:
         specifier: ^2.9.6
         version: 2.9.6
       sanitize-html:
-        specifier: ^2.17.6
+        specifier: ^2.11.0
         version: 2.17.6
       socket.io:
         specifier: ^4.8.3
