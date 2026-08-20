@@ -51643,3 +51643,47 @@
 [31m    at jestAdapter (/Users/anshjohnson/SRN/node_modules/.pnpm/jest-circus@30.4.2/node_modules/jest-circus/build/runner.js:111:19)[39m
 [31m    at runTestInternal (/Users/anshjohnson/SRN/node_modules/.pnpm/jest-runner@30.4.2/node_modules/jest-runner/build/index.js:276:16)[39m
 [31m    at runTest (/Users/anshjohnson/SRN/node_modules/.pnpm/jest-runner@30.4.2/node_modules/jest-runner/build/index.js:344:7)[39m
+2026-08-20 10:11:03:113 [31merror[39m: [31mError: Not allowed by CORS[39m
+[31m    at origin (/Users/anshjohnson/SRN/artifacts/srn-backend/src/index.ts:86:16)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:219:13[39m
+[31m    at optionsCallback (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:199:9)[39m
+[31m    at corsMiddleware (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:204:7)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/core/src/integrations/express/patch-layer.ts:214:36[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:136:38[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:95:15[39m
+[31m    at Module.handleCallbackErrors (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/core/src/utils/handleCallbackErrors.ts:52:26)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:94:14[39m
+[31m    at AsyncLocalStorage.run (node:internal/async_local_storage/async_hooks:91:14)[39m
+2026-08-20 10:11:03:113 [31merror[39m: [31mError: Not allowed by CORS[39m
+[31m    at origin (/Users/anshjohnson/SRN/artifacts/srn-backend/src/index.ts:86:16)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:219:13[39m
+[31m    at optionsCallback (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:199:9)[39m
+[31m    at corsMiddleware (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:204:7)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/core/src/integrations/express/patch-layer.ts:214:36[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:136:38[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:95:15[39m
+[31m    at Module.handleCallbackErrors (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/core/src/utils/handleCallbackErrors.ts:52:26)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:94:14[39m
+[31m    at AsyncLocalStorage.run (node:internal/async_local_storage/async_hooks:91:14)[39m
+2026-08-20 10:11:08:118 [31merror[39m: [31mError: Not allowed by CORS[39m
+[31m    at origin (/Users/anshjohnson/SRN/artifacts/srn-backend/src/index.ts:86:16)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:219:13[39m
+[31m    at optionsCallback (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:199:9)[39m
+[31m    at corsMiddleware (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:204:7)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/core/src/integrations/express/patch-layer.ts:214:36[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:136:38[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:95:15[39m
+[31m    at Module.handleCallbackErrors (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/core/src/utils/handleCallbackErrors.ts:52:26)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:94:14[39m
+[31m    at AsyncLocalStorage.run (node:internal/async_local_storage/async_hooks:91:14)[39m
+2026-08-20 10:11:08:118 [31merror[39m: [31mError: Not allowed by CORS[39m
+[31m    at origin (/Users/anshjohnson/SRN/artifacts/srn-backend/src/index.ts:86:16)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:219:13[39m
+[31m    at optionsCallback (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:199:9)[39m
+[31m    at corsMiddleware (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:204:7)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/core/src/integrations/express/patch-layer.ts:214:36[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:136:38[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:95:15[39m
+[31m    at Module.handleCallbackErrors (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/core/src/utils/handleCallbackErrors.ts:52:26)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:94:14[39m
+[31m    at AsyncLocalStorage.run (node:internal/async_local_storage/async_hooks:91:14)[39m

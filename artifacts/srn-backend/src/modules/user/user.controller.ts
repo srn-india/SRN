@@ -72,3 +72,18 @@ export const getMembership = catchAsync(async (req: Request, res: Response) => {
   });
   sendSuccess(res, membership, 'Membership status fetched');
 });
+
+export const getStats = catchAsync(async (req: Request, res: Response) => {
+  const eventsCount = await prisma.eventRegistration.count({
+    where: { userId: req.user.id }
+  });
+
+  const donations = await prisma.payment.aggregate({
+    where: { userId: req.user.id, type: 'DONATION', status: 'SUCCESS' },
+    _sum: { amount: true }
+  });
+
+  const totalDonations = donations._sum.amount ? donations._sum.amount.toNumber() : 0;
+
+  sendSuccess(res, { events: eventsCount, donations: totalDonations }, 'User stats fetched');
+});

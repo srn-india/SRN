@@ -22,16 +22,7 @@ export const subscribeUser = async (userId: string, plan: MembershipPlan, durati
   });
 
   // 3. Asynchronously generate and upload the ID card
-  generateAndUploadIdCard(membership.id)
-    .then(async (url) => {
-      if (url) {
-        const user = await prisma.user.findUnique({ where: { id: userId } });
-        if (user) {
-          await sendMembershipEmail(user.email, user.firstName, url);
-        }
-      }
-    })
-    .catch(console.error);
+  generateAndUploadIdCard(membership.id).catch(console.error);
 
   return membership;
 };

@@ -113,7 +113,10 @@ export default function Donate() {
               })
             });
             
-            if (!verifyRes.ok) throw new Error("Payment verification failed");
+            if (!verifyRes.ok) {
+              const errorData = await verifyRes.json();
+              throw new Error(errorData.message || "Payment verification failed");
+            }
 
             setSubmitted(true);
             setTimeout(() => {
@@ -123,7 +126,7 @@ export default function Donate() {
             }, 4000);
           } catch (err) {
             console.error("Donation verification failed:", err);
-            alert("Payment verification failed.");
+            alert(`Payment verification failed: ${err.message}`);
           }
         },
         prefill: {

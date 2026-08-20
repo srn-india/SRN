@@ -39,10 +39,9 @@ export const registerUser = async (data: any) => {
     },
   });
 
-  // Since we created utils/email.ts, we should import sendOTPEmail at the top, but we'll just require it dynamically here to avoid import issues for now, or assume it's imported.
-  // Actually, I'll import it at the top in a separate chunk.
-  const { sendOTPEmail } = require('../../utils/email');
-  await sendOTPEmail(user.email, otpCode);
+  // Send beautifully formatted OTP email using real SMTP credentials
+  const { notifyUserOfOTP } = require('../../utils/email.service');
+  await notifyUserOfOTP(user.email, otpCode);
 
   return { user, requiresOtp: true };
 };
@@ -72,8 +71,8 @@ export const loginUser = async (data: any) => {
       data: { otpCode, otpExpires }
     });
 
-    const { sendOTPEmail } = require('../../utils/email');
-    await sendOTPEmail(user.email, otpCode);
+    const { notifyUserOfOTP } = require('../../utils/email.service');
+    await notifyUserOfOTP(user.email, otpCode);
 
     return { user, requiresOtp: true };
   }

@@ -71,15 +71,22 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 const allowedOrigins = [
   'http://localhost:8080',
   'http://localhost:5173',
+  'http://localhost:8083',
+  'http://127.0.0.1:8080',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:8083',
+  'http://10.209.8.173:8080',
+  'http://10.209.8.173:8083',
   process.env.FRONTEND_URL
 ].filter(Boolean) as string[];
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Dynamically check if the origin is localhost or matches a Vercel preview domain for this app
+    // Dynamically check if the origin is localhost, local IP or matches a Vercel preview domain for this app
     const isVercelAllowed = origin && origin.startsWith('https://srn-') && origin.endsWith('.vercel.app');
+    const isLocalNetwork = origin && (origin.startsWith('http://192.168.') || origin.startsWith('http://10.'));
 
-    if (!origin || allowedOrigins.includes(origin) || isVercelAllowed) {
+    if (!origin || allowedOrigins.includes(origin) || isVercelAllowed || isLocalNetwork) {
       callback(null, true);
     } else {
       console.error(`CORS Blocked: Origin "${origin}" is not in the allowed list:`, allowedOrigins);

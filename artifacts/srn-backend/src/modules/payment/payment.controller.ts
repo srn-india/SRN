@@ -14,6 +14,11 @@ export const createOrder = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const verifyPayment = catchAsync(async (req: Request, res: Response) => {
-  const result = await paymentService.verifyPayment(req.body, req.user.id);
-  sendSuccess(res, result, 'Payment verified and membership activated');
+  try {
+    const result = await paymentService.verifyPayment(req.body, req.user.id);
+    sendSuccess(res, result, 'Payment verified and membership/donation activated');
+  } catch (error: any) {
+    console.error("verifyPayment Error Details:", error);
+    res.status(500).json({ status: 'error', message: error.message || 'Payment verification failed' });
+  }
 });

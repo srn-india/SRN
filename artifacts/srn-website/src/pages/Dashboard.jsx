@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, useAnimation } from "framer-motion";
-import { LogOut, User, Activity, Bell, CreditCard, ArrowLeft, Heart, Calendar, MessageSquare, ChevronRight, Settings, Star, TrendingUp, ShieldCheck, Lock } from "lucide-react";
+import { LogOut, User, Activity, Bell, CreditCard, ArrowLeft, Heart, Calendar, MessageSquare, ChevronRight, Settings, Star, TrendingUp, ShieldCheck, Lock, Download } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const containerVariants = {
@@ -21,13 +21,23 @@ export default function Dashboard() {
   const { user, loading, logout, API_BASE } = useAuth();
   const navigate = useNavigate();
   const [membership, setMembership] = useState(null);
+  const [stats, setStats] = useState({ events: 0, donations: 0 });
 
-  const fetchMembership = async () => {
+  const fetchDashboardData = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/users/membership`, { credentials: "include" });
-      if (res.ok) {
-        const data = await res.json();
+      const [membershipRes, statsRes] = await Promise.all([
+        fetch(`${API_BASE}/api/users/membership`, { credentials: "include" }),
+        fetch(`${API_BASE}/api/users/stats`, { credentials: "include" })
+      ]);
+      
+      if (membershipRes.ok) {
+        const data = await membershipRes.json();
         if (data?.data) setMembership(data.data);
+      }
+      
+      if (statsRes.ok) {
+        const data = await statsRes.json();
+        if (data?.data) setStats(data.data);
       }
     } catch (err) {
       // ignore
@@ -36,7 +46,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (user && API_BASE) {
-      fetchMembership();
+      fetchDashboardData();
     }
   }, [user, API_BASE]);
 
@@ -181,11 +191,11 @@ export default function Dashboard() {
                 </div>
                 <div className="flex justify-between items-center bg-[#FDF5EC]/50 p-4 rounded-xl border border-dashed border-[#E8D5B8] mb-3">
                   <span className="text-sm font-semibold text-[#5C3A1E]">Events Attended</span>
-                  <span className="text-lg font-bold text-[#2C1810]">0</span>
+                  <span className="text-lg font-bold text-[#2C1810]">{stats.events}</span>
                 </div>
                 <div className="flex justify-between items-center bg-[#FDF5EC]/50 p-4 rounded-xl border border-dashed border-[#E8D5B8]">
                   <span className="text-sm font-semibold text-[#5C3A1E]">Total Donations</span>
-                  <span className="text-lg font-bold text-[#2C1810]">₹0</span>
+                  <span className="text-lg font-bold text-[#2C1810]">₹{stats.donations}</span>
                 </div>
               </div>
 
@@ -286,9 +296,18 @@ export default function Dashboard() {
               </div>
               
               {membership?.status === 'ACTIVE' ? (
-                <div className="mt-4 flex items-center justify-center w-full px-5 py-3.5 bg-green-50 border border-green-200 rounded-[1.25rem] text-green-700 font-bold gap-2">
-                  <ShieldCheck className="w-4 h-4" />
-                  Active Member
+                <div className="mt-4 flex flex-col gap-2">
+                  <div className="flex items-center justify-center w-full px-5 py-3.5 bg-green-50 border border-green-200 rounded-[1.25rem] text-green-700 font-bold gap-2">
+                    <ShieldCheck className="w-4 h-4" />
+                    Active Member
+                  </div>
+                  <a 
+                    href={`https://cgmlrhewmemptyklkbrq.supabase.co/storage/v1/object/public/id-cards/${membership.id}.png?download=ID_${user.firstName}_${user.lastName}.png`}
+                    className="flex items-center justify-center w-full px-5 py-3.5 bg-[#E8622A] hover:bg-[#D4551E] text-white rounded-[1.25rem] font-bold gap-2 transition-colors shadow-sm"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download ID Card
+                  </a>
                 </div>
               ) : (
                 <div className="mt-4 flex items-center justify-center w-full px-5 py-3.5 bg-white/40 border border-[#E8D5B8]/50 rounded-[1.25rem] text-[#E8622A]/40 font-bold cursor-not-allowed select-none gap-2">

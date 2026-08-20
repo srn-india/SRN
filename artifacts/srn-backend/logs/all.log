@@ -51868,3 +51868,111 @@ yes 2026-05-13 12:41:14:4114 [34minfo[39m: [34mServer is running on port 3000
 2026-08-20 04:31:39:3139 [34minfo[39m: [34mServer is running on port 4000[39m
 2026-08-20 04:31:55:3155 [34minfo[39m: [34mServer is running on port 4000[39m
 2026-08-20 04:43:47:4347 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 04:45:48:4548 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 04:52:42:5242 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 04:57:18:5718 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 05:04:31:431 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 09:50:44:5044 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 09:55:38:5538 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 09:57:34:5734 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 10:03:14:314 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 10:04:34:434 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 10:04:45:445 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 10:09:58:958 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 10:11:03:113 [31merror[39m: [31mError: Not allowed by CORS[39m
+[31m    at origin (/Users/anshjohnson/SRN/artifacts/srn-backend/src/index.ts:86:16)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:219:13[39m
+[31m    at optionsCallback (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:199:9)[39m
+[31m    at corsMiddleware (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:204:7)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/core/src/integrations/express/patch-layer.ts:214:36[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:136:38[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:95:15[39m
+[31m    at Module.handleCallbackErrors (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/core/src/utils/handleCallbackErrors.ts:52:26)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:94:14[39m
+[31m    at AsyncLocalStorage.run (node:internal/async_local_storage/async_hooks:91:14)[39m
+2026-08-20 10:11:03:113 [31merror[39m: [31mError: Not allowed by CORS[39m
+[31m    at origin (/Users/anshjohnson/SRN/artifacts/srn-backend/src/index.ts:86:16)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:219:13[39m
+[31m    at optionsCallback (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:199:9)[39m
+[31m    at corsMiddleware (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:204:7)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/core/src/integrations/express/patch-layer.ts:214:36[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:136:38[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:95:15[39m
+[31m    at Module.handleCallbackErrors (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/core/src/utils/handleCallbackErrors.ts:52:26)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:94:14[39m
+[31m    at AsyncLocalStorage.run (node:internal/async_local_storage/async_hooks:91:14)[39m
+2026-08-20 10:11:08:118 [31merror[39m: [31mError: Not allowed by CORS[39m
+[31m    at origin (/Users/anshjohnson/SRN/artifacts/srn-backend/src/index.ts:86:16)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:219:13[39m
+[31m    at optionsCallback (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:199:9)[39m
+[31m    at corsMiddleware (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:204:7)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/core/src/integrations/express/patch-layer.ts:214:36[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:136:38[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:95:15[39m
+[31m    at Module.handleCallbackErrors (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/core/src/utils/handleCallbackErrors.ts:52:26)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:94:14[39m
+[31m    at AsyncLocalStorage.run (node:internal/async_local_storage/async_hooks:91:14)[39m
+2026-08-20 10:11:08:118 [31merror[39m: [31mError: Not allowed by CORS[39m
+[31m    at origin (/Users/anshjohnson/SRN/artifacts/srn-backend/src/index.ts:86:16)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:219:13[39m
+[31m    at optionsCallback (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:199:9)[39m
+[31m    at corsMiddleware (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/cors/lib/index.js:204:7)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/core/src/integrations/express/patch-layer.ts:214:36[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:136:38[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:95:15[39m
+[31m    at Module.handleCallbackErrors (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/core/src/utils/handleCallbackErrors.ts:52:26)[39m
+[31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:94:14[39m
+[31m    at AsyncLocalStorage.run (node:internal/async_local_storage/async_hooks:91:14)[39m
+2026-08-20 10:13:27:1327 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 10:13:48:1348 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 10:13:48:1348 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 10:14:00:140 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 10:14:01:141 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 10:29:29:2929 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 10:32:36:3236 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 21:26:56:2656 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 21:36:14:3614 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 21:36:25:3625 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 21:37:56:3756 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 21:39:35:3935 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 21:40:29:4029 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 21:41:06:416 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 21:41:06:416 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 21:41:30:4130 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 21:41:30:4130 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 21:42:54:4254 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 22:06:52:652 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 22:06:52:652 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 22:13:54:1354 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 22:14:06:146 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 22:16:26:1626 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 22:16:35:1635 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 22:19:07:197 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 22:20:56:2056 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 22:22:01:221 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 22:33:20:3320 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 22:34:41:3441 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 22:40:09:409 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 22:40:09:409 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 22:40:46:4046 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 22:40:46:4046 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 22:43:57:4357 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 22:43:57:4357 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 22:44:03:443 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 22:44:03:443 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 22:45:54:4554 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 22:46:41:4641 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 22:46:41:4641 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 22:50:40:5040 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 23:04:57:457 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 23:04:57:457 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 23:08:26:826 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 23:08:36:836 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 23:08:43:843 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 23:11:32:1132 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 23:12:24:1224 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 23:14:34:1434 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 23:18:36:1836 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 23:18:36:1836 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-20 23:20:38:2038 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-20 23:20:46:2046 [34minfo[39m: [34mServer is running on port 4000[39m

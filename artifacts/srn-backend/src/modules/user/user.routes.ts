@@ -24,6 +24,7 @@ router.use(protect);
  */
 router.get('/me', userController.getProfile);
 router.get('/membership', userController.getMembership);
+router.get('/stats', userController.getStats);
 
 
 /**
