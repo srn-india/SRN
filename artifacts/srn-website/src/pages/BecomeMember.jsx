@@ -117,7 +117,10 @@ export default function BecomeMember() {
       // 2. Create Order for 999 INR
       const orderRes = await fetch(`${API_BASE}/api/payments/order`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
+        },
         credentials: "include",
         body: JSON.stringify({ amount: 999, currency: "INR", type: "MEMBERSHIP" })
       });
@@ -127,6 +130,9 @@ export default function BecomeMember() {
 
       // 3. Get Razorpay Key
       const keyRes = await fetch(`${API_BASE}/api/payments/key`, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
+        },
         credentials: "include"
       });
       const keyData = await keyRes.json();
@@ -151,7 +157,10 @@ export default function BecomeMember() {
             // 4. Verify Payment
             const verifyRes = await fetch(`${API_BASE}/api/payments/verify`, {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
+              },
               credentials: "include",
               body: JSON.stringify({ 
                 razorpay_payment_id: response.razorpay_payment_id,
