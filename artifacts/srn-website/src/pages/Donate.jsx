@@ -20,6 +20,7 @@ export default function Donate() {
   const [customAmount, setCustomAmount] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [showPurposeDropdown, setShowPurposeDropdown] = useState(false);
 
   const donationPurposes = [
@@ -99,6 +100,7 @@ export default function Donate() {
         description: "Donation",
         order_id: orderData.data.razorpayOrderId,
         handler: async function (response) {
+          setIsProcessingPayment(true);
           try {
             // 3. Verify Payment
             const verifyRes = await fetch(`${API_BASE}/api/payments/verify`, {
@@ -124,9 +126,11 @@ export default function Donate() {
               setAmount(1000);
               setCustomAmount("");
             }, 4000);
+            setIsProcessingPayment(false);
           } catch (err) {
             console.error("Donation verification failed:", err);
             alert(`Payment verification failed: ${err.message}`);
+            setIsProcessingPayment(false);
           }
         },
         prefill: {
@@ -352,6 +356,20 @@ export default function Donate() {
           // Allow user to click 'Make a Secure Donation' again manually
         }} 
       />
+
+      {isProcessingPayment && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md">
+          <div className="bg-white rounded-2xl p-8 flex flex-col items-center shadow-2xl max-w-sm w-full mx-4 border border-[#E8622A]/20">
+             <div className="w-16 h-16 border-4 border-[#E8622A]/20 border-t-[#E8622A] rounded-full animate-spin mb-6"></div>
+             <h3 className="text-xl font-bold text-[#2C1810] mb-2 text-center">
+                {en ? "Processing Donation..." : "दान संसाधित हो रहा है..."}
+             </h3>
+             <p className="text-center text-[#5C3A1E] text-sm">
+                {en ? "Please wait while we securely verify your transaction. This may take a moment." : "कृपया प्रतीक्षा करें जब तक हम आपके लेनदेन को सुरक्षित रूप से सत्यापित करते हैं। इसमें कुछ समय लग सकता है।"}
+             </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

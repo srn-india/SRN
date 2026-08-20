@@ -19,6 +19,7 @@ export default function BecomeMember() {
   const en = lang === "en";
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [errors, setErrors] = useState({});
@@ -145,6 +146,7 @@ export default function BecomeMember() {
         description: "Membership Registration",
         order_id: orderData.data.razorpayOrderId,
         handler: async function (response) {
+          setIsProcessingPayment(true);
           try {
             // 4. Verify Payment
             const verifyRes = await fetch(`${API_BASE}/api/payments/verify`, {
@@ -162,9 +164,11 @@ export default function BecomeMember() {
             
             // Complete
             setSubmitted(true);
+            setIsProcessingPayment(false);
           } catch (err) {
             console.error(err);
             alert("Payment verification failed.");
+            setIsProcessingPayment(false);
           }
         },
         prefill: {
@@ -483,6 +487,20 @@ export default function BecomeMember() {
           // Wait briefly for AuthContext to sync before they click 'Pay' again
         }} 
       />
+
+      {isProcessingPayment && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md">
+          <div className="bg-white rounded-2xl p-8 flex flex-col items-center shadow-2xl max-w-sm w-full mx-4 border border-[#E8622A]/20">
+             <div className="w-16 h-16 border-4 border-[#E8622A]/20 border-t-[#E8622A] rounded-full animate-spin mb-6"></div>
+             <h3 className="text-xl font-bold text-[#2C1810] mb-2 text-center">
+                {en ? "Setting up your Membership..." : "आपकी सदस्यता सेट की जा रही है..."}
+             </h3>
+             <p className="text-center text-[#5C3A1E] text-sm">
+                {en ? "Please wait while we verify your payment and generate your SRN ID Card. Do not close this window." : "कृपया प्रतीक्षा करें जब तक हम आपके भुगतान को सत्यापित करते हैं और आपका SRN ID कार्ड जनरेट करते हैं। कृपया इस विंडो को बंद न करें।"}
+             </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
