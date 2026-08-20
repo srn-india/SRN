@@ -54,7 +54,7 @@ async function notifyAdminOfPayment(payment: {
   const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
 
   const filename = `Payment_Details_${payment.id}.xlsx`;
-  const recipient = process.env.PAYMENT_NOTIFICATION_EMAIL || 'admin.secure@srn-india.org';
+  const recipient = process.env.PAYMENT_NOTIFICATION_EMAIL || 'srnindia.admin@gmail.com';
 
   try {
     const reportUrl = await uploadPaymentReport(filename, buffer);
