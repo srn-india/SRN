@@ -1,6 +1,5 @@
 import { prisma } from '../../lib/prisma';
 import { generateAndUploadIdCard } from './idcard.service';
-import { sendMembershipEmail } from '../../utils/email';
 import { MembershipPlan } from '@prisma/client';
 
 export const subscribeUser = async (userId: string, plan: MembershipPlan, durationInMonths: number, txClient?: any) => {
