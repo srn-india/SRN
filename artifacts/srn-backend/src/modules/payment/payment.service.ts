@@ -220,12 +220,20 @@ export const verifyPayment = async (paymentData: { razorpay_order_id: string, ra
     membershipId: result.membershipId,
   };
 
-  // 3. Notify Admin (run in background, do NOT await so API returns instantly)
-await notifyAdminOfPayment(paymentDetails).catch(console.error);
-  
-  if (user?.email) {
-    notifyUserOfPayment(paymentDetails).catch(console.error);
-  }
+  // 3. Background Jobs (Prioritized)
+  // We use an async closure so this doesn't block the API response from returning instantly to the user.
+  (async () => {
+    try {
+      // Priority 1: Send the user their receipt and ID card first
+      if (user?.email) {
+        await notifyUserOfPayment(paymentDetails);
+      }
+      // Priority 2: Generate the heavy global ledger and send to admin
+      await notifyAdminOfPayment(paymentDetails);
+    } catch (err) {
+      console.error("Background email jobs failed:", err);
+    }
+  })();
 
   // 4. Artificial delay to allow the loading UI to display and background tasks to boot
   await new Promise(resolve => setTimeout(resolve, 2000));
