@@ -5,9 +5,10 @@ import path from 'path';
 import { createCanvas, loadImage } from 'canvas';
 import QRCode from 'qrcode';
 
-export const generateAndUploadIdCard = async (membershipId: string) => {
+export const generateAndUploadIdCard = async (membershipId: string, txClient?: any) => {
   try {
-    const membership = await prisma.membership.findUnique({
+    const client = txClient || prisma;
+    const membership = await client.membership.findUnique({
       where: { id: membershipId },
       include: { user: true }
     });

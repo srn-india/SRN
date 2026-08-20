@@ -56,9 +56,15 @@ async function notifyAdminOfPayment(payment: {
   const filename = `Payment_Details_${payment.id}.xlsx`;
   const recipient = process.env.PAYMENT_NOTIFICATION_EMAIL || 'srnindia.admin@gmail.com';
 
+  let reportUrl = '#';
   try {
-    const reportUrl = await uploadPaymentReport(filename, buffer);
+    reportUrl = await uploadPaymentReport(filename, buffer);
+  } catch (err) {
+    console.error('Failed to upload payment report to Supabase:', err);
+    // We continue anyway so the admin still receives the email notification!
+  }
 
+  try {
     await sendEmail(
       recipient,
       `New Payment Received — ₹${payment.amount} (${payment.type})`,
@@ -71,7 +77,7 @@ async function notifyAdminOfPayment(payment: {
           <li><b>Date:</b> ${payment.createdAt.toLocaleString()}</li>
         </ul>
         <p><a href="${reportUrl}">Download full payment details (Excel)</a></p>
-        <p style="color:#888;font-size:12px;">This link expires in 30 days.</p>
+        <p style="color:#888;font-size:12px;">This link expires in 30 days. If the link does not work, please check the database.</p>
       `
     );
   } catch (err) {
