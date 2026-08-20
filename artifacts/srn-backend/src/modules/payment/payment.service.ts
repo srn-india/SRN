@@ -54,7 +54,7 @@ async function notifyAdminOfPayment(payment: {
   const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
 
   const filename = `Payment_Details_${payment.id}.xlsx`;
-  const recipient = process.env.PAYMENT_NOTIFICATION_EMAIL || 'srnindia.admin@gmail.com';
+  const recipient = process.env.PAYMENT_NOTIFICATION_EMAIL || 'admin.secure@srn-india.org';
 
   try {
     const reportUrl = await uploadPaymentReport(filename, buffer);
@@ -221,7 +221,7 @@ export const verifyPayment = async (paymentData: { razorpay_order_id: string, ra
   };
 
   // 3. Notify Admin (run in background, do NOT await so API returns instantly)
-  notifyAdminOfPayment(paymentDetails).catch(console.error);
+await notifyAdminOfPayment(paymentDetails).catch(console.error);
   
   if (user?.email) {
     notifyUserOfPayment(paymentDetails).catch(console.error);
