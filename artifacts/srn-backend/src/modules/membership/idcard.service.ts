@@ -17,8 +17,9 @@ export const generateAndUploadIdCard = async (membershipId: string) => {
       return null;
     }
 
-    const templatePath = path.join(process.cwd(), 'src/assets/id-card.jpeg');
-    const image = await loadImage(templatePath);
+    // Fetch template from raw GitHub URL to avoid Vercel serverless missing file issues
+    const templateUrl = 'https://raw.githubusercontent.com/srn-india/SRN/main/artifacts/srn-backend/src/assets/id-card.jpeg';
+    const image = await loadImage(templateUrl);
     const canvas = createCanvas(image.width, image.height);
     const ctx = canvas.getContext('2d');
 
