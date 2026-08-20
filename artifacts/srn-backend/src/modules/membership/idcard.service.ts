@@ -83,7 +83,7 @@ export const generateAndUploadIdCard = async (membershipId: string) => {
     const { data: publicUrlData } = supabase.storage
       .from('id-cards')
       .getPublicUrl(`${membership.id}.png`, {
-        download: `ID_${membership.user.firstName}_${membership.user.lastName}.png`
+        download: true
       });
       
     const qrData = publicUrlData.publicUrl;
