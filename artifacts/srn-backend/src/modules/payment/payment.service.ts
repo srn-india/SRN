@@ -226,23 +226,21 @@ export const verifyPayment = async (paymentData: { razorpay_order_id: string, ra
     membershipId: result.membershipId,
   };
 
-  // 3. Background Jobs (Prioritized)
-  // We use an async closure so this doesn't block the API response from returning instantly to the user.
-  (async () => {
-    try {
-      // Priority 1: Send the user their receipt and ID card first
-      if (user?.email) {
-        await notifyUserOfPayment(paymentDetails);
-      }
-      // Priority 2: Generate the heavy global ledger and send to admin
-      await notifyAdminOfPayment(paymentDetails);
-    } catch (err) {
-      console.error("Background email jobs failed:", err);
+  // 3. Send notification emails synchronously BEFORE returning the response.
+  // IMPORTANT: Do NOT use a fire-and-forget IIFE here. Render's free tier kills background
+  // tasks as soon as the response is sent, so SMTP connections launched in a detached async
+  // closure never complete. Awaiting here ensures the emails are fully sent.
+  try {
+    // Priority 1: Send the user their receipt and ID card first
+    if (user?.email) {
+      await notifyUserOfPayment(paymentDetails);
     }
-  })();
-
-  // 4. Artificial delay to allow the loading UI to display and background tasks to boot
-  await new Promise(resolve => setTimeout(resolve, 2000));
+    // Priority 2: Generate the Excel ledger and send admin notification
+    await notifyAdminOfPayment(paymentDetails);
+  } catch (err) {
+    // Log but do NOT throw — a failed email should never break the payment response
+    console.error("Email notification jobs failed:", err);
+  }
 
   return result;
 };

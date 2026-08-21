@@ -2,11 +2,15 @@ import nodemailer from 'nodemailer';
 
 /**
  * Email Service utility for sending transactional emails.
- * In development, this uses a mock Ethereal Email account.
+ * In development (no EMAIL_HOST set), emails are logged to console only.
  * In production, configure SMTP credentials via environment variables.
+ *
+ * NOTE: The transporter is created lazily per-call (not at module load time).
+ * This prevents cold-start env-var timing issues on platforms like Render where
+ * env vars might not be injected yet when the module is first imported.
  */
 
-const transporter = nodemailer.createTransport({
+const createTransporter = () => nodemailer.createTransport({
   host: process.env.EMAIL_HOST || 'smtp.ethereal.email',
   port: parseInt(process.env.EMAIL_PORT || '587'),
   secure: process.env.EMAIL_SECURE === 'true',
@@ -178,7 +182,7 @@ export const sendEmail = async (to: string, subject: string, htmlContent: string
       return { messageId: 'mock_id' };
     }
 
-    const info = await transporter.sendMail(mailOptions);
+    const info = await createTransporter().sendMail(mailOptions);
     console.log('Message sent: %s', info.messageId);
     return info;
   } catch (error) {
