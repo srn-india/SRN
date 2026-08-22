@@ -105,6 +105,13 @@ const bearersData = {
         descEn: "Uttarakhand",
         descHi: "उत्तराखंड",
         image: "/national_bearers/rajesh-mehta.jpeg"
+      },
+      {
+        nameEn: "Shri Dheeraj Pandey",
+        nameHi: "श्री धीरज पाण्डेय",
+        descEn: "Jharkhand",
+        descHi: "झारखंड",
+        image: "/national_bearers/dheeraj-pandey.jpeg"
       }
     ]
   },
@@ -117,6 +124,25 @@ const bearersData = {
         descEn: "Andhra Pradesh",
         descHi: "आंध्र प्रदेश",
         image: "/national_bearers/krishnadu-dhananjaya.jpeg"
+      }
+    ]
+  },
+  morcha: {
+    titleHi: "मोर्चा",
+    members: [
+      {
+        nameEn: "Prof. (Dr.) Anjana Yadav",
+        nameHi: "प्रो. (डॉ.) अंजना यादव",
+        descEn: "Rajasthan, Mahila Morcha",
+        descHi: "राजस्थान, महिला मोर्चा",
+        image: "/national_bearers/anjana-yadav.jpeg"
+      },
+      {
+        nameEn: "Shri Sudhir Saxena",
+        nameHi: "श्री सुधीर सक्सेना",
+        descEn: "President Yuva Morcha",
+        descHi: "अध्यक्ष युवा मोर्चा",
+        image: "/national_bearers/sudhir-saxena.jpeg"
       }
     ]
   }
@@ -277,7 +303,7 @@ export default function NationalOfficeBearers() {
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-12 w-full justify-items-center justify-center max-w-3xl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 w-full justify-items-center justify-center max-w-5xl">
             {bearersData.secretaries.members.map((member, i) => (
               <MemberCard key={i} member={member} lang={lang} />
             ))}
@@ -295,6 +321,22 @@ export default function NationalOfficeBearers() {
           </div>
           <div className="grid grid-cols-1 gap-8 md:gap-12 w-full justify-items-center justify-center">
             {bearersData.jointSecretaries.members.map((member, i) => (
+              <MemberCard key={i} member={member} lang={lang} />
+            ))}
+          </div>
+        </section>
+
+        {/* 7. Morcha */}
+        <section className="flex flex-col items-center">
+          <div className="inline-flex items-center gap-3 mb-6 border-b border-[#E8622A]/20 pb-3">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
+            <h2 className="text-xl md:text-2xl font-bold font-serif text-[#5C1010] tracking-wide">
+              {bearersData.morcha.titleHi}
+            </h2>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12 w-full justify-items-center justify-center max-w-xl">
+            {bearersData.morcha.members.map((member, i) => (
               <MemberCard key={i} member={member} lang={lang} />
             ))}
           </div>
