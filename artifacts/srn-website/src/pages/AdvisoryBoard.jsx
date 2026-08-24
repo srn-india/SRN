@@ -14,6 +14,32 @@ const boardMembers = [
     ]
   },
   {
+    name: (
+      <span>
+        <span className="font-bold underline">पद्मश्री</span> डॉ. पी. एल. गौतम जी
+      </span>
+    ),
+    highlight: (
+      <span>
+        <strong className="font-bold text-[#5C1010]">कुलाधिपति</strong>, डॉ. राजेन्द्र प्रसाद केंद्रीय कृषि विश्वविद्यालय
+      </span>
+    ),
+    image: "/padamshri-dr-p-l-gautam.jpeg",
+    isCustomStyled: true,
+    details: [
+      <span>
+        पूर्व <strong className="font-bold text-[#5C1010]">कुलपति</strong>, जी. बी. पंत कृषि एवं प्रौद्योगिकी विश्वविद्यालय
+      </span>,
+      <strong className="font-bold text-[#5C1010]">पूर्व अध्यक्ष</strong>,
+      <span>
+        राष्ट्रीय जैव विविधता प्राधिकरण, <strong className="font-bold text-[#5C1010]">भारत सरकार, एवं</strong>
+      </span>,
+      <span>
+        पौधा किस्म एवं कृषक अधिकार संरक्षण प्राधिकरण
+      </span>
+    ]
+  },
+  {
     name: "श्री विभूति भूषण प्रधान",
     highlight: "आई.पी.एस. 1985",
     image: "/national_bearers/bibuthi-bhusan-pradhan.jpeg",
@@ -95,9 +121,11 @@ function AdvisoryMemberCard({ member, idx, lang }) {
         {member.name}
       </h3>
       
-      {/* Highlight/Designation - Bold text (except for idx === 4 where it is a degree) */}
+      {/* Highlight/Designation - Bold text (except for idx === 5 where it is a degree) */}
       <p className={`text-base leading-snug ${
-        idx === 4 ? "text-sm md:text-base text-[#7A5C45] font-medium" : "font-bold text-[#5C1010]"
+        member.isCustomStyled
+          ? ""
+          : (idx === 5 ? "text-sm md:text-base text-[#7A5C45] font-medium" : "font-bold text-[#5C1010]")
       }`}>
         {member.highlight}
       </p>
@@ -108,7 +136,9 @@ function AdvisoryMemberCard({ member, idx, lang }) {
           <p 
             key={dIdx} 
             className={`text-sm md:text-base text-[#7A5C45] leading-relaxed ${
-              (idx === 0 && dIdx === member.details.length - 1) || idx !== 0 ? "font-bold text-[#5C1010]" : ""
+              member.isCustomStyled
+                ? ""
+                : ((idx === 0 && dIdx === member.details.length - 1) || idx !== 0 ? "font-bold text-[#5C1010]" : "")
             }`}
           >
             {detail}

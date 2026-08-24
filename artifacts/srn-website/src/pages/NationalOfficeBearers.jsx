@@ -133,15 +133,15 @@ const bearersData = {
       {
         nameEn: "Prof. (Dr.) Anjana Yadav",
         nameHi: "प्रो. (डॉ.) अंजना यादव",
-        descEn: "Rajasthan, Mahila Morcha",
-        descHi: "राजस्थान, महिला मोर्चा",
+        descEn: "Rajasthan\nEx-Chancellor, Baba Mastnath University, Rohtak\nPresident, Mahila Morcha",
+        descHi: "राजस्थान\nपूर्व कुलपति, बाबा मस्तनाथ विश्वविद्यालय, रोहतक\nअध्यक्ष, महिला मोर्चा",
         image: "/national_bearers/anjana-yadav.jpeg"
       },
       {
         nameEn: "Shri Sudhir Saxena",
         nameHi: "श्री सुधीर सक्सेना",
-        descEn: "President Yuva Morcha",
-        descHi: "अध्यक्ष युवा मोर्चा",
+        descEn: "National Kickboxing player\nSilver medal for India at India Open International Kickboxing Cup 2026\nPresident, Yuva Morcha",
+        descHi: "राष्ट्रीय किकबॉक्सिंग खिलाड़ी\nइंडिया ओपन इंटरनेशनल किकबॉक्सिंग कप 2026 में भारत के लिए रजत पदक\nअध्यक्ष, युवा मोर्चा",
         image: "/national_bearers/sudhir-saxena.jpeg"
       }
     ]
@@ -187,7 +187,7 @@ function MemberCard({ member, lang }) {
         {name}
       </h3>
       {desc && (
-        <p className="mt-1 text-xs md:text-sm text-[#7A5C45] font-medium leading-normal">
+        <p className="mt-1 text-xs md:text-sm text-[#7A5C45] font-medium leading-normal whitespace-pre-line">
           {desc}
         </p>
       )}
