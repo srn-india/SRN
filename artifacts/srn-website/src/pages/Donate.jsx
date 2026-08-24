@@ -194,7 +194,6 @@ export default function Donate() {
 
             <div className="space-y-6">
               {[
-                { title: en ? "80G Tax Exemption" : "80G कर छूट", desc: en ? "All donations are 50% tax-exempt under section 80G of IT Act." : "सभी दान आयकर अधिनियम की धारा 80G के तहत 50% कर-मुक्त हैं।" },
                 { title: en ? "Transparent Use of Funds" : "निधियों का पारदर्शी उपयोग", desc: en ? "We maintain strict auditing and regular reporting." : "हम सख्त ऑडिटिंग और नियमित रिपोर्टिंग बनाए रखते हैं।" },
                 { title: en ? "Direct Impact" : "सीधा प्रभाव", desc: en ? "90% of your donation goes directly to field programs." : "आपके दान का 90% सीधे क्षेत्रीय कार्यक्रमों में जाता है।" },
               ].map((item, i) => (
