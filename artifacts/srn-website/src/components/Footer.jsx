@@ -227,24 +227,24 @@ export default function Footer() {
               {f.contact} {en ? "& Info" : "और जानकारी"}
             </h3>
             <div className="space-y-6">
-              <div className="bg-white/60 rounded-2xl p-5 border border-[#E8D5B8]/50 shadow-sm text-black/40 cursor-not-allowed select-none flex items-center justify-between">
+              <Link to="/donate" className="bg-white/80 rounded-2xl p-5 border border-[#E8D5B8]/80 shadow-sm text-[#2C1810] hover:border-[#E8622A]/50 hover:shadow-md transition-all duration-300 flex items-center justify-between group/card w-full">
                 <div>
-                  <p className="text-black/40 text-sm font-bold mb-2">{en ? "Support Our Cause" : "हमारे उद्देश्य का समर्थन करें"}</p>
-                  <span className="inline-flex items-center text-black/30 text-sm font-bold">
+                  <p className="text-[#7A5C45] text-xs font-semibold uppercase tracking-wider mb-1">{en ? "Support Our Cause" : "हमारे उद्देश्य का समर्थन करें"}</p>
+                  <span className="inline-flex items-center text-[#E8622A] text-base font-bold">
                     {en ? "Make a Donation" : "दान करें"}
                   </span>
                 </div>
-                <Lock className="w-4 h-4 text-[#E8622A]/70" />
-              </div>
-              <div className="bg-gradient-to-r from-[#E8622A]/5 to-transparent rounded-2xl p-5 border border-[#E8622A]/20 cursor-not-allowed select-none flex items-center justify-between">
+                <ArrowRight className="w-4 h-4 text-[#E8622A] transition-transform duration-300 group-hover/card:translate-x-1.5" />
+              </Link>
+              <Link to="/become-member" className="bg-gradient-to-r from-[#E8622A]/10 to-[#E8622A]/5 rounded-2xl p-5 border border-[#E8622A]/30 hover:border-[#E8622A]/50 hover:shadow-md transition-all duration-300 flex items-center justify-between group/card w-full">
                 <div>
-                  <p className="text-[#E8622A]/40 text-sm font-bold mb-2">{en ? "Join the Movement" : "आंदोलन में शामिल हों"}</p>
-                  <span className="inline-flex items-center text-black/30 text-sm font-bold">
+                  <p className="text-[#7A5C45] text-xs font-semibold uppercase tracking-wider mb-1">{en ? "Join the Movement" : "आंदोलन में शामिल हों"}</p>
+                  <span className="inline-flex items-center text-[#E8622A] text-base font-bold">
                     {en ? "Become a Member" : "सदस्य बनें"}
                   </span>
                 </div>
-                <Lock className="w-4 h-4 text-[#E8622A]/70" />
-              </div>
+                <ArrowRight className="w-4 h-4 text-[#E8622A] transition-transform duration-300 group-hover/card:translate-x-1.5" />
+              </Link>
             </div>
           </motion.div>
         </div>
