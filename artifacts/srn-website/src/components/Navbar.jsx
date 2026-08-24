@@ -148,20 +148,7 @@ export default function Navbar({ isOpen, setIsOpen, onPhoneClick }) {
   const isProfile = location.pathname === "/profile";
   if (isDashboard || isProfile) return null;
 
-  const processedMenuCategories = menuCategories.map(category => {
-    if (category.titleEn === "Action & Contact") {
-      return {
-        ...category,
-        links: category.links.map(link => {
-          if (link.path === "/become-member" || link.path === "/donate") {
-            return { ...link, isLocked: true };
-          }
-          return link;
-        })
-      };
-    }
-    return category;
-  });
+  const processedMenuCategories = menuCategories;
 
   return (
     <>

@@ -206,7 +206,7 @@ export default function Dashboard() {
               <h2 className="text-2xl font-bold text-[#2C1810] font-serif mb-6 pl-2">Quick Access</h2>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {[
-                  { icon: Heart, label: "Donate", desc: "Support cause", to: "/donate", gradient: "from-rose-400 to-rose-600", isLocked: true },
+                  { icon: Heart, label: "Donate", desc: "Support cause", to: "/donate", gradient: "from-rose-400 to-rose-600" },
                   { icon: Calendar, label: "Events", desc: "Join rallies", to: "/events", gradient: "from-blue-400 to-blue-600" },
                   { icon: MessageSquare, label: "Forums", desc: "Discussions", to: "/forums", gradient: "from-emerald-400 to-emerald-600" },
                   { icon: Activity, label: "Initiatives", desc: "Our work", to: "/initiatives", gradient: "from-amber-400 to-orange-500" },
