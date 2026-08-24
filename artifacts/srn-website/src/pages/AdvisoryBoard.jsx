@@ -16,7 +16,7 @@ const boardMembers = [
   {
     name: (
       <span>
-        <span className="font-bold underline">पद्मश्री</span> डॉ. पी. एल. गौतम जी
+        <span className="font-bold">पद्मश्री</span> डॉ. पी. एल. गौतम जी
       </span>
     ),
     highlight: (
@@ -93,7 +93,7 @@ function AdvisoryMemberCard({ member, idx, lang }) {
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.6, delay: (idx % 3) * 0.1 }}
+      transition={{ duration: 0.6, delay: (idx % 4) * 0.1 }}
       className="flex flex-col items-center text-center space-y-3 group w-full"
     >
       {/* 3:4 Aspect Ratio Image/Placeholder */}
@@ -204,7 +204,7 @@ export default function AdvisoryBoard() {
       {/* ── Members Section ────────────────────────────────────────── */}
       <section className="px-6 pt-8 pb-12 relative z-10">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 md:gap-x-16 md:gap-y-20">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-x-10 md:gap-y-20 max-w-7xl mx-auto justify-items-center">
             {boardMembers.map((member, idx) => (
               <AdvisoryMemberCard key={idx} member={member} idx={idx} lang={lang} />
             ))}
