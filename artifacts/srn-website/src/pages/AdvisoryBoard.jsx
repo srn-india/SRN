@@ -94,7 +94,7 @@ function AdvisoryMemberCard({ member, idx, lang }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.6, delay: (idx % 4) * 0.1 }}
-      className="flex flex-col items-center text-center space-y-3 group w-full"
+      className="flex flex-col items-center text-center space-y-2 group w-full"
     >
       {/* 3:4 Aspect Ratio Image/Placeholder */}
       <div className="w-full max-w-[210px] aspect-[3/4] rounded-2xl bg-white border border-[#E8D5B8] flex flex-col items-center justify-center relative overflow-hidden transition-all duration-300 group-hover:border-[#E8622A]/40 group-hover:shadow-md mb-2">
@@ -131,11 +131,11 @@ function AdvisoryMemberCard({ member, idx, lang }) {
       </p>
       
       {/* Details - Normal text */}
-      <div className="space-y-1.5 pt-1">
+      <div className="space-y-0.5 pt-0.5">
         {member.details.map((detail, dIdx) => (
           <p 
             key={dIdx} 
-            className={`text-sm md:text-base text-[#7A5C45] leading-relaxed ${
+            className={`text-sm md:text-base text-[#7A5C45] leading-normal ${
               member.isCustomStyled
                 ? ""
                 : ((idx === 0 && dIdx === member.details.length - 1) || idx !== 0 ? "font-bold text-[#5C1010]" : "")
