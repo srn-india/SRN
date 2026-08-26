@@ -203,8 +203,10 @@ const httpServer = createServer(app);
 initSocket(httpServer);
 
 if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
-  httpServer.listen(PORT, () => {
-    logger.info(`Server is running on port ${PORT}`);
+  const port = typeof PORT === 'string' ? parseInt(PORT, 10) : PORT;
+  httpServer.listen(port, '0.0.0.0', () => {
+    console.log(`[BOOT] Server successfully bound to 0.0.0.0 on port ${port}`);
+    logger.info(`Server is running on port ${port}`);
   });
 }
 
