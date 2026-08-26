@@ -35,6 +35,8 @@ import membershipRoutes from './modules/membership/membership.routes';
 import complaintRoutes from './modules/complaint/complaint.routes';
 import articleRoutes from './modules/article/article.routes';
 import applicationRoutes from './modules/application/application.routes';
+import manualPaymentRoutes from './modules/manual-payment/manual-payment.routes';
+import { sendEmail } from './utils/email.service';
 import { createServer } from 'http';
 import { initSocket } from './lib/socket';
 import logger from './utils/logger';
@@ -128,6 +130,31 @@ app.get('/', (req: Request, res: Response) => {
 // Swagger Documentation
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+// ── SMTP diagnostic endpoint (admin-secret protected, no auth token needed) ──
+// Usage: GET /api/admin/test-smtp  with header  X-Admin-Secret: <ADMIN_SECRET>
+app.get('/api/admin/test-smtp', async (req: Request, res: Response) => {
+  const secret = process.env.ADMIN_SECRET || 'srn-admin-test-2026';
+  if (req.headers['x-admin-secret'] !== secret) {
+    return res.status(403).json({ success: false, message: 'Forbidden' });
+  }
+  const to = (req.query.to as string) || process.env.EMAIL_USER || 'srnindia.admin@gmail.com';
+  try {
+    const info = await sendEmail(
+      to,
+      '✅ SRN SMTP Diagnostic Test',
+      `<h2>SMTP is working!</h2>
+       <p>This is a diagnostic email sent from the deployed Render backend.</p>
+       <p><b>Time:</b> ${new Date().toISOString()}</p>
+       <p><b>EMAIL_HOST:</b> ${process.env.EMAIL_HOST || '(not set — mock mode)'}</p>
+       <p><b>EMAIL_USER:</b> ${process.env.EMAIL_USER || '(not set)'}</p>`,
+      'SRN SMTP test succeeded'
+    );
+    res.json({ success: true, message: 'Test email sent', to, info });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: 'SMTP failed', error: err.message });
+  }
+});
+
 // Route Middleware
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
@@ -142,6 +169,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/complaints', complaintRoutes);
 app.use('/api/articles', articleRoutes);
 app.use('/api/applications', applicationRoutes);
+app.use('/api/manual-payments', manualPaymentRoutes);
 
 Sentry.setupExpressErrorHandler(app);
 

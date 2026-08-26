@@ -3,6 +3,7 @@ import * as authService from './auth.service';
 import { catchAsync } from '../../utils/catchAsync';
 import { sendSuccess, sendError } from '../../utils/response';
 import { OAuth2Client } from 'google-auth-library';
+import { prisma } from '../../lib/prisma';
 import { redis } from '../../lib/cache';
 
 const getCookieOptions = (req: Request, maxAge: number) => {
@@ -113,7 +114,15 @@ export const logout = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const getMe = catchAsync(async (req: Request, res: Response) => {
-  const user = { ...req.user, profilePicture: req.user.avatar };
+  const membership = await prisma.membership.findFirst({
+    where: { userId: req.user.id, status: 'ACTIVE' }
+  });
+  
+  const user = { 
+    ...req.user, 
+    profilePicture: req.user.avatar,
+    isMember: !!membership
+  };
   delete user.password;
   delete user.avatar;
   sendSuccess(res, { user }, 'User profile retrieved successfully');
@@ -211,6 +220,10 @@ export const verifyOtp = catchAsync(async (req: Request, res: Response) => {
 
   const result = await authService.verifyOtp(email, otp);
 
+  const membership = await prisma.membership.findFirst({
+    where: { userId: result.user.id, status: 'ACTIVE' }
+  });
+
   res.cookie('accessToken', result.accessToken, getCookieOptions(req, 15 * 60 * 1000));
   res.cookie('refreshToken', result.refreshToken, getCookieOptions(req, 7 * 24 * 60 * 60 * 1000));
 
@@ -225,7 +238,8 @@ export const verifyOtp = catchAsync(async (req: Request, res: Response) => {
       state: result.user.state,
       district: result.user.district,
       gender: result.user.gender,
-      profilePicture: result.user.avatar
+      profilePicture: result.user.avatar,
+      isMember: !!membership
     },
     accessToken: result.accessToken
   }, 'Email verified and logged in successfully');
@@ -252,6 +266,10 @@ export const verify2FALogin = catchAsync(async (req: Request, res: Response) => 
 
   const result = await authService.verify2FALogin(tempAuthToken, totpToken);
 
+  const membership = await prisma.membership.findFirst({
+    where: { userId: result.user.id, status: 'ACTIVE' }
+  });
+
   res.cookie('accessToken', result.accessToken, getCookieOptions(req, 15 * 60 * 1000));
   res.cookie('refreshToken', result.refreshToken, getCookieOptions(req, 7 * 24 * 60 * 60 * 1000));
 
@@ -266,7 +284,8 @@ export const verify2FALogin = catchAsync(async (req: Request, res: Response) => 
       state: result.user.state,
       district: result.user.district,
       gender: result.user.gender,
-      profilePicture: result.user.avatar
+      profilePicture: result.user.avatar,
+      isMember: !!membership
     },
     accessToken: result.accessToken
   }, '2FA verified and login successful');

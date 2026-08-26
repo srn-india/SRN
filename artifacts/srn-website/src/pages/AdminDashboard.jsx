@@ -6,7 +6,7 @@ import {
   ArrowLeft, LogOut, UserCircle, Calendar, MessageSquare, 
   ShieldCheck, CheckCircle2, XCircle, Plus, Trash2, ShieldAlert,
   Settings, Sliders, Bell, LayoutDashboard, Key, TrendingUp, Download, MapPin,
-  BookOpen, AlertCircle, Briefcase, FileText, X, Eye, GraduationCap, Heart, CalendarDays, User, Users, RotateCw
+  BookOpen, AlertCircle, Briefcase, FileText, X, Eye, GraduationCap, Heart, CalendarDays, User, Users, RotateCw, QrCode, Send
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -33,6 +33,13 @@ export default function AdminDashboard() {
   const { user, logout, API_BASE, checkAuth } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("profile");
+
+  // Manual payments state
+  const [manualPayments, setManualPayments] = useState([]);
+  const [manualLoading, setManualLoading] = useState(false);
+  const [rejectModal, setRejectModal] = useState(null); // { id, userId }
+  const [rejectReason, setRejectReason] = useState("");
+  const [mpFilter, setMpFilter] = useState("PENDING");
   
   // 2FA Setup State
   const [qrCodeUrl, setQrCodeUrl] = useState(null);
@@ -132,6 +139,7 @@ export default function AdminDashboard() {
     if (activeTab === "events") fetchEvents();
     if (activeTab === "forums") fetchForums();
     if (activeTab === "memberships") fetchMemberships(membershipPage);
+    if (activeTab === "manual-payments") fetchManualPayments();
   }, [activeTab]);
 
   const fetchComplaints = async () => {
@@ -280,7 +288,71 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchManualPayments = async (status) => {
+    const s = status || mpFilter;
+    setManualLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/manual-payments/admin/all?status=${s}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (res.ok) setManualPayments(data.data || []);
+    } catch (err) {
+      console.error("fetchManualPayments:", err);
+    } finally {
+      setManualLoading(false);
+    }
+  };
+
+  const approveManualPayment = async (id, type) => {
+    const msg = type === "MEMBERSHIP" 
+      ? "Approve this payment? This will grant membership access to the user." 
+      : "Approve this payment? This will verify the user's donation.";
+    if (!window.confirm(msg)) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/manual-payments/admin/${id}/approve`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}`, "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ adminNote: "" })
+      });
+      if (res.ok) { alert("✅ Payment approved! User notified via email."); fetchManualPayments(); }
+      else alert("Failed: " + (await res.json()).message);
+    } catch (err) { alert("Error: " + err.message); }
+  };
+
+  const rejectManualPayment = async (id) => {
+    if (!rejectReason.trim()) { alert("Please enter a rejection reason first."); return; }
+    try {
+      const res = await fetch(`${API_BASE}/api/manual-payments/admin/${id}/reject`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}`, "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ adminNote: rejectReason }),
+      });
+      if (res.ok) {
+        alert("❌ Payment rejected. User notified via email.");
+        setRejectModal(null); setRejectReason(""); fetchManualPayments();
+      } else alert("Failed: " + (await res.json()).message);
+    } catch (err) { alert("Error: " + err.message); }
+  };
+
+  const sendMemberIdCard = async (userId) => {
+    if (!window.confirm("Generate and send ID card to this user?")) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/manual-payments/admin/${userId}/send-idcard`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
+        credentials: "include",
+      });
+      if (res.ok) alert("🪪 ID card email sent successfully!");
+      else alert("Failed: " + (await res.json()).message);
+    } catch (err) { alert("Error: " + err.message); }
+  };
+
   const handleExportMemberships = () => {
+
     if (memberships.length === 0) return;
 
     // Calculate total revenue (999 per membership)
@@ -519,6 +591,7 @@ export default function AdminDashboard() {
     { id: "applications", label: "Post Applications", icon: Briefcase },
     { id: "approvals", label: "Approve IDs", icon: ShieldCheck },
     { id: "memberships", label: "Manage Memberships", icon: Users },
+    { id: "manual-payments", label: "Manual Payments", icon: QrCode },
     { id: "settings", label: "Platform Settings", icon: Settings },
   ];
 
@@ -1227,6 +1300,125 @@ export default function AdminDashboard() {
                       </div>
                     )}
                   </div>
+                </motion.div>
+              )}
+
+              {/* MANUAL PAYMENTS TAB */}
+              {activeTab === "manual-payments" && (
+                <motion.div key="manual-payments" variants={fadeVariants} initial="hidden" animate="visible" exit="exit" className="bg-white/70 backdrop-blur-xl p-8 rounded-[2rem] border border-white/80 shadow-sm">
+                  <div className="mb-6 pb-4 border-b border-gray-100 flex items-center justify-between flex-wrap gap-4">
+                    <div>
+                      <h2 className="text-2xl font-bold text-[#2C1810] font-serif flex items-center gap-3">
+                        <div className="p-2 bg-[#E8622A]/10 rounded-xl"><QrCode className="w-6 h-6 text-[#E8622A]" /></div>
+                        Manual Payments (UPI/QR)
+                      </h2>
+                      <p className="text-sm text-[#7A5C45] mt-1">Review and verify UPI payment submissions from members and donors.</p>
+                    </div>
+                    <button onClick={() => fetchManualPayments()} className="flex items-center gap-2 px-4 py-2 bg-[#E8622A]/10 hover:bg-[#E8622A]/20 text-[#E8622A] rounded-xl font-semibold text-sm transition-colors">
+                      <RotateCw className="w-4 h-4" /> Refresh
+                    </button>
+                  </div>
+
+                  {/* Filter Tabs */}
+                  <div className="flex gap-2 mb-6 bg-gray-100 p-1 rounded-xl w-fit">
+                    {["PENDING", "APPROVED", "REJECTED"].map(s => (
+                      <button key={s} onClick={() => { setMpFilter(s); fetchManualPayments(s); }}
+                        className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${mpFilter === s ? "bg-white shadow text-[#E8622A]" : "text-gray-500 hover:text-gray-700"}`}>
+                        {s.charAt(0) + s.slice(1).toLowerCase()}
+                      </button>
+                    ))}
+                  </div>
+
+                  {manualLoading ? (
+                    <div className="flex justify-center py-16"><div className="w-10 h-10 border-4 border-[#E8622A]/20 border-t-[#E8622A] rounded-full animate-spin" /></div>
+                  ) : manualPayments.length === 0 ? (
+                    <div className="text-center py-16 text-gray-400">
+                      <QrCode className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                      <p>No {mpFilter.toLowerCase()} manual payments.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {manualPayments.map(p => (
+                        <div key={p.id} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+                          <div className="flex flex-wrap gap-4 items-start justify-between">
+                            {/* Info */}
+                            <div className="space-y-1 flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide ${
+                                  p.status === "PENDING" ? "bg-amber-100 text-amber-700" :
+                                  p.status === "APPROVED" ? "bg-green-100 text-green-700" :
+                                  "bg-red-100 text-red-700"
+                                }`}>{p.status}</span>
+                                <span className="text-xs text-gray-400">{new Date(p.createdAt).toLocaleString("en-IN")}</span>
+                                <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${p.type === "MEMBERSHIP" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"}`}>{p.type}</span>
+                              </div>
+                              <p className="font-bold text-[#2C1810] text-lg">₹{p.amount}</p>
+                              <p className="text-sm text-gray-600"><span className="font-semibold">Name:</span> {p.user?.firstName} {p.user?.lastName}</p>
+                              <p className="text-sm text-gray-600"><span className="font-semibold">Email:</span> {p.user?.email}</p>
+                              <p className="text-sm text-gray-600"><span className="font-semibold">UTR:</span> <span className="font-mono">{p.utrNumber}</span></p>
+                              {p.adminNote && <p className="text-sm text-red-500"><span className="font-semibold">Admin Note:</span> {p.adminNote}</p>}
+                            </div>
+
+                            {/* Screenshot */}
+                            {p.screenshot && (
+                              <a href={p.screenshot} target="_blank" rel="noopener noreferrer">
+                                <img src={p.screenshot} alt="Payment screenshot" className="w-24 h-24 object-cover rounded-xl border border-gray-200 hover:opacity-90 transition-opacity flex-shrink-0" />
+                              </a>
+                            )}
+                          </div>
+
+                          {/* Actions */}
+                          {p.status === "PENDING" && (
+                            <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-gray-100">
+                              <button onClick={() => approveManualPayment(p.id, p.type)}
+                                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold text-sm transition-colors">
+                                <CheckCircle2 className="w-4 h-4" /> Approve
+                              </button>
+                              <button onClick={() => setRejectModal(p)}
+                                className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl font-semibold text-sm transition-colors">
+                                <XCircle className="w-4 h-4" /> Reject
+                              </button>
+                            </div>
+                          )}
+                          {p.status === "APPROVED" && p.type === "MEMBERSHIP" && (
+                            <div className="flex gap-3 mt-4 pt-4 border-t border-gray-100">
+                              <button onClick={() => sendMemberIdCard(p.userId)}
+                                className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold text-sm transition-colors">
+                                <Send className="w-4 h-4" /> Send ID Card via Email
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Reject Modal */}
+                  <AnimatePresence>
+                    {rejectModal && (
+                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
+                        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+                          className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl">
+                          <h3 className="text-xl font-bold text-[#2C1810] mb-2">Reject Payment</h3>
+                          <p className="text-sm text-gray-500 mb-4">User: <strong>{rejectModal.user?.firstName} {rejectModal.user?.lastName}</strong> — ₹{rejectModal.amount}</p>
+                          <textarea
+                            rows={3}
+                            value={rejectReason}
+                            onChange={e => setRejectReason(e.target.value)}
+                            placeholder="Reason for rejection (will be sent to user via email)..."
+                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-red-400 resize-none mb-4"
+                          />
+                          <div className="flex gap-3">
+                            <button onClick={() => rejectManualPayment(rejectModal.id)}
+                              className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold transition-colors">Confirm Reject</button>
+                            <button onClick={() => { setRejectModal(null); setRejectReason(""); }}
+                              className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold transition-colors">Cancel</button>
+                          </div>
+                        </motion.div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </motion.div>
               )}
 

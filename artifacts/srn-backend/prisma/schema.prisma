@@ -60,6 +60,12 @@ enum ApplicationStatus {
   REJECTED
 }
 
+enum ManualPaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
   id            String         @id @default(uuid())
   firstName     String
@@ -83,17 +89,18 @@ model User {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
-  memberships   Membership[]
-  payments      Payment[]
-  posts         Post[]
-  forumThreads  ForumThread[]
-  forumComments ForumComment[]
-  notifications Notification[]
+  memberships      Membership[]
+  payments         Payment[]
+  manualPayments   ManualPayment[]
+  posts            Post[]
+  forumThreads     ForumThread[]
+  forumComments    ForumComment[]
+  notifications    Notification[]
   eventRegistrations EventRegistration[]
-  complaints    Complaint[]
-  janmantArticles JanmantArticle[]
+  complaints       Complaint[]
+  janmantArticles  JanmantArticle[]
   postApplications PostApplication[]
-  refreshTokens   RefreshToken[]
+  refreshTokens    RefreshToken[]
 }
 
 model Membership {
@@ -286,6 +293,25 @@ model Donation {
   donorEmail  String?
   anonymous   Boolean  @default(false)
   createdAt   DateTime @default(now())
+}
+
+model ManualPayment {
+  id           String              @id @default(uuid())
+  userId       String
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount       Float
+  type         PaymentType
+  utrNumber    String
+  screenshot   String?
+  purpose      String?
+  status       ManualPaymentStatus @default(PENDING)
+  adminNote    String?
+  membershipId String?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  @@index([userId])
+  @@index([status])
 }
 
 model RefreshToken {

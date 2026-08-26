@@ -55,7 +55,8 @@ export const generateAndUploadIdCard = async (membershipId: string, txClient?: a
 
     try {
       let avatarImage = null;
-      const avatarUrl = membership.user.avatar || 'https://i.pravatar.cc/300';
+      const defaultAvatar = 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
+      const avatarUrl = membership.user.avatar || defaultAvatar;
       if (avatarUrl) {
         if (avatarUrl.startsWith('http')) {
           avatarImage = await loadImage(avatarUrl);

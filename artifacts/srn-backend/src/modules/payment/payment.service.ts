@@ -6,6 +6,8 @@ import { PaymentType } from '@prisma/client';
 import * as XLSX from 'xlsx';
 import { sendEmail } from '../../utils/email.service';
 import { uploadPaymentReport } from '../../utils/storage.service';
+import { generateReceiptPdf } from '../../utils/receipt.service';
+
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID as string,
   key_secret: process.env.RAZORPAY_KEY_SECRET as string,
@@ -77,7 +79,6 @@ async function notifyAdminOfPayment(payment: {
           <li><b>Date:</b> ${payment.createdAt.toLocaleString()}</li>
         </ul>
         <p><a href="${reportUrl}">Download full payment details (Excel)</a></p>
-        <p style="color:#888;font-size:12px;">This link expires in 30 days. If the link does not work, please check the database.</p>
       `
     );
   } catch (err) {
@@ -132,8 +133,27 @@ async function notifyUserOfPayment(payment: any) {
       <p style="margin-top: 24px;">Let's build a stronger India, together.<br><b>The SRN Team</b></p>
     `;
 
+  let attachments: any[] = [];
   try {
-    await sendEmail(payment.userEmail, subject, htmlContent, 'Thank you for your support!');
+    const pdfBuffer = await generateReceiptPdf({
+      userName: payment.userName || 'Supporter',
+      amount: Number(payment.amount),
+      paymentId: payment.razorpayPaymentId || payment.id,
+      type: isDonation ? 'DONATION' : 'MEMBERSHIP',
+      date: payment.createdAt,
+      method: 'RAZORPAY'
+    });
+    attachments.push({
+      filename: isDonation ? 'SRN_Donation_Receipt.pdf' : 'SRN_Membership_Receipt.pdf',
+      content: pdfBuffer,
+      contentType: 'application/pdf'
+    });
+  } catch (err) {
+    console.error('Failed to generate PDF receipt:', err);
+  }
+
+  try {
+    await sendEmail(payment.userEmail, subject, htmlContent, 'Thank you for your support!', attachments);
   } catch (err) {
     console.error('Failed to send user thank you email:', err);
   }

@@ -251,6 +251,10 @@ export default function Navbar({ isOpen, setIsOpen, onPhoneClick }) {
                         ...category.links
                       ];
                     }
+                    
+                    if (user?.isMember && linksToRender?.length) {
+                      linksToRender = linksToRender.filter(link => link.path !== "/become-member");
+                    }
                     const renderLink = (link, linkIdx) => {
                       const isActive = location.pathname === link.path;
                       

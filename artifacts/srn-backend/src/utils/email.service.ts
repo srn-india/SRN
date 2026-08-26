@@ -162,7 +162,7 @@ export const notifyUserOfOTP = async (email: string, otpCode: string) => {
   );
 };
 
-export const sendEmail = async (to: string, subject: string, htmlContent: string, preheader?: string) => {
+export const sendEmail = async (to: string, subject: string, htmlContent: string, preheader?: string, attachments?: any[]) => {
   try {
     const brandedHtml = wrapWithSRNBranding(htmlContent, preheader);
 
@@ -171,6 +171,7 @@ export const sendEmail = async (to: string, subject: string, htmlContent: string
       to,
       subject,
       html: brandedHtml,
+      attachments,
     };
 
     if (!process.env.EMAIL_HOST) {
