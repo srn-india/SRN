@@ -106,7 +106,7 @@ app.use(sanitizeInput);
 app.use('/uploads', express.static('uploads'));
 
 // Rate Limiting
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'development') {
   const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // Limit each IP to 100 requests per windowMs

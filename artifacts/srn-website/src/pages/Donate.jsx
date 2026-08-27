@@ -84,6 +84,11 @@ export default function Donate() {
       setIsModalOpen(true);
       return;
     }
+    
+    if (amount < 1000) {
+      alert(en ? "Minimum donation amount is ₹1000" : "न्यूनतम दान राशि ₹1000 है");
+      return;
+    }
 
     setLoading(true);
     try {
@@ -185,6 +190,10 @@ export default function Donate() {
     e.preventDefault();
     if (!user || (!user.profilePicture && !user.avatar)) {
       setIsModalOpen(true);
+      return;
+    }
+    if (amount < 1000) {
+      alert(en ? "Minimum donation amount is ₹1000" : "न्यूनतम दान राशि ₹1000 है");
       return;
     }
     if (!utrNumber.trim()) {
@@ -375,7 +384,7 @@ export default function Donate() {
                         </div>
                         <div className="relative">
                           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><IndianRupee className="h-5 w-5 text-gray-400" /></div>
-                          <input type="number" placeholder={en ? "Custom Amount" : "अन्य राशि"} value={customAmount} onChange={handleCustomChange}
+                          <input type="number" min="1000" placeholder={en ? "Custom Amount (Min ₹1000)" : "अन्य राशि (न्यूनतम ₹1000)"} value={customAmount} onChange={handleCustomChange}
                             className="block w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-[#1E0F05] focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] transition-colors" />
                         </div>
                       </div>
@@ -460,18 +469,26 @@ export default function Donate() {
                         </div>
                         <div className="relative">
                           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><IndianRupee className="h-5 w-5 text-gray-400" /></div>
-                          <input type="number" placeholder={en ? "Custom Amount" : "अन्य राशि"} value={customAmount} onChange={handleCustomChange}
+                          <input type="number" min="1000" placeholder={en ? "Custom Amount (Min ₹1000)" : "अन्य राशि (न्यूनतम ₹1000)"} value={customAmount} onChange={handleCustomChange}
                             className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-[#1E0F05] focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] transition-colors" />
                         </div>
                       </div>
 
                       {/* QR Code display */}
-                      <div className="flex flex-col items-center bg-gradient-to-b from-orange-50 to-white border border-orange-100 rounded-2xl p-5 mb-5">
+                      <div className="flex flex-col items-center bg-gradient-to-b from-orange-50 to-white border border-orange-100 rounded-2xl p-5 mb-5 relative">
+                        {amount < 1000 && (
+                          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm rounded-2xl p-4 text-center">
+                            <Lock className="w-8 h-8 text-[#E8622A] mb-2" />
+                            <p className="text-[#5C1010] font-bold">
+                              {en ? "Enter an amount of ₹1000 or more to generate QR" : "QR देखने के लिए ₹1000 या अधिक दर्ज करें"}
+                            </p>
+                          </div>
+                        )}
                         <p className="text-sm text-[#7A5C45] font-semibold mb-3">
-                          {en ? `Scan & Pay ₹${amount || 0}` : `₹${amount || 0} स्कैन करें और भुगतान करें`}
+                          {en ? `Scan & Pay ₹${amount >= 1000 ? amount : 0}` : `₹${amount >= 1000 ? amount : 0} स्कैन करें और भुगतान करें`}
                         </p>
                         <div className="w-56 h-56 sm:w-64 sm:h-64 overflow-hidden rounded-xl border border-orange-200 shadow flex items-center justify-center bg-white p-4">
-                          <QRCode value={`upi://pay?pa=${UPI_ID}&pn=SASHAKT%20RASHTRA%20NIRMAN&am=${amount || 0}&cu=INR`} size={256} className="w-full h-full" />
+                          <QRCode value={`upi://pay?pa=${UPI_ID}&pn=SASHAKT%20RASHTRA%20NIRMAN&am=${amount >= 1000 ? amount : 1000}&cu=INR`} size={256} className={`w-full h-full ${amount < 1000 ? 'opacity-20' : ''}`} />
                         </div>
                         <p className="mt-3 text-xs text-gray-500 font-mono tracking-wider">{UPI_ID}</p>
                         <p className="text-xs text-gray-400 mt-1">{en ? "Open any UPI app and scan" : "कोई भी UPI ऐप खोलें और स्कैन करें"}</p>
@@ -550,17 +567,25 @@ export default function Donate() {
                         </div>
                         <div className="relative">
                           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><IndianRupee className="h-5 w-5 text-gray-400" /></div>
-                          <input type="number" placeholder={en ? "Custom Amount" : "अन्य राशि"} value={customAmount} onChange={handleCustomChange}
+                          <input type="number" min="1000" placeholder={en ? "Custom Amount (Min ₹1000)" : "अन्य राशि (न्यूनतम ₹1000)"} value={customAmount} onChange={handleCustomChange}
                             className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-[#1E0F05] focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] transition-colors" />
                         </div>
                       </div>
 
                       {/* Bank Details display */}
-                      <div className="flex flex-col items-center bg-gradient-to-b from-orange-50 to-white border border-orange-100 rounded-2xl p-5 mb-5 w-full">
+                      <div className="flex flex-col items-center bg-gradient-to-b from-orange-50 to-white border border-orange-100 rounded-2xl p-5 mb-5 w-full relative">
+                        {amount < 1000 && (
+                          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm rounded-2xl p-4 text-center">
+                            <Lock className="w-8 h-8 text-[#E8622A] mb-2" />
+                            <p className="text-[#5C1010] font-bold">
+                              {en ? "Enter an amount of ₹1000 or more to view Bank Details" : "बैंक विवरण देखने के लिए ₹1000 या अधिक दर्ज करें"}
+                            </p>
+                          </div>
+                        )}
                         <p className="text-sm text-[#7A5C45] font-semibold mb-3">
-                          {en ? `Transfer ₹${amount || 0} to:` : `₹${amount || 0} यहाँ ट्रांसफर करें:`}
+                          {en ? `Transfer ₹${amount >= 1000 ? amount : 0} to:` : `₹${amount >= 1000 ? amount : 0} यहाँ ट्रांसफर करें:`}
                         </p>
-                        <div className="w-full text-left space-y-2 text-sm text-[#1E0F05]">
+                        <div className={`w-full text-left space-y-2 text-sm text-[#1E0F05] ${amount < 1000 ? 'opacity-20' : ''}`}>
                           <div className="flex justify-between border-b border-orange-100 pb-2"><span className="text-gray-500">{en ? "Account Name:" : "खाता नाम:"}</span> <strong className="text-right">{BANK_ACCOUNT_NAME}</strong></div>
                           <div className="flex justify-between border-b border-orange-100 pb-2 pt-1"><span className="text-gray-500">{en ? "Account No:" : "खाता संख्या:"}</span> <strong className="font-mono text-right">{BANK_ACCOUNT_NUMBER}</strong></div>
                           <div className="flex justify-between border-b border-orange-100 pb-2 pt-1"><span className="text-gray-500">{en ? "IFSC Code:" : "IFSC कोड:"}</span> <strong className="font-mono text-right">{BANK_IFSC}</strong></div>

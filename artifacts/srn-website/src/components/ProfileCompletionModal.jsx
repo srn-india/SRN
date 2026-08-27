@@ -1,15 +1,16 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowRight, Camera, Mail, Lock, User as UserIcon, Phone } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import imageCompression from "browser-image-compression";
 import { useAuth } from "../context/AuthContext";
 
 export default function ProfileCompletionModal({ isOpen, onClose, onComplete }) {
   const { user, updateProfile, register, login, verifyOtp } = useAuth();
+  const navigate = useNavigate();
   
-  // Modes: 'auth' (login/register), 'otp', 'profile' (photo upload)
+  // Modes: 'otp', 'profile' (photo upload)
   const [mode, setMode] = useState('profile');
-  const [isLogin, setIsLogin] = useState(true);
   
   const [formData, setFormData] = useState({
     firstName: "",
@@ -28,7 +29,7 @@ export default function ProfileCompletionModal({ isOpen, onClose, onComplete }) 
   useEffect(() => {
     if (isOpen) {
       if (!user) {
-        setMode('auth');
+        onClose(); // Shouldn't happen with protected routes, but fallback
       } else if (!user.profilePicture && !user.avatar) {
         setMode('profile');
       } else {
@@ -36,7 +37,7 @@ export default function ProfileCompletionModal({ isOpen, onClose, onComplete }) 
         if (onComplete) onComplete();
       }
     }
-  }, [isOpen, user]);
+  }, [isOpen, user, onClose, onComplete]);
 
   if (!isOpen) return null;
 
@@ -152,62 +153,6 @@ export default function ProfileCompletionModal({ isOpen, onClose, onComplete }) 
             <X className="w-5 h-5" />
           </button>
 
-          {mode === 'auth' && (
-            <div>
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold font-serif text-[#2C1810]">
-                  {isLogin ? "Welcome Back" : "Quick Sign Up"}
-                </h2>
-                <p className="text-[#7A5C45] text-sm mt-1">
-                  {isLogin ? "Sign in to continue your donation" : "Create an account to track donations"}
-                </p>
-              </div>
-
-              {error && <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg text-center">{error}</div>}
-
-              <form onSubmit={handleAuthSubmit} className="space-y-4">
-                {!isLogin && (
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <UserIcon className="w-4 h-4 absolute left-3.5 top-3.5 text-gray-400" />
-                      <input required name="firstName" placeholder="First Name" onChange={handleChange} className={inputClass} />
-                    </div>
-                    <div className="relative flex-1">
-                      <input required name="lastName" placeholder="Last Name" onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none" />
-                    </div>
-                  </div>
-                )}
-                
-                <div className="relative">
-                  <Mail className="w-4 h-4 absolute left-3.5 top-3.5 text-gray-400" />
-                  <input required type="email" name="email" placeholder="Email Address" onChange={handleChange} className={inputClass} />
-                </div>
-                
-                {!isLogin && (
-                  <div className="relative">
-                    <Phone className="w-4 h-4 absolute left-3.5 top-3.5 text-gray-400" />
-                    <input required type="tel" name="phone" placeholder="Phone Number" onChange={handleChange} className={inputClass} />
-                  </div>
-                )}
-
-                <div className="relative">
-                  <Lock className="w-4 h-4 absolute left-3.5 top-3.5 text-gray-400" />
-                  <input required type="password" name="password" placeholder="Password" onChange={handleChange} className={inputClass} />
-                </div>
-
-                <button type="submit" disabled={isSaving} className="w-full py-3.5 bg-[#E8622A] text-white rounded-xl font-bold shadow-md hover:bg-[#C04A18] disabled:opacity-70 transition-all flex items-center justify-center gap-2">
-                  {isSaving ? "Processing..." : (isLogin ? "Sign In" : "Sign Up")}
-                  {!isSaving && <ArrowRight className="w-4 h-4" />}
-                </button>
-              </form>
-
-              <div className="mt-4 text-center">
-                <button type="button" onClick={() => setIsLogin(!isLogin)} className="text-sm text-[#E8622A] hover:underline">
-                  {isLogin ? "Need an account? Sign up" : "Already have an account? Sign in"}
-                </button>
-              </div>
-            </div>
-          )}
 
           {mode === 'otp' && (
             <div>

@@ -132,12 +132,12 @@ export default function Home() {
               {lang === "en" ? h.ctaKnowMore : h.ctaKnowMoreHindi}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <div
-              className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full border-2 border-white/20 text-white/40 font-semibold backdrop-blur-sm cursor-not-allowed select-none text-sm w-full sm:w-auto"
+            <Link
+              to="/become-member"
+              className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full border-2 border-white/40 text-white font-semibold hover:bg-white/10 hover:border-white backdrop-blur-sm transition-all duration-300 text-sm w-full sm:w-auto"
             >
               {lang === "en" ? h.ctaJoin : h.ctaJoinHindi}
-              <Lock className="w-3.5 h-3.5 text-white/30" />
-            </div>
+            </Link>
           </motion.div>
         </motion.div>
 

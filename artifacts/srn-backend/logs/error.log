@@ -51687,3 +51687,36 @@
 [31m    at Module.handleCallbackErrors (/Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/core/src/utils/handleCallbackErrors.ts:52:26)[39m
 [31m    at /Users/anshjohnson/SRN/artifacts/srn-backend/node_modules/@sentry/opentelemetry/src/trace.ts:94:14[39m
 [31m    at AsyncLocalStorage.run (node:internal/async_local_storage/async_hooks:91:14)[39m
+2026-08-27 20:29:48:2948 [31merror[39m: [31mAuth Middleware Error: Error: Stream isn't writeable and enableOfflineQueue options is false[39m
+[31m    at EventEmitter.sendCommand (/Users/anshjohnson/SRN/node_modules/.pnpm/ioredis@5.10.1/node_modules/ioredis/built/Redis.js:365:32)[39m
+[31m    at EventEmitter.<anonymous> (/Users/anshjohnson/SRN/node_modules/.pnpm/@sentry+node@10.57.0/node_modules/@sentry/node/src/integrations/tracing/redis/vendored/ioredis-instrumentation.ts:193:33)[39m
+[31m    at EventEmitter.get (/Users/anshjohnson/SRN/node_modules/.pnpm/ioredis@5.10.1/node_modules/ioredis/built/utils/Commander.js:90:25)[39m
+[31m    at protect (/Users/anshjohnson/SRN/artifacts/srn-backend/src/middleware/auth.ts:31:39)[39m
+[31m    at Layer.handleRequest (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/layer.js:152:17)[39m
+[31m    at next (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/route.js:157:13)[39m
+[31m    at Route.dispatch (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/route.js:117:3)[39m
+[31m    at handle (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/index.js:435:11)[39m
+[31m    at /Users/anshjohnson/SRN/node_modules/.pnpm/@sentry+core@10.57.0/node_modules/@sentry/core/src/integrations/express/patch-layer.ts:214:36[39m
+[31m    at /Users/anshjohnson/SRN/node_modules/.pnpm/@sentry+opentelemetry@10.57.0_@opentelemetry+api@1.9.1_@opentelemetry+core@2.7.1_@opent_e3b74f387e2a3bd4369f09b37e9da51a/node_modules/@sentry/opentelemetry/src/trace.ts:136:38[39m
+2026-08-27 20:29:48:2948 [31merror[39m: [31mAuth Middleware Error: Error: Stream isn't writeable and enableOfflineQueue options is false[39m
+[31m    at EventEmitter.sendCommand (/Users/anshjohnson/SRN/node_modules/.pnpm/ioredis@5.10.1/node_modules/ioredis/built/Redis.js:365:32)[39m
+[31m    at EventEmitter.<anonymous> (/Users/anshjohnson/SRN/node_modules/.pnpm/@sentry+node@10.57.0/node_modules/@sentry/node/src/integrations/tracing/redis/vendored/ioredis-instrumentation.ts:193:33)[39m
+[31m    at EventEmitter.get (/Users/anshjohnson/SRN/node_modules/.pnpm/ioredis@5.10.1/node_modules/ioredis/built/utils/Commander.js:90:25)[39m
+[31m    at protect (/Users/anshjohnson/SRN/artifacts/srn-backend/src/middleware/auth.ts:31:39)[39m
+[31m    at Layer.handleRequest (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/layer.js:152:17)[39m
+[31m    at next (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/route.js:157:13)[39m
+[31m    at Route.dispatch (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/route.js:117:3)[39m
+[31m    at handle (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/index.js:435:11)[39m
+[31m    at /Users/anshjohnson/SRN/node_modules/.pnpm/@sentry+core@10.57.0/node_modules/@sentry/core/src/integrations/express/patch-layer.ts:214:36[39m
+[31m    at /Users/anshjohnson/SRN/node_modules/.pnpm/@sentry+opentelemetry@10.57.0_@opentelemetry+api@1.9.1_@opentelemetry+core@2.7.1_@opent_e3b74f387e2a3bd4369f09b37e9da51a/node_modules/@sentry/opentelemetry/src/trace.ts:136:38[39m
+2026-08-27 20:29:49:2949 [31merror[39m: [31mAuth Middleware Error: Error: Stream isn't writeable and enableOfflineQueue options is false[39m
+[31m    at EventEmitter.sendCommand (/Users/anshjohnson/SRN/node_modules/.pnpm/ioredis@5.10.1/node_modules/ioredis/built/Redis.js:365:32)[39m
+[31m    at EventEmitter.<anonymous> (/Users/anshjohnson/SRN/node_modules/.pnpm/@sentry+node@10.57.0/node_modules/@sentry/node/src/integrations/tracing/redis/vendored/ioredis-instrumentation.ts:193:33)[39m
+[31m    at EventEmitter.get (/Users/anshjohnson/SRN/node_modules/.pnpm/ioredis@5.10.1/node_modules/ioredis/built/utils/Commander.js:90:25)[39m
+[31m    at protect (/Users/anshjohnson/SRN/artifacts/srn-backend/src/middleware/auth.ts:31:39)[39m
+[31m    at Layer.handleRequest (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/layer.js:152:17)[39m
+[31m    at next (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/route.js:157:13)[39m
+[31m    at Route.dispatch (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/route.js:117:3)[39m
+[31m    at handle (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/index.js:435:11)[39m
+[31m    at /Users/anshjohnson/SRN/node_modules/.pnpm/@sentry+core@10.57.0/node_modules/@sentry/core/src/integrations/express/patch-layer.ts:214:36[39m
+[31m    at /Users/anshjohnson/SRN/node_modules/.pnpm/@sentry+opentelemetry@10.57.0_@opentelemetry+api@1.9.1_@opentelemetry+core@2.7.1_@opent_e3b74f387e2a3bd4369f09b37e9da51a/node_modules/@sentry/opentelemetry/src/trace.ts:136:38[39m

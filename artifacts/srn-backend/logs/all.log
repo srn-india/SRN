@@ -52056,3 +52056,62 @@ yes 2026-05-13 12:41:14:4114 [34minfo[39m: [34mServer is running on port 3000
 2026-08-27 06:31:00:310 [34minfo[39m: [34mServer is running on port 4000[39m
 2026-08-27 06:36:58:3658 [34minfo[39m: [34mServer is running on port 4000[39m
 2026-08-27 06:43:25:4325 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-27 13:11:12:1112 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-27 13:18:13:1813 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-27 13:18:31:1831 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-27 13:28:03:283 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-27 13:37:00:370 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-27 13:40:31:4031 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-27 13:40:45:4045 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-27 13:44:01:441 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-27 13:50:24:5024 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-27 13:51:44:5144 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-27 13:58:03:583 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-27 13:58:47:5847 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-27 13:58:59:5859 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-27 14:05:10:510 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-27 14:06:26:626 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-27 14:07:50:750 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-27 20:17:36:1736 [34minfo[39m: [34mServer is running on port 4000[39m
+2026-08-27 20:21:02:212 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-27 20:21:02:212 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-27 20:29:48:2948 [31merror[39m: [31mAuth Middleware Error: Error: Stream isn't writeable and enableOfflineQueue options is false[39m
+[31m    at EventEmitter.sendCommand (/Users/anshjohnson/SRN/node_modules/.pnpm/ioredis@5.10.1/node_modules/ioredis/built/Redis.js:365:32)[39m
+[31m    at EventEmitter.<anonymous> (/Users/anshjohnson/SRN/node_modules/.pnpm/@sentry+node@10.57.0/node_modules/@sentry/node/src/integrations/tracing/redis/vendored/ioredis-instrumentation.ts:193:33)[39m
+[31m    at EventEmitter.get (/Users/anshjohnson/SRN/node_modules/.pnpm/ioredis@5.10.1/node_modules/ioredis/built/utils/Commander.js:90:25)[39m
+[31m    at protect (/Users/anshjohnson/SRN/artifacts/srn-backend/src/middleware/auth.ts:31:39)[39m
+[31m    at Layer.handleRequest (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/layer.js:152:17)[39m
+[31m    at next (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/route.js:157:13)[39m
+[31m    at Route.dispatch (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/route.js:117:3)[39m
+[31m    at handle (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/index.js:435:11)[39m
+[31m    at /Users/anshjohnson/SRN/node_modules/.pnpm/@sentry+core@10.57.0/node_modules/@sentry/core/src/integrations/express/patch-layer.ts:214:36[39m
+[31m    at /Users/anshjohnson/SRN/node_modules/.pnpm/@sentry+opentelemetry@10.57.0_@opentelemetry+api@1.9.1_@opentelemetry+core@2.7.1_@opent_e3b74f387e2a3bd4369f09b37e9da51a/node_modules/@sentry/opentelemetry/src/trace.ts:136:38[39m
+2026-08-27 20:29:48:2948 [31merror[39m: [31mAuth Middleware Error: Error: Stream isn't writeable and enableOfflineQueue options is false[39m
+[31m    at EventEmitter.sendCommand (/Users/anshjohnson/SRN/node_modules/.pnpm/ioredis@5.10.1/node_modules/ioredis/built/Redis.js:365:32)[39m
+[31m    at EventEmitter.<anonymous> (/Users/anshjohnson/SRN/node_modules/.pnpm/@sentry+node@10.57.0/node_modules/@sentry/node/src/integrations/tracing/redis/vendored/ioredis-instrumentation.ts:193:33)[39m
+[31m    at EventEmitter.get (/Users/anshjohnson/SRN/node_modules/.pnpm/ioredis@5.10.1/node_modules/ioredis/built/utils/Commander.js:90:25)[39m
+[31m    at protect (/Users/anshjohnson/SRN/artifacts/srn-backend/src/middleware/auth.ts:31:39)[39m
+[31m    at Layer.handleRequest (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/layer.js:152:17)[39m
+[31m    at next (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/route.js:157:13)[39m
+[31m    at Route.dispatch (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/route.js:117:3)[39m
+[31m    at handle (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/index.js:435:11)[39m
+[31m    at /Users/anshjohnson/SRN/node_modules/.pnpm/@sentry+core@10.57.0/node_modules/@sentry/core/src/integrations/express/patch-layer.ts:214:36[39m
+[31m    at /Users/anshjohnson/SRN/node_modules/.pnpm/@sentry+opentelemetry@10.57.0_@opentelemetry+api@1.9.1_@opentelemetry+core@2.7.1_@opent_e3b74f387e2a3bd4369f09b37e9da51a/node_modules/@sentry/opentelemetry/src/trace.ts:136:38[39m
+2026-08-27 20:29:49:2949 [31merror[39m: [31mAuth Middleware Error: Error: Stream isn't writeable and enableOfflineQueue options is false[39m
+[31m    at EventEmitter.sendCommand (/Users/anshjohnson/SRN/node_modules/.pnpm/ioredis@5.10.1/node_modules/ioredis/built/Redis.js:365:32)[39m
+[31m    at EventEmitter.<anonymous> (/Users/anshjohnson/SRN/node_modules/.pnpm/@sentry+node@10.57.0/node_modules/@sentry/node/src/integrations/tracing/redis/vendored/ioredis-instrumentation.ts:193:33)[39m
+[31m    at EventEmitter.get (/Users/anshjohnson/SRN/node_modules/.pnpm/ioredis@5.10.1/node_modules/ioredis/built/utils/Commander.js:90:25)[39m
+[31m    at protect (/Users/anshjohnson/SRN/artifacts/srn-backend/src/middleware/auth.ts:31:39)[39m
+[31m    at Layer.handleRequest (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/layer.js:152:17)[39m
+[31m    at next (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/route.js:157:13)[39m
+[31m    at Route.dispatch (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/lib/route.js:117:3)[39m
+[31m    at handle (/Users/anshjohnson/SRN/node_modules/.pnpm/router@2.2.0/node_modules/router/index.js:435:11)[39m
+[31m    at /Users/anshjohnson/SRN/node_modules/.pnpm/@sentry+core@10.57.0/node_modules/@sentry/core/src/integrations/express/patch-layer.ts:214:36[39m
+[31m    at /Users/anshjohnson/SRN/node_modules/.pnpm/@sentry+opentelemetry@10.57.0_@opentelemetry+api@1.9.1_@opentelemetry+core@2.7.1_@opent_e3b74f387e2a3bd4369f09b37e9da51a/node_modules/@sentry/opentelemetry/src/trace.ts:136:38[39m
+2026-08-27 20:29:53:2953 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-27 20:29:53:2953 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-27 20:29:53:2953 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-27 20:29:53:2953 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-27 20:50:04:504 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-27 20:50:04:504 [33mwarn[39m: [33mJWT Verification Error: jwt expired[39m
+2026-08-27 20:52:07:527 [34minfo[39m: [34mServer is running on port 4000[39m
