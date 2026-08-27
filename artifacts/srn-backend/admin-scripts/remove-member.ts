@@ -43,10 +43,15 @@ async function removeMembership() {
       // 3. Confirm with admin
       rl.question(`Found active membership for ${user.firstName} ${user.lastName}. Are you sure you want to CANCEL it? (yes/no): `, async (answer) => {
         if (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y') {
-          // 4. Update status to CANCELLED
+          // 4. Update status to CANCELLED and downgrade user role
           await prisma.membership.update({
             where: { id: activeMembership.id },
             data: { status: 'CANCELLED' }
+          });
+
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { role: 'USER' }
           });
           
           console.log(`✅ Successfully revoked membership for ${email}. Their status is now CANCELLED.`);

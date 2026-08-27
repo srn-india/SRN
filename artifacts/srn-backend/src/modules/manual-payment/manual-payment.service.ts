@@ -138,10 +138,10 @@ export const approvePayment = async (id: string, adminNote?: string) => {
     data: { status: 'APPROVED', adminNote, membershipId },
   });
 
-  // Notify user
+  // Notify user in background
   const user = payment.user;
   const firstName = user.firstName;
-  await sendEmail(
+  sendEmail(
     user.email,
     payment.type === 'MEMBERSHIP'
       ? '🎉 Your SRN Membership is now Active!'
@@ -175,15 +175,16 @@ export const rejectPayment = async (id: string, adminNote: string) => {
     data: { status: 'REJECTED', adminNote },
   });
 
-  // Notify user
+  // Notify user in background
   const user = payment.user;
-  await sendEmail(
+  sendEmail(
     user.email,
-    '❌ Your Payment Verification was Unsuccessful',
-    `<h2>Payment Verification Failed</h2>
-     <p>Dear ${user.firstName}, we were unable to verify your UPI payment of <b>₹${payment.amount}</b>.</p>
+    '❌ Issue with your SRN Payment',
+    `<h2>Hi ${user.firstName},</h2>
+     <p>We encountered an issue while verifying your recent payment of <b>₹${payment.amount}</b>.</p>
      <p><b>Reason:</b> ${adminNote}</p>
-     <p>Please contact us at <a href="mailto:${ADMIN_EMAIL}">${ADMIN_EMAIL}</a> if you believe this is an error, or try submitting your payment details again.</p>`
+     <p>If you believe this is an error, please reply to this email or re-submit your payment verification via the website.</p>
+     <center><a href="${process.env.FRONTEND_URL}/donate" class="btn">Re-submit Payment</a></center>`
   ).catch(err => console.error('Rejection email failed:', err));
 
   return updated;
