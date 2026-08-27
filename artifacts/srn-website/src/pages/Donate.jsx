@@ -6,6 +6,7 @@ import { Heart, ShieldCheck, IndianRupee, ArrowRight, CheckCircle2, ChevronDown,
 import { useLanguage } from "../context/LanguageContext";
 import { useAuth } from "../context/AuthContext";
 import ProfileCompletionModal from "../components/ProfileCompletionModal";
+import imageCompression from 'browser-image-compression';
 import { loadRazorpayScript } from "../utils/razorpay";
 
 const UPI_ID = "sashaktrashtranirman@cbin";
@@ -232,11 +233,24 @@ export default function Donate() {
     }
   };
 
-  const handleScreenshotChange = (e) => {
+  const handleScreenshotChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    setScreenshotFile(file);
-    setScreenshotPreview(URL.createObjectURL(file));
+
+    try {
+      const options = {
+        maxSizeMB: 0.5,
+        maxWidthOrHeight: 1200,
+        useWebWorker: true,
+      };
+      const compressedFile = await imageCompression(file, options);
+      setScreenshotFile(compressedFile);
+      setScreenshotPreview(URL.createObjectURL(compressedFile));
+    } catch (error) {
+      console.error('Error compressing image:', error);
+      setScreenshotFile(file); // fallback to original
+      setScreenshotPreview(URL.createObjectURL(file));
+    }
   };
 
   return (
