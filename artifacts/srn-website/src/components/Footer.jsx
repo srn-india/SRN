@@ -190,6 +190,7 @@ export default function Footer() {
                       {[
                         { to: "/organisation/sansrakshak", label: en ? "Sanrakshak" : "संरक्षक" },
                         { to: "/organisation/national-president", label: en ? "National President" : "राष्ट्रीय अध्यक्ष" },
+                        { to: "/organisation/national-office-bearers", label: en ? "National Office Bearers" : "राष्ट्रीय पदाधिकारी" },
                         { to: "/organisation/advisory-board", label: en ? "Advisory Board" : "सलाहकार मंडल" },
                       ].map((subLink) => (
                         <li key={subLink.to}>
