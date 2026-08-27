@@ -134,12 +134,12 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetchAnalytics();
+    fetchManualPayments("PENDING");
     if (activeTab === "complaints") fetchComplaints();
     if (activeTab === "articles") fetchArticles();
     if (activeTab === "events") fetchEvents();
     if (activeTab === "forums") fetchForums();
     if (activeTab === "memberships") fetchMemberships(membershipPage);
-    if (activeTab === "manual-payments") fetchManualPayments();
   }, [activeTab]);
 
   const fetchComplaints = async () => {
@@ -715,11 +715,11 @@ export default function AdminDashboard() {
                       <p className="text-sm text-[#7A5C45] font-semibold">Active Forums</p>
                     </div>
                     <div className="bg-white/60 backdrop-blur-md rounded-[2rem] p-6 border border-white/80 shadow-sm">
-                      <UserCircle className="w-8 h-8 text-rose-500 mb-4" />
+                      <QrCode className="w-8 h-8 text-rose-500 mb-4" />
                       <h3 className="text-2xl font-bold text-[#2C1810]">
-                        {adminComplaints.filter(c => c.status === "PENDING").length}
+                        {manualPayments.filter(c => c.status === "PENDING").length}
                       </h3>
-                      <p className="text-sm text-[#7A5C45] font-semibold">Pending Approvals</p>
+                      <p className="text-sm text-[#7A5C45] font-semibold">Pending Payments</p>
                     </div>
                   </div>
 
@@ -731,8 +731,9 @@ export default function AdminDashboard() {
                       <Sliders className="w-5 h-5 text-[#E8622A]" />
                       Quick Admin Actions
                     </h3>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 relative z-10">
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 relative z-10">
                       {[
+                        { label: "Review Payments", icon: QrCode, bg: "bg-rose-50/80", border: "border-rose-100", text: "text-rose-600", onClick: () => setActiveTab("manual-payments") },
                         { label: "New Event", icon: Plus, bg: "bg-blue-50/80", border: "border-blue-100", text: "text-blue-600", onClick: () => { setActiveTab("events"); setShowEventModal(true); } },
                         { label: "Analytics", icon: TrendingUp, bg: "bg-emerald-50/80", border: "border-emerald-100", text: "text-emerald-600", onClick: () => setShowAnalyticsModal(true) },
                         { label: "User Roles", icon: ShieldAlert, bg: "bg-purple-50/80", border: "border-purple-100", text: "text-purple-600", onClick: () => setActiveTab("approvals") },
