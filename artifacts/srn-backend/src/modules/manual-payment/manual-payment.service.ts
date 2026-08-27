@@ -205,14 +205,47 @@ export const sendIdCard = async (userId: string) => {
   const cardUrl = await idcardService.generateAndUploadIdCard(membership.id);
   if (!cardUrl) throw new Error('Failed to generate ID card');
 
+  // Try to find the associated manual payment for the receipt
+  const payment = await prisma.manualPayment.findFirst({
+    where: { userId, type: 'MEMBERSHIP', status: 'APPROVED' },
+    orderBy: { createdAt: 'desc' }
+  });
+
   const firstName = user.firstName;
-  await sendEmail(
+  let attachments: any[] = [];
+
+  if (payment) {
+    try {
+      const pdfBuffer = await generateReceiptPdf({
+        userName: `${user.firstName} ${user.lastName}`.trim(),
+        amount: Number(payment.amount),
+        paymentId: payment.utrNumber,
+        type: 'MEMBERSHIP',
+        date: payment.createdAt,
+        method: 'UPI (Manual)'
+      });
+      attachments.push({
+        filename: 'SRN_Membership_Receipt.pdf',
+        content: pdfBuffer,
+        contentType: 'application/pdf'
+      });
+    } catch (err) {
+      console.error('Failed to generate membership receipt PDF:', err);
+    }
+  }
+
+  // Use the backgrounded approach for sendEmail as well!
+  sendEmail(
     user.email,
-    '🪪 Your SRN Member ID Card',
+    '🪪 Your SRN Member ID Card & Receipt',
     `<h2>Your SRN ID Card is Ready, ${firstName}!</h2>
-     <p>Click the button below to download your official SRN Member ID Card.</p>
-     <center><a href="${cardUrl}" class="btn">Download ID Card</a></center>`
-  );
+     <p>Welcome to Sashakt Rashtra Nirman. Your active member ID card has been generated.</p>
+     <p>Click the button below to view and download your official SRN Member ID Card.</p>
+     ${attachments.length > 0 ? '<p>Please find the official receipt for your membership payment attached to this email.</p>' : ''}
+     <center><a href="${cardUrl}" class="btn">Download ID Card</a></center>`,
+     undefined,
+     attachments
+  ).catch(err => console.error('Failed to send ID card email:', err));
 
   return { success: true, membershipId: membership.id, cardUrl };
 };
