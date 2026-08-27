@@ -34,10 +34,10 @@ export const submitPayment = async (
     include: { user: true },
   });
 
-  // Notify admin
+  // Notify admin in background
   const user = payment.user;
   const userName = `${user.firstName} ${user.lastName}`.trim();
-  await sendEmail(
+  sendEmail(
     ADMIN_EMAIL,
     `🔔 New Manual Payment Submitted — ₹${data.amount} (${data.type})`,
     `<h2>Manual Payment ${initialStatus === 'APPROVED' ? 'Received (Auto-Approved)' : 'Pending Verification'}</h2>
@@ -52,46 +52,48 @@ export const submitPayment = async (
      <p><a href="${process.env.FRONTEND_URL}/admin-dashboard" class="btn">Review in Admin Dashboard</a></p>`
   ).catch(err => console.error('Admin notification email failed:', err));
 
-  // If DONATION, send the thank you email immediately
+  // If DONATION, send the thank you email immediately in the background
   if (data.type === 'DONATION') {
-    let attachments: any[] = [];
-    try {
-      const pdfBuffer = await generateReceiptPdf({
-        userName: `${user.firstName} ${user.lastName}`.trim(),
-        amount: Number(data.amount),
-        paymentId: data.utrNumber,
-        type: 'DONATION',
-        date: new Date(),
-        method: 'UPI (Manual)'
-      });
-      attachments.push({
-        filename: 'SRN_Donation_Receipt.pdf',
-        content: pdfBuffer,
-        contentType: 'application/pdf'
-      });
-    } catch (err) {
-      console.error('Failed to generate PDF receipt:', err);
-    }
+    (async () => {
+      let attachments: any[] = [];
+      try {
+        const pdfBuffer = await generateReceiptPdf({
+          userName: `${user.firstName} ${user.lastName}`.trim(),
+          amount: Number(data.amount),
+          paymentId: data.utrNumber,
+          type: 'DONATION',
+          date: new Date(),
+          method: 'UPI (Manual)'
+        });
+        attachments.push({
+          filename: 'SRN_Donation_Receipt.pdf',
+          content: pdfBuffer,
+          contentType: 'application/pdf'
+        });
+      } catch (err) {
+        console.error('Failed to generate PDF receipt:', err);
+      }
 
-    await sendEmail(
-      user.email,
-      '✅ Your Donation has been received!',
-      `<h2>Dear ${user.firstName},</h2>
-       <p>We have successfully received your generous donation of <b>₹${data.amount}</b> via UPI.</p>
-       <p>Your contribution directly empowers our youth-driven initiatives and helps us build a stronger India. We cannot do this without the support of dedicated individuals like you.</p>
-       <div style="background-color: #f3f4f6; padding: 16px; border-radius: 6px; margin: 24px 0;">
-         <h3 style="margin-top:0; color: #111;">Donation Receipt</h3>
-         <p style="margin:4px 0;"><b>Amount:</b> ₹${data.amount}</p>
-         <p style="margin:4px 0;"><b>Payment Method:</b> UPI</p>
-         <p style="margin:4px 0;"><b>UTR / Transaction ID:</b> ${data.utrNumber}</p>
-         <p style="margin:4px 0;"><b>Date:</b> ${new Date().toLocaleDateString('en-IN')}</p>
-       </div>
-       <p>Please find the official PDF receipt attached to this email.</p>
-       <p>With deep gratitude,<br><b>The SRN Team</b></p>
-       <center><a href="${process.env.FRONTEND_URL}/dashboard" class="btn">Visit Dashboard</a></center>`,
-      undefined,
-      attachments
-    ).catch(err => console.error('Donation thank you email failed:', err));
+      await sendEmail(
+        user.email,
+        '✅ Your Donation has been received!',
+        `<h2>Dear ${user.firstName},</h2>
+         <p>We have successfully received your generous donation of <b>₹${data.amount}</b> via UPI.</p>
+         <p>Your contribution directly empowers our youth-driven initiatives and helps us build a stronger India. We cannot do this without the support of dedicated individuals like you.</p>
+         <div style="background-color: #f3f4f6; padding: 16px; border-radius: 6px; margin: 24px 0;">
+           <h3 style="margin-top:0; color: #111;">Donation Receipt</h3>
+           <p style="margin:4px 0;"><b>Amount:</b> ₹${data.amount}</p>
+           <p style="margin:4px 0;"><b>Payment Method:</b> UPI</p>
+           <p style="margin:4px 0;"><b>UTR / Transaction ID:</b> ${data.utrNumber}</p>
+           <p style="margin:4px 0;"><b>Date:</b> ${new Date().toLocaleDateString('en-IN')}</p>
+         </div>
+         <p>Please find the official PDF receipt attached to this email.</p>
+         <p>With deep gratitude,<br><b>The SRN Team</b></p>
+         <center><a href="${process.env.FRONTEND_URL}/dashboard" class="btn">Visit Dashboard</a></center>`,
+        undefined,
+        attachments
+      ).catch(err => console.error('Donation thank you email failed:', err));
+    })();
   }
 
   return payment;
