@@ -1,15 +1,16 @@
 import { Request, Response } from 'express';
 import * as service from './manual-payment.service';
 import { upload, uploadToSupabase } from '../../utils/upload';
+import { prisma } from '../../lib/prisma';
 
 export const submit = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id;
-    const { amount, type, utrNumber, screenshot, purpose } = req.body;
+    const { amount, type, utrNumber, screenshot, purpose, email } = req.body;
     if (!amount || !type || !utrNumber) {
       return res.status(400).json({ success: false, message: 'amount, type and utrNumber are required' });
     }
-    const payment = await service.submitPayment(userId, { amount, type, utrNumber, screenshot, purpose });
+    const payment = await service.submitPayment(userId, { amount, type, utrNumber, screenshot, purpose, email });
     res.json({ success: true, message: 'Payment submitted for verification', data: payment });
   } catch (err: any) {
     res.status(500).json({ success: false, message: err.message });

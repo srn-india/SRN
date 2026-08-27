@@ -16,6 +16,7 @@ export const submitPayment = async (
     utrNumber: string;
     screenshot?: string;
     purpose?: string;
+    email?: string;
   }
 ) => {
   // Donations are automatically approved since they don't grant member privileges
@@ -37,12 +38,14 @@ export const submitPayment = async (
   // Notify admin in background
   const user = payment.user;
   const userName = `${user.firstName} ${user.lastName}`.trim();
+  const recipientEmail = data.email || user.email;
+
   sendEmail(
     ADMIN_EMAIL,
     `🔔 New Manual Payment Submitted — ₹${data.amount} (${data.type})`,
     `<h2>Manual Payment ${initialStatus === 'APPROVED' ? 'Received (Auto-Approved)' : 'Pending Verification'}</h2>
      <ul>
-       <li><b>User:</b> ${userName} (${user.email})</li>
+       <li><b>User:</b> ${userName} (${recipientEmail})</li>
        <li><b>Type:</b> ${data.type}</li>
        <li><b>Amount:</b> ₹${data.amount}</li>
        <li><b>UTR / Transaction ID:</b> ${data.utrNumber}</li>
@@ -63,7 +66,7 @@ export const submitPayment = async (
           paymentId: data.utrNumber,
           type: 'DONATION',
           date: new Date(),
-          method: 'UPI (Manual)'
+          method: data.purpose?.includes('[BANK TRANSFER]') ? 'Bank Transfer' : 'UPI (Manual)'
         });
         attachments.push({
           filename: 'SRN_Donation_Receipt.pdf',
@@ -75,15 +78,15 @@ export const submitPayment = async (
       }
 
       await sendEmail(
-        user.email,
+        recipientEmail,
         '✅ Your Donation has been received!',
         `<h2>Dear ${user.firstName},</h2>
-         <p>We have successfully received your generous donation of <b>₹${data.amount}</b> via UPI.</p>
+         <p>We have successfully received your generous donation of <b>₹${data.amount}</b> via ${data.purpose?.includes('[BANK TRANSFER]') ? 'Bank Transfer' : 'UPI'}.</p>
          <p>Your contribution directly empowers our youth-driven initiatives and helps us build a stronger India. We cannot do this without the support of dedicated individuals like you.</p>
          <div style="background-color: #f3f4f6; padding: 16px; border-radius: 6px; margin: 24px 0;">
            <h3 style="margin-top:0; color: #111;">Donation Receipt</h3>
            <p style="margin:4px 0;"><b>Amount:</b> ₹${data.amount}</p>
-           <p style="margin:4px 0;"><b>Payment Method:</b> UPI</p>
+           <p style="margin:4px 0;"><b>Payment Method:</b> ${data.purpose?.includes('[BANK TRANSFER]') ? 'Bank Transfer' : 'UPI'}</p>
            <p style="margin:4px 0;"><b>UTR / Transaction ID:</b> ${data.utrNumber}</p>
            <p style="margin:4px 0;"><b>Date:</b> ${new Date().toLocaleDateString('en-IN')}</p>
          </div>
@@ -92,9 +95,20 @@ export const submitPayment = async (
          <center><a href="${process.env.FRONTEND_URL}/dashboard" class="btn">Visit Dashboard</a></center>`,
         undefined,
         attachments
-      ).catch(err => console.error('Donation thank you email failed:', err));
+      ).then(() => console.log('Donation thank you email sent successfully')).catch(err => console.error('Donation thank you email failed:', err));
     })();
   }
+  
+  // Send an acknowledgment email for ALL manual payments immediately
+  console.log('Sending acknowledgment email to', recipientEmail);
+  sendEmail(
+    recipientEmail,
+    '⏳ Payment Verification Pending',
+    `<h2>Hi ${user.firstName},</h2>
+      <p>We have received your manual payment submission of <b>₹${data.amount}</b> for ${data.type}.</p>
+      <p>Our team will verify your transaction (<b>${data.utrNumber}</b>) shortly.</p>
+      <p>You will receive a confirmation email and your receipt once it is approved.</p>`
+  ).then(() => console.log('Ack email sent successfully')).catch(err => console.error('Ack email failed:', err));
 
   return payment;
 };
@@ -148,12 +162,12 @@ export const approvePayment = async (id: string, adminNote?: string) => {
       : '✅ Your Donation has been verified!',
     payment.type === 'MEMBERSHIP'
       ? `<h2>Welcome to SRN, ${firstName}!</h2>
-         <p>Your payment of <b>₹${payment.amount}</b> via UPI has been verified by our team.</p>
+         <p>Your payment of <b>₹${payment.amount}</b> via ${payment.purpose?.includes('[BANK TRANSFER]') ? 'Bank Transfer' : 'UPI'} has been verified by our team.</p>
          <p>Your SRN Membership is now <b>ACTIVE</b>. You can log in to access all member features.</p>
          ${adminNote ? `<p><b>Note from admin:</b> ${adminNote}</p>` : ''}
          <center><a href="${process.env.FRONTEND_URL}/dashboard" class="btn">Go to Dashboard</a></center>`
       : `<h2>Thank you for your generous donation, ${firstName}!</h2>
-         <p>Your donation of <b>₹${payment.amount}</b> via UPI has been successfully verified.</p>
+         <p>Your donation of <b>₹${payment.amount}</b> via ${payment.purpose?.includes('[BANK TRANSFER]') ? 'Bank Transfer' : 'UPI'} has been successfully verified.</p>
          ${adminNote ? `<p><b>Note:</b> ${adminNote}</p>` : ''}
          <center><a href="${process.env.FRONTEND_URL}/dashboard" class="btn">Visit Dashboard</a></center>`
   ).catch(err => console.error('Approval email failed:', err));
@@ -222,7 +236,7 @@ export const sendIdCard = async (userId: string) => {
         paymentId: payment.utrNumber,
         type: 'MEMBERSHIP',
         date: payment.createdAt,
-        method: 'UPI (Manual)'
+        method: payment.purpose?.includes('[BANK TRANSFER]') ? 'Bank Transfer' : 'UPI (Manual)'
       });
       attachments.push({
         filename: 'SRN_Membership_Receipt.pdf',

@@ -1311,9 +1311,9 @@ export default function AdminDashboard() {
                     <div>
                       <h2 className="text-2xl font-bold text-[#2C1810] font-serif flex items-center gap-3">
                         <div className="p-2 bg-[#E8622A]/10 rounded-xl"><QrCode className="w-6 h-6 text-[#E8622A]" /></div>
-                        Manual Payments (UPI/QR)
+                        Manual Payments (UPI & Bank Transfer)
                       </h2>
-                      <p className="text-sm text-[#7A5C45] mt-1">Review and verify UPI payment submissions from members and donors.</p>
+                      <p className="text-sm text-[#7A5C45] mt-1">Review and verify UPI and Bank Transfer payment submissions from members and donors.</p>
                     </div>
                     <button onClick={() => fetchManualPayments()} className="flex items-center gap-2 px-4 py-2 bg-[#E8622A]/10 hover:bg-[#E8622A]/20 text-[#E8622A] rounded-xl font-semibold text-sm transition-colors">
                       <RotateCw className="w-4 h-4" /> Refresh
@@ -1352,11 +1352,32 @@ export default function AdminDashboard() {
                                 }`}>{p.status}</span>
                                 <span className="text-xs text-gray-400">{new Date(p.createdAt).toLocaleString("en-IN")}</span>
                                 <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${p.type === "MEMBERSHIP" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"}`}>{p.type}</span>
+                                {(() => {
+                                  let methodTag = "Manual";
+                                  let cleanPurpose = p.purpose || "";
+                                  if (cleanPurpose.includes("[BANK TRANSFER]")) {
+                                    methodTag = "Bank Transfer";
+                                    cleanPurpose = cleanPurpose.replace("[BANK TRANSFER]", "").trim();
+                                  } else if (cleanPurpose.includes("[UPI]")) {
+                                    methodTag = "UPI";
+                                    cleanPurpose = cleanPurpose.replace("[UPI]", "").trim();
+                                  }
+                                  
+                                  // Assign cleanPurpose back to p so we render it nicely below
+                                  p.cleanPurpose = cleanPurpose;
+                                  
+                                  return (
+                                    <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${methodTag === "Bank Transfer" ? "bg-indigo-100 text-indigo-700" : "bg-teal-100 text-teal-700"}`}>
+                                      {methodTag}
+                                    </span>
+                                  );
+                                })()}
                               </div>
                               <p className="font-bold text-[#2C1810] text-lg">₹{p.amount}</p>
                               <p className="text-sm text-gray-600"><span className="font-semibold">Name:</span> {p.user?.firstName} {p.user?.lastName}</p>
                               <p className="text-sm text-gray-600"><span className="font-semibold">Email:</span> {p.user?.email}</p>
                               <p className="text-sm text-gray-600"><span className="font-semibold">UTR:</span> <span className="font-mono">{p.utrNumber}</span></p>
+                              {p.cleanPurpose && <p className="text-sm text-gray-600"><span className="font-semibold">Purpose:</span> {p.cleanPurpose}</p>}
                               {p.adminNote && <p className="text-sm text-red-500"><span className="font-semibold">Admin Note:</span> {p.adminNote}</p>}
                             </div>
 

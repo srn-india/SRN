@@ -6,7 +6,7 @@ export interface ReceiptData {
   paymentId: string; // Razorpay Payment ID or Manual Payment UTR
   type: 'DONATION' | 'MEMBERSHIP';
   date: Date;
-  method: 'RAZORPAY' | 'UPI (Manual)';
+  method: 'RAZORPAY' | 'UPI (Manual)' | 'Bank Transfer';
 }
 
 export const generateReceiptPdf = async (data: ReceiptData): Promise<Buffer> => {
