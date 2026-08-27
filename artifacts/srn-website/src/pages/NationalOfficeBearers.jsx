@@ -53,6 +53,13 @@ const bearersData = {
         descEn: "Uttar Pradesh",
         descHi: "उत्तर प्रदेश",
         image: "/national_bearers/bhola-pahalwan.jpeg"
+      },
+      {
+        nameEn: "Shri Shammi Kumar Bakshi",
+        nameHi: "श्री शम्मी कुमार बख्शी",
+        descEn: "Madhya Pradesh",
+        descHi: "मध्य प्रदेश",
+        image: "/national_bearers/shammi-kumar-bakshi.jpeg"
       }
     ]
   },
@@ -133,16 +140,23 @@ const bearersData = {
       {
         nameEn: "Prof. (Dr.) Anjana Yadav",
         nameHi: "प्रो. (डॉ.) अंजना यादव",
-        descEn: "Rajasthan\nEx-Chancellor, Baba Mastnath University, Rohtak\nPresident, Mahila Morcha",
-        descHi: "राजस्थान\nपूर्व कुलपति, बाबा मस्तनाथ विश्वविद्यालय, रोहतक\nअध्यक्ष, महिला मोर्चा",
+        descEn: "Rajasthan\nEx-Pro Chancellor, Baba Mastnath University, Rohtak\n**President, Mahila Morcha**",
+        descHi: "राजस्थान\nपूर्व प्रति-कुलाधिपति, बाबा मस्तनाथ विश्वविद्यालय, रोहतक\n**अध्यक्ष, महिला मोर्चा**",
         image: "/national_bearers/anjana-yadav.jpeg"
       },
       {
         nameEn: "Shri Sudhir Saxena",
         nameHi: "श्री सुधीर सक्सेना",
-        descEn: "National Kickboxing player\nSilver medal for India at India Open International Kickboxing Cup 2026\nPresident, Yuva Morcha",
-        descHi: "राष्ट्रीय किकबॉक्सिंग खिलाड़ी\nइंडिया ओपन इंटरनेशनल किकबॉक्सिंग कप 2026 में भारत के लिए रजत पदक\nअध्यक्ष, युवा मोर्चा",
+        descEn: "National Kickboxing player\nSilver medal for India at India Open International Kickboxing Cup 2026\n**President, Yuva Morcha**",
+        descHi: "राष्ट्रीय किकबॉक्सिंग खिलाड़ी\nइंडिया ओपन इंटरनेशनल किकबॉक्सिंग कप 2026 में भारत के लिए रजत पदक\n**अध्यक्ष, युवा मोर्चा**",
         image: "/national_bearers/sudhir-saxena.jpeg"
+      },
+      {
+        nameEn: "Shri Prakash Uikey",
+        nameHi: "श्री प्रकाश उइके",
+        descEn: "Former Judge\n**President, ST Morcha**",
+        descHi: "पूर्व न्यायाधीश\n**अध्यक्ष, एसटी मोर्चा**",
+        image: "/national_bearers/prakash-uikey.jpeg"
       }
     ]
   }
@@ -154,13 +168,31 @@ function MemberCard({ member, lang }) {
   const desc = en ? member.descEn : member.descHi;
   const [imageError, setImageError] = useState(false);
 
+  const renderDesc = (text) => {
+    if (!text) return null;
+    const lines = text.split("\n");
+    return lines.map((line, lIdx) => {
+      const parts = line.split("**");
+      return (
+        <span key={lIdx} className="block">
+          {parts.map((part, pIdx) => {
+            if (pIdx % 2 === 1) {
+              return <strong key={pIdx} className="font-bold text-[#5C1010]">{part}</strong>;
+            }
+            return part;
+          })}
+        </span>
+      );
+    });
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5 }}
-      className="flex flex-col items-center text-center w-full max-w-[210px] group"
+      className="flex flex-col items-center text-center w-full max-w-[230px] group"
     >
       {/* 3:4 Aspect Ratio Image/Placeholder */}
       <div className="w-full aspect-[3/4] rounded-2xl bg-white border border-[#E8D5B8] flex flex-col items-center justify-center relative overflow-hidden transition-all duration-300 group-hover:border-[#E8622A]/40 group-hover:shadow-md">
@@ -187,8 +219,8 @@ function MemberCard({ member, lang }) {
         {name}
       </h3>
       {desc && (
-        <p className="mt-1 text-xs md:text-sm text-[#7A5C45] font-medium leading-normal whitespace-pre-line">
-          {desc}
+        <p className="mt-1 text-xs md:text-sm text-[#7A5C45] font-medium leading-normal">
+          {renderDesc(desc)}
         </p>
       )}
     </motion.div>
@@ -271,7 +303,7 @@ export default function NationalOfficeBearers() {
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 md:gap-12 w-full justify-items-center justify-center">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 w-full justify-items-center justify-center max-w-[1440px]">
             {bearersData.vicePresidents.members.map((member, i) => (
               <MemberCard key={i} member={member} lang={lang} />
             ))}
@@ -335,7 +367,7 @@ export default function NationalOfficeBearers() {
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12 w-full justify-items-center justify-center max-w-xl">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-12 w-full justify-items-center justify-center max-w-4xl">
             {bearersData.morcha.members.map((member, i) => (
               <MemberCard key={i} member={member} lang={lang} />
             ))}
