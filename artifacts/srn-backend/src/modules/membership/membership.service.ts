@@ -3,11 +3,20 @@ import { generateAndUploadIdCard } from './idcard.service';
 import { MembershipPlan } from '@prisma/client';
 
 export const subscribeUser = async (userId: string, plan: MembershipPlan, durationInMonths: number, txClient?: any) => {
+  const client = txClient || prisma;
+
+  // Prevent duplicate active memberships
+  const existingMembership = await client.membership.findFirst({
+    where: { userId, status: 'ACTIVE' }
+  });
+
+  if (existingMembership) {
+    return existingMembership;
+  }
+
   const startDate = new Date();
   const endDate = new Date();
   endDate.setMonth(endDate.getMonth() + durationInMonths);
-
-  const client = txClient || prisma;
 
   // 1. Create membership record
   const membership = await client.membership.create({

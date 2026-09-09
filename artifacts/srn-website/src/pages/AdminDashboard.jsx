@@ -40,6 +40,7 @@ export default function AdminDashboard() {
   const [rejectModal, setRejectModal] = useState(null); // { id, userId }
   const [rejectReason, setRejectReason] = useState("");
   const [mpFilter, setMpFilter] = useState("PENDING");
+  const [paymentTypeFilter, setPaymentTypeFilter] = useState("ALL");
   
   // 2FA Setup State
   const [qrCodeUrl, setQrCodeUrl] = useState(null);
@@ -589,7 +590,6 @@ export default function AdminDashboard() {
     { id: "articles", label: "Manage Articles", icon: BookOpen },
     { id: "complaints", label: "Manage Complaints", icon: AlertCircle },
     { id: "applications", label: "Post Applications", icon: Briefcase },
-    { id: "approvals", label: "Approve IDs", icon: ShieldCheck },
     { id: "memberships", label: "Manage Memberships", icon: Users },
     { id: "manual-payments", label: "Manual Payments", icon: QrCode },
     { id: "settings", label: "Platform Settings", icon: Settings },
@@ -662,13 +662,6 @@ export default function AdminDashboard() {
                   >
                     <tab.icon className={`w-4 h-4 lg:w-5 lg:h-5 ${isActive ? "text-white" : "text-[#E8622A]"}`} />
                     {tab.label}
-                    {tab.id === "approvals" && pendingUsers.length > 0 && (
-                      <span className={`ml-2 lg:ml-auto text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                        isActive ? "bg-white text-[#E8622A]" : "bg-[#E8622A] text-white"
-                      }`}>
-                        {pendingUsers.length}
-                      </span>
-                    )}
                   </button>
                 )
               })}
@@ -736,7 +729,6 @@ export default function AdminDashboard() {
                         { label: "Review Payments", icon: QrCode, bg: "bg-rose-50/80", border: "border-rose-100", text: "text-rose-600", onClick: () => setActiveTab("manual-payments") },
                         { label: "New Event", icon: Plus, bg: "bg-blue-50/80", border: "border-blue-100", text: "text-blue-600", onClick: () => { setActiveTab("events"); setShowEventModal(true); } },
                         { label: "Analytics", icon: TrendingUp, bg: "bg-emerald-50/80", border: "border-emerald-100", text: "text-emerald-600", onClick: () => setShowAnalyticsModal(true) },
-                        { label: "User Roles", icon: ShieldAlert, bg: "bg-purple-50/80", border: "border-purple-100", text: "text-purple-600", onClick: () => setActiveTab("approvals") },
                         { label: "Grievances", icon: AlertCircle, bg: "bg-amber-50/80", border: "border-amber-100", text: "text-amber-600", onClick: () => setActiveTab("complaints") },
                       ].map((action, i) => (
                         <div key={i} onClick={action.onClick} className={`p-5 rounded-[1.5rem] border ${action.border} ${action.bg} shadow-sm cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all flex flex-col items-center justify-center gap-3 backdrop-blur-sm`}>
@@ -1247,63 +1239,6 @@ export default function AdminDashboard() {
                 </motion.div>
               )}
 
-              {/* APPROVE IDS TAB */}
-              {activeTab === "approvals" && (
-                <motion.div key="approvals" variants={fadeVariants} initial="hidden" animate="visible" exit="exit" className="bg-white/70 backdrop-blur-xl p-8 rounded-[2rem] border border-white/80 shadow-sm">
-                  <div className="mb-8 pb-4 border-b border-gray-100">
-                    <h2 className="text-2xl font-bold text-[#2C1810] font-serif flex items-center gap-2">
-                      Approve IDs
-                      <span className="bg-[#E8622A] text-white text-sm px-2 py-0.5 rounded-full">{pendingUsers.length}</span>
-                    </h2>
-                    <p className="text-sm text-[#7A5C45] mt-1">Review pending member registrations to generate their digital IDs.</p>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    {pendingUsers.map((user) => (
-                      <div key={user.id} className="flex flex-col md:flex-row justify-between md:items-center gap-4 bg-gradient-to-r from-white/60 to-white/30 border border-white p-5 rounded-2xl shadow-sm hover:shadow-md transition-all group relative overflow-hidden">
-                        <div className="absolute -right-4 -bottom-4 opacity-5 pointer-events-none transition-transform group-hover:scale-110 duration-500">
-                          <ShieldCheck className="w-24 h-24" />
-                        </div>
-                        <div className="flex items-center gap-5 relative z-10">
-                          <div className="relative">
-                            <div className="w-14 h-14 bg-gradient-to-br from-orange-100 to-orange-200 rounded-2xl flex items-center justify-center text-[#E8622A] font-bold text-xl border-2 border-white shadow-sm group-hover:shadow-md transition-shadow">
-                              {user.name.charAt(0)}
-                            </div>
-                            <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-amber-400 border-2 border-white rounded-full shadow-sm animate-pulse" />
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-[#2C1810] text-lg">{user.name}</h4>
-                            <p className="text-xs text-[#7A5C45] font-medium">{user.email}</p>
-                            <p className="text-[10px] text-gray-500 font-bold uppercase mt-1 tracking-wider">Applied: {user.date}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3 relative z-10">
-                          <button 
-                            onClick={() => handleApproveUser(user.id)}
-                            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl transition-all hover:scale-105 hover:shadow-emerald-500/30 hover:shadow-lg text-sm font-bold border border-emerald-400"
-                          >
-                            <CheckCircle2 className="w-4 h-4" /> Approve
-                          </button>
-                          <button 
-                            onClick={() => handleDeclineUser(user.id)}
-                            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300 rounded-xl transition-all text-sm font-bold shadow-sm"
-                          >
-                            <XCircle className="w-4 h-4" /> Decline
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                    {pendingUsers.length === 0 && (
-                      <div className="text-center py-16 flex flex-col items-center">
-                        <ShieldCheck className="w-16 h-16 text-green-400 mb-4 opacity-50" />
-                        <h3 className="text-lg font-bold text-[#2C1810]">All caught up!</h3>
-                        <p className="text-[#7A5C45]">There are no pending ID approvals.</p>
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              )}
-
               {/* MANUAL PAYMENTS TAB */}
               {activeTab === "manual-payments" && (
                 <motion.div key="manual-payments" variants={fadeVariants} initial="hidden" animate="visible" exit="exit" className="bg-white/70 backdrop-blur-xl p-8 rounded-[2rem] border border-white/80 shadow-sm">
@@ -1321,13 +1256,23 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* Filter Tabs */}
-                  <div className="flex gap-2 mb-6 bg-gray-100 p-1 rounded-xl w-fit">
-                    {["PENDING", "APPROVED", "REJECTED"].map(s => (
-                      <button key={s} onClick={() => { setMpFilter(s); fetchManualPayments(s); }}
-                        className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${mpFilter === s ? "bg-white shadow text-[#E8622A]" : "text-gray-500 hover:text-gray-700"}`}>
-                        {s.charAt(0) + s.slice(1).toLowerCase()}
-                      </button>
-                    ))}
+                  <div className="flex flex-col xl:flex-row justify-between gap-4 mb-8 bg-white/60 p-2 rounded-2xl border border-white/80 shadow-sm backdrop-blur-md">
+                    <div className="flex bg-gray-100/80 p-1 rounded-xl w-full xl:w-auto overflow-x-auto">
+                      {["PENDING", "APPROVED", "REJECTED"].map(s => (
+                        <button key={s} onClick={() => { setMpFilter(s); fetchManualPayments(s); }}
+                          className={`flex-1 xl:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${mpFilter === s ? "bg-white shadow-sm text-[#E8622A] scale-[1.02]" : "text-gray-500 hover:text-gray-700 hover:bg-white/50"}`}>
+                          {s.charAt(0) + s.slice(1).toLowerCase()}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex bg-gray-100/80 p-1 rounded-xl w-full xl:w-auto overflow-x-auto">
+                      {["ALL", "MEMBERSHIP", "DONATION"].map(s => (
+                        <button key={s} onClick={() => setPaymentTypeFilter(s)}
+                          className={`flex-1 xl:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${paymentTypeFilter === s ? "bg-white shadow-sm text-blue-600 scale-[1.02]" : "text-gray-500 hover:text-gray-700 hover:bg-white/50"}`}>
+                          {s === "ALL" ? "All Types" : s.charAt(0) + s.slice(1).toLowerCase()}
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
                   {manualLoading ? (
@@ -1339,79 +1284,153 @@ export default function AdminDashboard() {
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {manualPayments.map(p => (
-                        <div key={p.id} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-                          <div className="flex flex-wrap gap-4 items-start justify-between">
-                            {/* Info */}
-                            <div className="space-y-1 flex-1 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide ${
-                                  p.status === "PENDING" ? "bg-amber-100 text-amber-700" :
-                                  p.status === "APPROVED" ? "bg-green-100 text-green-700" :
-                                  "bg-red-100 text-red-700"
-                                }`}>{p.status}</span>
-                                <span className="text-xs text-gray-400">{new Date(p.createdAt).toLocaleString("en-IN")}</span>
-                                <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${p.type === "MEMBERSHIP" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"}`}>{p.type}</span>
-                                {(() => {
-                                  let methodTag = "Manual";
-                                  let cleanPurpose = p.purpose || "";
-                                  if (cleanPurpose.includes("[BANK TRANSFER]")) {
-                                    methodTag = "Bank Transfer";
-                                    cleanPurpose = cleanPurpose.replace("[BANK TRANSFER]", "").trim();
-                                  } else if (cleanPurpose.includes("[UPI]")) {
-                                    methodTag = "UPI";
-                                    cleanPurpose = cleanPurpose.replace("[UPI]", "").trim();
-                                  }
+                      {manualPayments.filter(p => paymentTypeFilter === "ALL" || p.type === paymentTypeFilter).length === 0 ? (
+                        <div className="text-center py-10 text-gray-500">No {paymentTypeFilter !== "ALL" ? paymentTypeFilter.toLowerCase() : ""} payments found in this category.</div>
+                      ) : (
+                        manualPayments.filter(p => paymentTypeFilter === "ALL" || p.type === paymentTypeFilter).map(p => (
+                          <div key={p.id} className="bg-white border border-gray-100 rounded-[2rem] p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                            {/* Decorative Background */}
+                            <div className={`absolute top-0 right-0 w-32 h-32 rounded-bl-full pointer-events-none opacity-20 transition-transform group-hover:scale-110 ${
+                              p.status === "PENDING" ? "bg-gradient-to-br from-amber-400 to-transparent" :
+                              p.status === "APPROVED" ? "bg-gradient-to-br from-emerald-400 to-transparent" :
+                              "bg-gradient-to-br from-red-400 to-transparent"
+                            }`} />
+                            
+                            <div className="flex flex-wrap lg:flex-nowrap gap-8 items-start justify-between relative z-10">
+                              {/* Left Content */}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2.5 flex-wrap mb-4">
+                                  <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                                    p.status === "PENDING" ? "bg-amber-100 text-amber-700 border border-amber-200" :
+                                    p.status === "APPROVED" ? "bg-emerald-100 text-emerald-700 border border-emerald-200" :
+                                    "bg-red-100 text-red-700 border border-red-200"
+                                  }`}>
+                                    <div className="flex items-center gap-1.5">
+                                      {p.status === "PENDING" && <RotateCw className="w-3 h-3 animate-spin-slow" />}
+                                      {p.status === "APPROVED" && <CheckCircle2 className="w-3 h-3" />}
+                                      {p.status === "REJECTED" && <XCircle className="w-3 h-3" />}
+                                      {p.status}
+                                    </div>
+                                  </span>
+                                  <span className="text-xs text-gray-400 font-medium bg-gray-50 px-3 py-1 rounded-full border border-gray-100">
+                                    {new Date(p.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+                                  </span>
+                                  <span className={`text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full border ${p.type === "MEMBERSHIP" ? "bg-purple-50 text-purple-600 border-purple-100" : "bg-blue-50 text-blue-600 border-blue-100"}`}>
+                                    {p.type}
+                                  </span>
+                                  {(() => {
+                                    let methodTag = "Manual";
+                                    let cleanPurpose = p.purpose || "";
+                                    if (cleanPurpose.includes("[BANK TRANSFER]")) {
+                                      methodTag = "Bank Transfer";
+                                      cleanPurpose = cleanPurpose.replace("[BANK TRANSFER]", "").trim();
+                                    } else if (cleanPurpose.includes("[UPI]")) {
+                                      methodTag = "UPI";
+                                      cleanPurpose = cleanPurpose.replace("[UPI]", "").trim();
+                                    }
+                                    p.cleanPurpose = cleanPurpose;
+                                    
+                                    return (
+                                      <span className={`text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full border ${methodTag === "Bank Transfer" ? "bg-indigo-50 text-indigo-600 border-indigo-100" : "bg-teal-50 text-teal-600 border-teal-100"}`}>
+                                        {methodTag}
+                                      </span>
+                                    );
+                                  })()}
+                                </div>
+                                
+                                <h3 className="text-4xl font-bold font-serif text-[#2C1810] mb-6">₹{p.amount}</h3>
+                                
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                  <div className="flex items-start gap-3 bg-gray-50/80 p-3 rounded-2xl border border-gray-100">
+                                    <div className="p-2 bg-white rounded-xl shadow-sm text-gray-500"><User className="w-4 h-4" /></div>
+                                    <div>
+                                      <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Sender Name</p>
+                                      <p className="text-sm font-bold text-[#2C1810]">{p.user?.firstName} {p.user?.lastName}</p>
+                                    </div>
+                                  </div>
                                   
-                                  // Assign cleanPurpose back to p so we render it nicely below
-                                  p.cleanPurpose = cleanPurpose;
+                                  <div className="flex items-start gap-3 bg-gray-50/80 p-3 rounded-2xl border border-gray-100">
+                                    <div className="p-2 bg-white rounded-xl shadow-sm text-gray-500"><Send className="w-4 h-4" /></div>
+                                    <div className="truncate">
+                                      <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Email Address</p>
+                                      <p className="text-sm font-semibold text-[#7A5C45] truncate">{p.user?.email}</p>
+                                    </div>
+                                  </div>
                                   
-                                  return (
-                                    <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${methodTag === "Bank Transfer" ? "bg-indigo-100 text-indigo-700" : "bg-teal-100 text-teal-700"}`}>
-                                      {methodTag}
-                                    </span>
-                                  );
-                                })()}
+                                  <div className="flex items-start gap-3 bg-gray-50/80 p-3 rounded-2xl border border-gray-100">
+                                    <div className="p-2 bg-white rounded-xl shadow-sm text-gray-500"><FileText className="w-4 h-4" /></div>
+                                    <div>
+                                      <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">UTR / Transaction ID</p>
+                                      <p className="text-sm font-mono font-bold text-blue-600">{p.utrNumber}</p>
+                                    </div>
+                                  </div>
+
+                                  {p.cleanPurpose && (
+                                    <div className="flex items-start gap-3 bg-gray-50/80 p-3 rounded-2xl border border-gray-100">
+                                      <div className="p-2 bg-white rounded-xl shadow-sm text-gray-500"><MessageSquare className="w-4 h-4" /></div>
+                                      <div>
+                                        <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Purpose</p>
+                                        <p className="text-sm font-semibold text-[#7A5C45] line-clamp-2">{p.cleanPurpose}</p>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                                
+                                {p.adminNote && (
+                                  <div className="mt-4 p-4 bg-red-50/80 border border-red-100 rounded-2xl flex items-start gap-3">
+                                    <ShieldAlert className="w-5 h-5 text-red-500 shrink-0" />
+                                    <div>
+                                      <p className="text-xs font-bold text-red-600 uppercase tracking-widest mb-0.5">Admin Rejection Note</p>
+                                      <p className="text-sm text-red-700 font-medium">{p.adminNote}</p>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
-                              <p className="font-bold text-[#2C1810] text-lg">₹{p.amount}</p>
-                              <p className="text-sm text-gray-600"><span className="font-semibold">Name:</span> {p.user?.firstName} {p.user?.lastName}</p>
-                              <p className="text-sm text-gray-600"><span className="font-semibold">Email:</span> {p.user?.email}</p>
-                              <p className="text-sm text-gray-600"><span className="font-semibold">UTR:</span> <span className="font-mono">{p.utrNumber}</span></p>
-                              {p.cleanPurpose && <p className="text-sm text-gray-600"><span className="font-semibold">Purpose:</span> {p.cleanPurpose}</p>}
-                              {p.adminNote && <p className="text-sm text-red-500"><span className="font-semibold">Admin Note:</span> {p.adminNote}</p>}
+                              
+                              {/* Right Screenshot */}
+                              {p.screenshot && (
+                                <div className="w-full lg:w-48 xl:w-56 shrink-0 flex flex-col gap-2">
+                                  <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Attached Proof</p>
+                                  <a href={p.screenshot} target="_blank" rel="noopener noreferrer" className="block group/img">
+                                    <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-gray-100 shadow-sm group-hover/img:shadow-md transition-all">
+                                      <img src={p.screenshot} alt="Payment proof" className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500" />
+                                      <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/10 transition-colors flex items-center justify-center">
+                                        <div className="bg-white/90 backdrop-blur-sm p-3 rounded-full opacity-0 group-hover/img:opacity-100 transition-opacity transform group-hover/img:scale-100 scale-90">
+                                          <Eye className="w-5 h-5 text-gray-700" />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </a>
+                                </div>
+                              )}
                             </div>
 
-                            {/* Screenshot */}
-                            {p.screenshot && (
-                              <a href={p.screenshot} target="_blank" rel="noopener noreferrer">
-                                <img src={p.screenshot} alt="Payment screenshot" className="w-24 h-24 object-cover rounded-xl border border-gray-200 hover:opacity-90 transition-opacity flex-shrink-0" />
-                              </a>
+                            {/* Action Buttons */}
+                            {(p.status === "PENDING" || (p.status === "APPROVED" && p.type === "MEMBERSHIP")) && (
+                              <div className="mt-6 pt-6 border-t border-gray-100 flex flex-wrap gap-3 relative z-10">
+                                {p.status === "PENDING" && (
+                                  <>
+                                    <button onClick={() => approveManualPayment(p.id, p.type)}
+                                      className="flex-1 sm:flex-none flex justify-center items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5">
+                                      <CheckCircle2 className="w-5 h-5" /> Approve Payment
+                                    </button>
+                                    <button onClick={() => setRejectModal(p)}
+                                      className="flex-1 sm:flex-none flex justify-center items-center gap-2 px-6 py-3 bg-white border-2 border-red-100 hover:border-red-500 hover:bg-red-50 text-red-500 rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5 shadow-sm">
+                                      <XCircle className="w-5 h-5" /> Reject
+                                    </button>
+                                  </>
+                                )}
+                                {p.status === "APPROVED" && p.type === "MEMBERSHIP" && (
+                                  <button onClick={() => sendMemberIdCard(p.userId)}
+                                    className="flex justify-center items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5">
+                                    <Send className="w-5 h-5" /> Send Digital ID Card
+                                  </button>
+                                )}
+                              </div>
                             )}
                           </div>
-
-                          {/* Actions */}
-                          {p.status === "PENDING" && (
-                            <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-gray-100">
-                              <button onClick={() => approveManualPayment(p.id, p.type)}
-                                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold text-sm transition-colors">
-                                <CheckCircle2 className="w-4 h-4" /> Approve
-                              </button>
-                              <button onClick={() => setRejectModal(p)}
-                                className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl font-semibold text-sm transition-colors">
-                                <XCircle className="w-4 h-4" /> Reject
-                              </button>
-                            </div>
-                          )}
-                          {p.status === "APPROVED" && p.type === "MEMBERSHIP" && (
-                            <div className="flex gap-3 mt-4 pt-4 border-t border-gray-100">
-                              <button onClick={() => sendMemberIdCard(p.userId)}
-                                className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold text-sm transition-colors">
-                                <Send className="w-4 h-4" /> Send ID Card via Email
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                        ))
+                      )}
                     </div>
                   )}
 
