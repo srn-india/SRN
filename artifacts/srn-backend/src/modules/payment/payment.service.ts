@@ -211,7 +211,7 @@ export const verifyPayment = async (paymentData: { razorpay_order_id: string, ra
 
     // 2. Decouple logic depending on type
     if (payment.type === 'MEMBERSHIP') {
-      const membership = await membershipService.subscribeUser(userId, 'PREMIUM', 12, tx);
+      const membership = await membershipService.subscribeUser(userId, 'PREMIUM', 36, tx);
       membershipId = membership.id;
     } else if (payment.type === 'DONATION') {
       const userObj = await tx.user.findUnique({ where: { id: userId } });

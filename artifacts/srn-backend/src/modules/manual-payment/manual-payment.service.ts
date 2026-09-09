@@ -143,7 +143,7 @@ export const approvePayment = async (id: string, adminNote?: string) => {
 
   // Grant membership if applicable
   if (payment.type === 'MEMBERSHIP') {
-    const membership = await membershipService.subscribeUser(payment.userId, 'PREMIUM', 12);
+    const membership = await membershipService.subscribeUser(payment.userId, 'PREMIUM', 36);
     membershipId = membership.id;
   }
 
