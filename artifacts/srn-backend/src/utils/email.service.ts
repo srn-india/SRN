@@ -1,24 +1,31 @@
 import nodemailer from 'nodemailer';
+import { isGmailOAuthConfigured, sendGmailViaAPI } from './gmail.service';
 
 /**
  * Email Service utility for sending transactional emails.
- * In development (no EMAIL_HOST set), emails are logged to console only.
- * In production, configure SMTP credentials via environment variables.
- *
- * NOTE: The transporter is created lazily per-call (not at module load time).
- * This prevents cold-start env-var timing issues on platforms like Render where
- * env vars might not be injected yet when the module is first imported.
+ * Supports:
+ * 1. High-speed Google Gmail REST API via OAuth2 (using GMAIL_TOKEN_B64 or token.pickle)
+ * 2. Pooled SMTP (via EMAIL_HOST, EMAIL_USER, etc.)
+ * 3. Mock logger in development if neither is configured.
  */
 
-const createTransporter = () => nodemailer.createTransport({
-  host: process.env.EMAIL_HOST || 'smtp.ethereal.email',
-  port: parseInt(process.env.EMAIL_PORT || '587'),
-  secure: process.env.EMAIL_SECURE === 'true',
-  auth: {
-    user: process.env.EMAIL_USER || 'mock_user',
-    pass: process.env.EMAIL_PASS || 'mock_pass',
-  },
-});
+let pooledTransporter: nodemailer.Transporter | null = null;
+const getTransporter = () => {
+  if (!pooledTransporter) {
+    pooledTransporter = nodemailer.createTransport({
+      pool: true,
+      maxConnections: 5,
+      host: process.env.EMAIL_HOST || 'smtp.ethereal.email',
+      port: parseInt(process.env.EMAIL_PORT || '587'),
+      secure: process.env.EMAIL_SECURE === 'true',
+      auth: {
+        user: process.env.EMAIL_USER || 'mock_user',
+        pass: process.env.EMAIL_PASS || 'mock_pass',
+      },
+    });
+  }
+  return pooledTransporter;
+};
 
 export const wrapWithSRNBranding = (content: string, preheader: string = 'Update from Sashakt Rashtra Nirman') => {
   // Use a public URL for the logo in emails (emails cannot load local images like /srn-logo.png)
@@ -166,6 +173,27 @@ export const sendEmail = async (to: string, subject: string, htmlContent: string
   try {
     const brandedHtml = wrapWithSRNBranding(htmlContent, preheader);
 
+    // 1. Prioritize Gmail API via OAuth2 (fastest ~150-250ms, no SMTP handshake)
+    if (isGmailOAuthConfigured()) {
+      return await sendGmailViaAPI({
+        to,
+        subject,
+        html: brandedHtml,
+        attachments,
+      });
+    }
+
+    // 2. Mock mode for local dev if neither Gmail OAuth nor SMTP host is configured
+    if (!process.env.EMAIL_HOST) {
+      console.log('---------------------------------------');
+      console.log(`[Dev Email Mock] Sent to: ${to}`);
+      console.log(`Subject: ${subject}`);
+      console.log(`Content length: ${brandedHtml.length} characters`);
+      console.log('---------------------------------------');
+      return { messageId: 'mock_id' };
+    }
+
+    // 3. Fallback to pooled SMTP
     const mailOptions = {
       from: `"Sashakt Rashtra Nirman" <${process.env.EMAIL_FROM || 'no-reply@srn.org'}>`,
       to,
@@ -174,17 +202,8 @@ export const sendEmail = async (to: string, subject: string, htmlContent: string
       attachments,
     };
 
-    if (!process.env.EMAIL_HOST) {
-      console.log('---------------------------------------');
-      console.log(`Email Sent to: ${to}`);
-      console.log(`Subject: ${subject}`);
-      console.log(`Content length: ${brandedHtml.length} characters`);
-      console.log('---------------------------------------');
-      return { messageId: 'mock_id' };
-    }
-
-    const info = await createTransporter().sendMail(mailOptions);
-    console.log('Message sent: %s', info.messageId);
+    const info = await getTransporter().sendMail(mailOptions);
+    console.log('Message sent via SMTP: %s', info.messageId);
     return info;
   } catch (error) {
     console.error('Email Send Error:', error);

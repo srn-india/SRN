@@ -53,3 +53,12 @@ Thumbs.db
 replit.md
 .kiro/
 .vercel
+
+# Secrets and OAuth Tokens
+credentials.json
+token.pickle
+token.json
+*.pickle
+*.log
+__pycache__/
+*.pyc
