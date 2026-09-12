@@ -81,11 +81,12 @@ export const generateAndUploadIdCard = async (membershipId: string, txClient?: a
       console.error('Failed to draw avatar:', err);
     }
 
-    // Pre-calculate Supabase public URL with download option
+    // Pre-calculate Supabase public URL with proper filename
+    const downloadFileName = `SRN_ID_Card_${membership.user.firstName || 'Member'}.png`;
     const { data: publicUrlData } = supabase.storage
       .from('id-cards')
       .getPublicUrl(`${membership.id}.png`, {
-        download: true
+        download: downloadFileName
       });
       
     const qrData = publicUrlData.publicUrl;

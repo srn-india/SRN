@@ -302,7 +302,10 @@ export default function Dashboard() {
                     Active Member
                   </div>
                   <a 
-                    href={`https://cgmlrhewmemptyklkbrq.supabase.co/storage/v1/object/public/id-cards/${membership.id}.png?download=true`}
+                    href={`https://cgmlrhewmemptyklkbrq.supabase.co/storage/v1/object/public/id-cards/${membership.id}.png?download=SRN_Membership_Card.png`}
+                    download="SRN_Membership_Card.png"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex items-center justify-center w-full px-5 py-3.5 bg-[#E8622A] hover:bg-[#D4551E] text-white rounded-[1.25rem] font-bold gap-2 transition-colors shadow-sm"
                   >
                     <Download className="w-4 h-4" />

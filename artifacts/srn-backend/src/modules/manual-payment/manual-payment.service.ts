@@ -152,25 +152,53 @@ export const approvePayment = async (id: string, adminNote?: string) => {
     data: { status: 'APPROVED', adminNote, membershipId },
   });
 
-  // Notify user in background
+  // Notify user with ID card and receipt (unified email)
   const user = payment.user;
-  const firstName = user.firstName;
-  sendEmail(
-    user.email,
-    payment.type === 'MEMBERSHIP'
-      ? '🎉 Your SRN Membership is now Active!'
-      : '✅ Your Donation has been verified!',
-    payment.type === 'MEMBERSHIP'
-      ? `<h2>Welcome to SRN, ${firstName}!</h2>
-         <p>Your payment of <b>₹${payment.amount}</b> via ${payment.purpose?.includes('[BANK TRANSFER]') ? 'Bank Transfer' : 'UPI'} has been verified by our team.</p>
-         <p>Your SRN Membership is now <b>ACTIVE</b>. You can log in to access all member features.</p>
-         ${adminNote ? `<p><b>Note from admin:</b> ${adminNote}</p>` : ''}
-         <center><a href="${process.env.FRONTEND_URL}/dashboard" class="btn">Go to Dashboard</a></center>`
-      : `<h2>Thank you for your generous donation, ${firstName}!</h2>
+  const firstName = user.firstName || 'Member';
+
+  if (payment.type === 'MEMBERSHIP') {
+    try {
+      await sendIdCard(payment.userId);
+    } catch (err) {
+      console.error('Failed to send ID card and receipt on approval:', err);
+    }
+  } else {
+    // DONATION: Generate receipt PDF and send confirmation email
+    let attachments: any[] = [];
+    try {
+      const pdfBuffer = await generateReceiptPdf({
+        userName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || firstName,
+        amount: Number(payment.amount),
+        paymentId: payment.utrNumber,
+        type: 'DONATION',
+        date: payment.createdAt,
+        method: payment.purpose?.includes('[BANK TRANSFER]') ? 'Bank Transfer' : 'UPI (Manual)'
+      });
+      attachments.push({
+        filename: 'SRN_Donation_Receipt.pdf',
+        content: pdfBuffer,
+        contentType: 'application/pdf'
+      });
+    } catch (err) {
+      console.error('Failed to generate donation receipt PDF on approval:', err);
+    }
+
+    try {
+      await sendEmail(
+        user.email,
+        '✅ Your Donation has been verified!',
+        `<h2>Thank you for your generous donation, ${firstName}!</h2>
          <p>Your donation of <b>₹${payment.amount}</b> via ${payment.purpose?.includes('[BANK TRANSFER]') ? 'Bank Transfer' : 'UPI'} has been successfully verified.</p>
+         <p>Your official tax-deductible receipt is attached to this email.</p>
          ${adminNote ? `<p><b>Note:</b> ${adminNote}</p>` : ''}
-         <center><a href="${process.env.FRONTEND_URL}/dashboard" class="btn">Visit Dashboard</a></center>`
-  ).catch(err => console.error('Approval email failed:', err));
+         <center><a href="${process.env.FRONTEND_URL}/dashboard" class="btn">Visit Dashboard</a></center>`,
+        'Your donation is verified',
+        attachments
+      );
+    } catch (err) {
+      console.error('Donation approval email dispatch failed:', err);
+    }
+  }
 
   return { ...updated, membershipId };
 };
@@ -189,17 +217,21 @@ export const rejectPayment = async (id: string, adminNote: string) => {
     data: { status: 'REJECTED', adminNote },
   });
 
-  // Notify user in background
+  // Notify user
   const user = payment.user;
-  sendEmail(
-    user.email,
-    '❌ Issue with your SRN Payment',
-    `<h2>Hi ${user.firstName},</h2>
-     <p>We encountered an issue while verifying your recent payment of <b>₹${payment.amount}</b>.</p>
-     <p><b>Reason:</b> ${adminNote}</p>
-     <p>If you believe this is an error, please reply to this email or re-submit your payment verification via the website.</p>
-     <center><a href="${process.env.FRONTEND_URL}/donate" class="btn">Re-submit Payment</a></center>`
-  ).catch(err => console.error('Rejection email failed:', err));
+  try {
+    await sendEmail(
+      user.email,
+      '❌ Issue with your SRN Payment',
+      `<h2>Hi ${user.firstName},</h2>
+       <p>We encountered an issue while verifying your recent payment of <b>₹${payment.amount}</b>.</p>
+       <p><b>Reason:</b> ${adminNote}</p>
+       <p>If you believe this is an error, please reply to this email or re-submit your payment verification via the website.</p>
+       <center><a href="${process.env.FRONTEND_URL}/donate" class="btn">Re-submit Payment</a></center>`
+    );
+  } catch (err) {
+    console.error('Rejection email dispatch failed:', err);
+  }
 
   return updated;
 };
@@ -225,13 +257,28 @@ export const sendIdCard = async (userId: string) => {
     orderBy: { createdAt: 'desc' }
   });
 
-  const firstName = user.firstName;
+  const firstName = user.firstName || 'Member';
   let attachments: any[] = [];
 
+  // 1. Attach the official ID card PNG directly
+  try {
+    const cardRes = await fetch(cardUrl);
+    if (cardRes.ok) {
+      attachments.push({
+        filename: `SRN_ID_Card_${firstName}.png`,
+        content: Buffer.from(await cardRes.arrayBuffer()),
+        contentType: 'image/png'
+      });
+    }
+  } catch (err) {
+    console.error('Failed to attach ID card image:', err);
+  }
+
+  // 2. Attach receipt PDF if payment exists
   if (payment) {
     try {
       const pdfBuffer = await generateReceiptPdf({
-        userName: `${user.firstName} ${user.lastName}`.trim(),
+        userName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || firstName,
         amount: Number(payment.amount),
         paymentId: payment.utrNumber,
         type: 'MEMBERSHIP',
@@ -248,18 +295,18 @@ export const sendIdCard = async (userId: string) => {
     }
   }
 
-  // Use the backgrounded approach for sendEmail as well!
-  sendEmail(
+  // Await email dispatch so Render serverless/container never terminates prematurely
+  await sendEmail(
     user.email,
     '🪪 Your SRN Member ID Card & Receipt',
     `<h2>Your SRN ID Card is Ready, ${firstName}!</h2>
-     <p>Welcome to Sashakt Rashtra Nirman. Your active member ID card has been generated.</p>
-     <p>Click the button below to view and download your official SRN Member ID Card.</p>
-     ${attachments.length > 0 ? '<p>Please find the official receipt for your membership payment attached to this email.</p>' : ''}
+     <p>Welcome to Sashakt Rashtra Nirman. Your active member ID card has been issued.</p>
+     <p>Your official ID card is attached to this email and can also be downloaded using the button below.</p>
+     ${payment ? '<p>Your payment receipt is also attached to this email.</p>' : ''}
      <center><a href="${cardUrl}" class="btn">Download ID Card</a></center>`,
-     undefined,
-     attachments
-  ).catch(err => console.error('Failed to send ID card email:', err));
+    'Your official SRN Member ID Card is ready',
+    attachments
+  );
 
   return { success: true, membershipId: membership.id, cardUrl };
 };
