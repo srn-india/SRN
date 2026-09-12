@@ -2,11 +2,39 @@ import { prisma } from '../../lib/prisma';
 import { supabase } from '../../lib/supabase';
 import fs from 'fs';
 import path from 'path';
-import { createCanvas, loadImage } from 'canvas';
+import { createCanvas, loadImage, registerFont } from 'canvas';
 import QRCode from 'qrcode';
+
+// Ensure bundled TrueType font is registered so canvas never renders tofu/square boxes
+let fontRegistered = false;
+function ensureFontRegistered() {
+  if (fontRegistered) return;
+  const possiblePaths = [
+    path.join(process.cwd(), 'src', 'assets', 'fonts', 'Arial-Bold.ttf'),
+    path.join(process.cwd(), 'dist', 'assets', 'fonts', 'Arial-Bold.ttf'),
+    path.join(__dirname, '..', '..', 'assets', 'fonts', 'Arial-Bold.ttf'),
+    path.join(__dirname, '..', '..', '..', 'src', 'assets', 'fonts', 'Arial-Bold.ttf'),
+    '/usr/share/fonts/ttf-dejavu/DejaVuSans-Bold.ttf',
+    '/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf'
+  ];
+
+  for (const fp of possiblePaths) {
+    if (fs.existsSync(fp)) {
+      try {
+        registerFont(fp, { family: 'SRN-Bold', weight: 'bold' });
+        fontRegistered = true;
+        break;
+      } catch (err) {
+        console.warn('Could not register font at:', fp, err);
+      }
+    }
+  }
+}
 
 export const generateAndUploadIdCard = async (membershipId: string, txClient?: any) => {
   try {
+    ensureFontRegistered();
+
     const client = txClient || prisma;
     const membership = await client.membership.findUnique({
       where: { id: membershipId },
@@ -18,16 +46,28 @@ export const generateAndUploadIdCard = async (membershipId: string, txClient?: a
       return null;
     }
 
-    // Fetch template from raw GitHub URL to avoid Vercel serverless missing file issues
-    const templateUrl = 'https://raw.githubusercontent.com/srn-india/SRN/main/artifacts/srn-backend/src/assets/id-card.jpeg';
-    const image = await loadImage(templateUrl);
+    // Fetch template from raw GitHub URL or local asset
+    let image = null;
+    const localTemplate = path.join(process.cwd(), 'src', 'assets', 'id-card.jpeg');
+    if (fs.existsSync(localTemplate)) {
+      try {
+        image = await loadImage(localTemplate);
+      } catch (e) {
+        // Fallback to URL
+      }
+    }
+    if (!image) {
+      const templateUrl = 'https://raw.githubusercontent.com/srn-india/SRN/main/artifacts/srn-backend/src/assets/id-card.jpeg';
+      image = await loadImage(templateUrl);
+    }
+
     const canvas = createCanvas(image.width, image.height);
     const ctx = canvas.getContext('2d');
 
     ctx.drawImage(image, 0, 0, image.width, image.height);
 
     ctx.fillStyle = '#000000';
-    ctx.font = 'bold 40px "Open Sans", Arial';
+    ctx.font = 'bold 38px "SRN-Bold", "DejaVu Sans", Arial, sans-serif';
 
     const valueX = image.width * 0.35;
     const nameY = image.height * 0.565;

@@ -6,7 +6,7 @@ import {
   ArrowLeft, LogOut, UserCircle, Calendar, MessageSquare, 
   ShieldCheck, CheckCircle2, XCircle, Plus, Trash2, ShieldAlert,
   Settings, Sliders, Bell, LayoutDashboard, Key, TrendingUp, Download, MapPin,
-  BookOpen, AlertCircle, Briefcase, FileText, X, Eye, GraduationCap, Heart, CalendarDays, User, Users, RotateCw, QrCode, Send
+  BookOpen, AlertCircle, Briefcase, FileText, X, Eye, GraduationCap, Heart, CalendarDays, User, Users, RotateCw, QrCode, Send, Pencil
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -133,15 +133,15 @@ export default function AdminDashboard() {
   const [analytics, setAnalytics] = useState(null);
   const [loadingAnalytics, setLoadingAnalytics] = useState(true);
 
-  useEffect(() => {
-    fetchAnalytics();
-    fetchManualPayments("PENDING");
-    if (activeTab === "complaints") fetchComplaints();
-    if (activeTab === "articles") fetchArticles();
-    if (activeTab === "events") fetchEvents();
-    if (activeTab === "forums") fetchForums();
-    if (activeTab === "memberships") fetchMemberships(membershipPage);
-  }, [activeTab]);
+  // Rename user modal state
+  const [renameModalOpen, setRenameModalOpen] = useState(false);
+  const [renamingUser, setRenamingUser] = useState(null);
+  const [editFirstName, setEditFirstName] = useState("");
+  const [editLastName, setEditLastName] = useState("");
+  const [renameLoading, setRenameLoading] = useState(false);
+  const [renameError, setRenameError] = useState("");
+
+
 
   const fetchComplaints = async () => {
     setLoadingComplaints(true);
@@ -201,14 +201,7 @@ export default function AdminDashboard() {
   const [loadingApplications, setLoadingApplications] = useState(true);
   const [selectedApplication, setSelectedApplication] = useState(null);
 
-  useEffect(() => {
-    fetchComplaints();
-    fetchArticles();
-    fetchApplications();
-    fetchEvents();
-    fetchForums();
-    fetchMemberships();
-  }, [API_BASE]);
+
 
   const fetchApplications = async () => {
     setLoadingApplications(true);
@@ -274,6 +267,68 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleUpdateUserName = async (e) => {
+    e.preventDefault();
+    if (!renamingUser || !editFirstName.trim()) {
+      setRenameError("First name is required.");
+      return;
+    }
+    setRenameLoading(true);
+    setRenameError("");
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/users/${renamingUser.id}/name`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          firstName: editFirstName.trim(),
+          lastName: editLastName.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to update user name");
+      }
+
+      // Update in memberships state
+      setMemberships(prev => prev.map(m => {
+        if ((m.userId && m.userId === renamingUser.id) || (m.user && m.user.id === renamingUser.id)) {
+          return {
+            ...m,
+            user: {
+              ...m.user,
+              firstName: editFirstName.trim(),
+              lastName: editLastName.trim(),
+            }
+          };
+        }
+        return m;
+      }));
+
+      // Update in manual payments state
+      setManualPayments(prev => prev.map(p => {
+        if ((p.userId && p.userId === renamingUser.id) || (p.user && p.user.id === renamingUser.id)) {
+          return {
+            ...p,
+            user: {
+              ...p.user,
+              firstName: editFirstName.trim(),
+              lastName: editLastName.trim(),
+            }
+          };
+        }
+        return p;
+      }));
+
+      setRenameModalOpen(false);
+      setRenamingUser(null);
+    } catch (err) {
+      setRenameError(err.message || "Failed to update name");
+    } finally {
+      setRenameLoading(false);
+    }
+  };
+
   const fetchAnalytics = async () => {
     setLoadingAnalytics(true);
     try {
@@ -305,6 +360,26 @@ export default function AdminDashboard() {
       setManualLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (activeTab === "profile") {
+      fetchAnalytics();
+    } else if (activeTab === "memberships") {
+      fetchMemberships(membershipPage);
+    } else if (activeTab === "manual-payments") {
+      fetchManualPayments(mpFilter);
+    } else if (activeTab === "complaints") {
+      fetchComplaints();
+    } else if (activeTab === "articles") {
+      fetchArticles();
+    } else if (activeTab === "events") {
+      fetchEvents();
+    } else if (activeTab === "forums") {
+      fetchForums();
+    } else if (activeTab === "applications") {
+      fetchApplications();
+    }
+  }, [activeTab]);
 
   const approveManualPayment = async (id, type) => {
     const msg = type === "MEMBERSHIP" 
@@ -352,46 +427,120 @@ export default function AdminDashboard() {
     } catch (err) { alert("Error: " + err.message); }
   };
 
-  const handleExportMemberships = () => {
+  const handleDownloadMemberIdCard = async (payment) => {
+    let memId = payment.membershipId;
+    if (!memId) {
+      try {
+        const res = await fetch(`${API_BASE}/api/memberships?page=1&limit=500`, { credentials: 'include' });
+        if (res.ok) {
+          const data = await res.json();
+          const mem = data.data?.memberships?.find(m => (m.userId && m.userId === payment.userId) || (m.user && m.user.id === payment.userId));
+          if (mem) memId = mem.id;
+        }
+      } catch (err) {
+        console.error("Failed to find membership for user:", err);
+      }
+    }
 
-    if (memberships.length === 0) return;
+    if (!memId) {
+      alert("No active membership found for this user to download ID card.");
+      return;
+    }
 
-    // Calculate total revenue (999 per membership)
-    const activeCount = memberships.filter(m => m.status === 'ACTIVE').length;
-    const totalCount = memberships.length;
-    const totalRevenue = totalCount * 999;
+    const downloadFileName = `SRN_ID_Card_${payment.user?.firstName || 'Member'}.png`;
+    const cardUrl = `https://cgmlrhewmemptyklkbrq.supabase.co/storage/v1/object/public/id-cards/${memId}.png?download=${downloadFileName}`;
+    
+    // Trigger download in new tab / download attribute
+    const link = document.createElement('a');
+    link.href = cardUrl;
+    link.download = downloadFileName;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
 
-    // Build CSV content
-    const headers = ["Member Name", "Email", "Plan", "Start Date", "End Date", "Status", "Revenue (INR)"];
-    const rows = memberships.map(m => [
-      m.user ? `"${m.user.firstName || ''} ${m.user.lastName || ''}"`.trim() : "Unknown User",
-      m.user?.email || "N/A",
-      m.plan,
-      new Date(m.startDate).toLocaleDateString(),
-      new Date(m.endDate).toLocaleDateString(),
-      m.status,
-      "999"
+  const handleExportMemberships = async () => {
+    let dataToExport = memberships;
+
+    // Fetch full list across all pages if possible
+    try {
+      const res = await fetch(`${API_BASE}/api/memberships?page=1&limit=5000`, { credentials: 'include' });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.data && json.data.memberships && json.data.memberships.length > 0) {
+          dataToExport = json.data.memberships;
+        }
+      }
+    } catch (err) {
+      console.warn("Could not fetch full membership list for export, falling back to loaded records:", err);
+    }
+
+    if (dataToExport.length === 0) {
+      alert("No membership records to export.");
+      return;
+    }
+
+    const activeCount = dataToExport.filter(m => m.status === 'ACTIVE').length;
+    const totalCount = dataToExport.length;
+
+    // Build comprehensive CSV headers as requested
+    const headers = [
+      "Full Name",
+      "Phone Number",
+      "Email Address",
+      "Gender",
+      "State",
+      "District / City",
+      "Occupation",
+      "Plan",
+      "Start Date",
+      "End Date",
+      "Status",
+      "Fee (INR)"
+    ];
+
+    const escapeCsv = (val) => {
+      if (val === null || val === undefined) return '""';
+      const str = String(val).replace(/"/g, '""');
+      return `"${str}"`;
+    };
+
+    const rows = dataToExport.map(m => [
+      escapeCsv(m.user ? `${m.user.firstName || ''} ${m.user.lastName || ''}`.trim() : "Unknown User"),
+      escapeCsv(m.user?.phone || "N/A"),
+      escapeCsv(m.user?.email || "N/A"),
+      escapeCsv(m.user?.gender || "N/A"),
+      escapeCsv(m.user?.state || "N/A"),
+      escapeCsv(m.user?.district || "N/A"),
+      escapeCsv(m.user?.occupation || "N/A"),
+      escapeCsv(m.plan || "PREMIUM"),
+      escapeCsv(new Date(m.startDate).toLocaleDateString("en-IN")),
+      escapeCsv(new Date(m.endDate).toLocaleDateString("en-IN")),
+      escapeCsv(m.status || "ACTIVE"),
+      escapeCsv("999")
     ]);
 
-    // Append summary rows
+    // Append Summary Details at bottom
     rows.push([]);
-    rows.push(["Summary Details"]);
-    rows.push(["Total Registered Members", totalCount]);
-    rows.push(["Active Members", activeCount]);
-    rows.push(["MEMBERSHIP REVENUE", analytics?.membershipRevenue || 0]);
-    rows.push(["DONATION REVENUE", analytics?.donationRevenue || 0]);
-    rows.push(["TOTAL REVENUE", analytics?.totalRevenue || 0]);
+    rows.push([escapeCsv("--- Summary Details ---"), '""', '""', '""', '""', '""', '""', '""', '""', '""', '""', '""']);
+    rows.push([escapeCsv("Total Registered Members"), escapeCsv(totalCount), '""', '""', '""', '""', '""', '""', '""', '""', '""', '""']);
+    rows.push([escapeCsv("Active Members"), escapeCsv(activeCount), '""', '""', '""', '""', '""', '""', '""', '""', '""', '""']);
+    rows.push([escapeCsv("Membership Revenue"), escapeCsv(analytics?.membershipRevenue || 0), '""', '""', '""', '""', '""', '""', '""', '""', '""', '""']);
+    rows.push([escapeCsv("Donation Revenue"), escapeCsv(analytics?.donationRevenue || 0), '""', '""', '""', '""', '""', '""', '""', '""', '""', '""']);
+    rows.push([escapeCsv("Total Revenue"), escapeCsv(analytics?.totalRevenue || 0), '""', '""', '""', '""', '""', '""', '""', '""', '""', '""']);
 
-    const csvContent = "data:text/csv;charset=utf-8," 
-      + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
-
-    const encodedUri = encodeURI(csvContent);
+    const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
     const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", encodedUri);
-    downloadAnchor.setAttribute("download", `srn_membership_revenue_${new Date().toISOString().slice(0,10)}.csv`);
+    downloadAnchor.setAttribute("href", url);
+    downloadAnchor.setAttribute("download", `srn_memberships_report_${new Date().toISOString().slice(0,10)}.csv`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
+    URL.revokeObjectURL(url);
   };
 
   const handleCreateEvent = async (e) => {
@@ -656,7 +805,7 @@ export default function AdminDashboard() {
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center gap-2.5 lg:gap-3 px-3.5 py-2.5 lg:px-4 lg:py-3 rounded-xl lg:rounded-2xl transition-all duration-300 font-semibold text-xs lg:text-sm shrink-0 w-auto lg:w-full ${
                       isActive 
-                        ? "bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white shadow-md shadow-orange-900/20 lg:translate-x-1" 
+                        ? "bg-[#E8622A] text-white shadow-md shadow-orange-900/20 lg:translate-x-1" 
                         : "text-[#7A5C45] hover:bg-white hover:text-[#2C1810] hover:shadow-sm"
                     }`}
                   >
@@ -716,6 +865,46 @@ export default function AdminDashboard() {
                     </div>
                   </div>
 
+                  {/* Total Received Amount Overview */}
+                  <div className="bg-white/70 backdrop-blur-xl p-8 rounded-[2rem] border border-white/80 shadow-sm relative overflow-hidden">
+                    <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
+                      <div>
+                        <h3 className="text-xl font-bold font-serif text-[#2C1810] flex items-center gap-2">
+                          <TrendingUp className="w-5 h-5 text-[#E8622A]" />
+                          Total Amount Received (Collections)
+                        </h3>
+                        <p className="text-xs text-[#7A5C45] mt-0.5">Verified collections from memberships and donations across UPI, QR, Bank Transfer & Online.</p>
+                      </div>
+                      <button
+                        onClick={fetchAnalytics}
+                        className="text-xs font-bold text-[#E8622A] hover:text-[#C04A18] flex items-center gap-1.5 px-3 py-1.5 bg-orange-50 rounded-xl cursor-pointer transition-colors border border-orange-100"
+                        title="Refresh Collections"
+                      >
+                        <RotateCw className="w-3.5 h-3.5" /> Refresh
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                      <div className="bg-gradient-to-br from-orange-500/10 to-transparent p-6 rounded-2xl border border-orange-200/60 bg-white/50">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#7A5C45] block mb-1">Total Received Amount</span>
+                        <div className="text-3xl font-black text-[#E8622A] font-serif">₹{analytics?.totalRevenue?.toLocaleString('en-IN') || 0}</div>
+                        <span className="text-[11px] text-gray-500 mt-1 block">Combined Memberships & Donations</span>
+                      </div>
+
+                      <div className="bg-gradient-to-br from-purple-500/10 to-transparent p-6 rounded-2xl border border-purple-200/60 bg-white/50">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#7A5C45] block mb-1">Membership Amount Received</span>
+                        <div className="text-3xl font-black text-purple-700 font-serif">₹{analytics?.membershipRevenue?.toLocaleString('en-IN') || 0}</div>
+                        <span className="text-[11px] text-gray-500 mt-1 block">{analytics?.totalMembers || 0} Active Member subscriptions</span>
+                      </div>
+
+                      <div className="bg-gradient-to-br from-blue-500/10 to-transparent p-6 rounded-2xl border border-blue-200/60 bg-white/50">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#7A5C45] block mb-1">Donation Amount Received</span>
+                        <div className="text-3xl font-black text-blue-700 font-serif">₹{analytics?.donationRevenue?.toLocaleString('en-IN') || 0}</div>
+                        <span className="text-[11px] text-gray-500 mt-1 block">Total Verified Donations</span>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="mt-8 bg-white/70 backdrop-blur-xl p-8 rounded-[2rem] border border-white/80 shadow-sm relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
                       <LayoutDashboard className="w-32 h-32 text-gray-900" />
@@ -760,7 +949,7 @@ export default function AdminDashboard() {
                       >
                         <RotateCw className={`w-4 h-4 ${loadingEvents ? "animate-spin" : ""}`} />
                       </button>
-                      <button onClick={() => setShowEventModal(true)} className="flex items-center gap-2 bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md hover:shadow-lg hover:scale-105 transition-all">
+                      <button onClick={() => setShowEventModal(true)} className="flex items-center gap-2 bg-[#E8622A] hover:bg-[#D4551E] text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all cursor-pointer">
                         <Plus className="w-4 h-4" /> Add Event
                       </button>
                     </div>
@@ -822,7 +1011,7 @@ export default function AdminDashboard() {
                       >
                         <RotateCw className={`w-4 h-4 ${loadingForums ? "animate-spin" : ""}`} />
                       </button>
-                      <button onClick={() => setShowForumModal(true)} className="flex items-center gap-2 bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md hover:shadow-lg hover:scale-105 transition-all">
+                      <button onClick={() => setShowForumModal(true)} className="flex items-center gap-2 bg-[#E8622A] hover:bg-[#D4551E] text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all cursor-pointer">
                         <Plus className="w-4 h-4" /> Add Forum
                       </button>
                     </div>
@@ -913,7 +1102,7 @@ export default function AdminDashboard() {
                           {art.status === "PENDING" && (
                             <button 
                               onClick={() => handleApproveArticle(art.id)}
-                              className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl text-xs font-bold border border-emerald-400 hover:scale-105 transition-all shadow"
+                              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow cursor-pointer"
                             >
                               Approve
                             </button>
@@ -993,7 +1182,7 @@ export default function AdminDashboard() {
                           {comp.status === "PENDING" && (
                             <button 
                               onClick={() => handleSolveComplaint(comp.id)}
-                              className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl text-xs font-bold border border-emerald-400 hover:scale-105 transition-all shadow"
+                              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow cursor-pointer"
                             >
                               Mark Solved
                             </button>
@@ -1074,7 +1263,7 @@ export default function AdminDashboard() {
                           {app.status === "PENDING" && (
                             <button 
                               onClick={() => handleApproveApplication(app.id)}
-                              className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl text-xs font-bold border border-emerald-400 hover:scale-105 transition-all shadow"
+                              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow cursor-pointer"
                             >
                               Approve
                             </button>
@@ -1118,7 +1307,7 @@ export default function AdminDashboard() {
                       <button 
                         onClick={handleExportMemberships}
                         disabled={loadingMemberships || memberships.length === 0}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all disabled:opacity-50 cursor-pointer"
+                        className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all disabled:opacity-50 cursor-pointer"
                         title="Export Memberships Report"
                       >
                         <Download className="w-4 h-4" /> Export Report
@@ -1164,30 +1353,57 @@ export default function AdminDashboard() {
                         <table className="w-full text-left border-collapse">
                           <thead>
                             <tr className="bg-gradient-to-r from-orange-50 to-orange-100/50 text-[#7A5C45] font-bold text-xs uppercase tracking-wider border-b border-gray-100">
-                              <th className="px-6 py-4">Member Name</th>
-                              <th className="px-6 py-4">Email</th>
-                              <th className="px-6 py-4">Plan</th>
-                              <th className="px-6 py-4">Duration</th>
+                              <th className="px-6 py-4">Member Name & Gender</th>
+                              <th className="px-6 py-4">Contact (Phone / Email)</th>
+                              <th className="px-6 py-4">Location & Occupation</th>
+                              <th className="px-6 py-4">Plan & Duration</th>
                               <th className="px-6 py-4">Status</th>
+                              <th className="px-6 py-4 text-right">Action</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-100 text-sm">
                             {memberships.map((m) => (
                               <tr key={m.id} className="hover:bg-white/50 transition-colors">
                                 <td className="px-6 py-4 font-semibold text-[#2C1810]">
-                                  {m.user ? `${m.user.firstName || ''} ${m.user.lastName || ''}`.trim() : "Unknown User"}
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span>{m.user ? `${m.user.firstName || ''} ${m.user.lastName || ''}`.trim() : "Unknown User"}</span>
+                                    {m.user?.gender && (
+                                      <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-bold uppercase tracking-wider">
+                                        {m.user.gender}
+                                      </span>
+                                    )}
+                                    {m.user && (
+                                      <button
+                                        onClick={() => {
+                                          setRenamingUser({ id: m.userId || m.user.id, firstName: m.user.firstName || '', lastName: m.user.lastName || '', email: m.user.email });
+                                          setEditFirstName(m.user.firstName || '');
+                                          setEditLastName(m.user.lastName || '');
+                                          setRenameError('');
+                                          setRenameModalOpen(true);
+                                        }}
+                                        className="p-1 hover:bg-orange-50 text-gray-400 hover:text-[#E8622A] rounded-lg transition-colors cursor-pointer"
+                                        title="Rename Member"
+                                      >
+                                        <Pencil className="w-3.5 h-3.5" />
+                                      </button>
+                                    )}
+                                  </div>
                                 </td>
                                 <td className="px-6 py-4 text-gray-600">
-                                  {m.user?.email || "N/A"}
+                                  <div className="font-medium text-sm text-[#2C1810]">{m.user?.phone || "No phone"}</div>
+                                  <div className="text-xs text-gray-500">{m.user?.email || "N/A"}</div>
+                                </td>
+                                <td className="px-6 py-4 text-xs font-medium text-gray-600">
+                                  <div className="text-gray-800 font-semibold">{[m.user?.district, m.user?.state].filter(Boolean).join(", ") || "N/A"}</div>
+                                  <div className="text-[#7A5C45]">{m.user?.occupation && m.user.occupation !== 'N/A' ? m.user.occupation : "No occupation listed"}</div>
                                 </td>
                                 <td className="px-6 py-4">
                                   <span className="px-2.5 py-1 bg-orange-50 text-[#E8622A] rounded-lg text-xs font-bold border border-orange-100">
                                     {m.plan}
                                   </span>
-                                </td>
-                                <td className="px-6 py-4 text-xs text-gray-500 font-medium">
-                                  <div>Start: {new Date(m.startDate).toLocaleDateString()}</div>
-                                  <div>End: {new Date(m.endDate).toLocaleDateString()}</div>
+                                  <div className="text-[11px] text-gray-400 mt-1">
+                                    {new Date(m.startDate).toLocaleDateString("en-IN")} - {new Date(m.endDate).toLocaleDateString("en-IN")}
+                                  </div>
                                 </td>
                                 <td className="px-6 py-4">
                                   <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
@@ -1197,11 +1413,27 @@ export default function AdminDashboard() {
                                     {m.status}
                                   </span>
                                 </td>
+                                <td className="px-6 py-4 text-right">
+                                  {m.user && (
+                                    <button
+                                      onClick={() => {
+                                        setRenamingUser({ id: m.userId || m.user.id, firstName: m.user.firstName || '', lastName: m.user.lastName || '', email: m.user.email });
+                                        setEditFirstName(m.user.firstName || '');
+                                        setEditLastName(m.user.lastName || '');
+                                        setRenameError('');
+                                        setRenameModalOpen(true);
+                                      }}
+                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 hover:border-orange-300 hover:bg-orange-50/50 text-[#7A5C45] hover:text-[#E8622A] rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
+                                    >
+                                      <Pencil className="w-3.5 h-3.5" /> Rename
+                                    </button>
+                                  )}
+                                </td>
                               </tr>
                             ))}
                             {memberships.length === 0 && (
                               <tr>
-                                <td colSpan={5} className="text-center py-10 text-[#7A5C45] bg-white/10">
+                                <td colSpan={6} className="text-center py-10 text-[#7A5C45] bg-white/10">
                                   No membership records found.
                                 </td>
                               </tr>
@@ -1343,9 +1575,26 @@ export default function AdminDashboard() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                   <div className="flex items-start gap-3 bg-gray-50/80 p-3 rounded-2xl border border-gray-100">
                                     <div className="p-2 bg-white rounded-xl shadow-sm text-gray-500"><User className="w-4 h-4" /></div>
-                                    <div>
-                                      <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Sender Name</p>
-                                      <p className="text-sm font-bold text-[#2C1810]">{p.user?.firstName} {p.user?.lastName}</p>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center justify-between gap-1">
+                                        <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Sender Name</p>
+                                        {p.user && (
+                                          <button
+                                            onClick={() => {
+                                              setRenamingUser({ id: p.userId || p.user.id, firstName: p.user.firstName || '', lastName: p.user.lastName || '', email: p.user.email });
+                                              setEditFirstName(p.user.firstName || '');
+                                              setEditLastName(p.user.lastName || '');
+                                              setRenameError('');
+                                              setRenameModalOpen(true);
+                                            }}
+                                            className="text-gray-400 hover:text-[#E8622A] text-xs font-bold inline-flex items-center gap-1 cursor-pointer transition-colors"
+                                            title="Rename User"
+                                          >
+                                            <Pencil className="w-3 h-3" /> Edit
+                                          </button>
+                                        )}
+                                      </div>
+                                      <p className="text-sm font-bold text-[#2C1810] truncate">{p.user?.firstName} {p.user?.lastName}</p>
                                     </div>
                                   </div>
                                   
@@ -1411,20 +1660,32 @@ export default function AdminDashboard() {
                                 {p.status === "PENDING" && (
                                   <>
                                     <button onClick={() => approveManualPayment(p.id, p.type)}
-                                      className="flex-1 sm:flex-none flex justify-center items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5">
+                                      className="flex-1 sm:flex-none flex justify-center items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 cursor-pointer">
                                       <CheckCircle2 className="w-5 h-5" /> Approve Payment
                                     </button>
                                     <button onClick={() => setRejectModal(p)}
-                                      className="flex-1 sm:flex-none flex justify-center items-center gap-2 px-6 py-3 bg-white border-2 border-red-100 hover:border-red-500 hover:bg-red-50 text-red-500 rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5 shadow-sm">
+                                      className="flex-1 sm:flex-none flex justify-center items-center gap-2 px-6 py-3 bg-white border-2 border-red-100 hover:border-red-500 hover:bg-red-50 text-red-500 rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5 shadow-sm cursor-pointer">
                                       <XCircle className="w-5 h-5" /> Reject
                                     </button>
                                   </>
                                 )}
                                 {p.status === "APPROVED" && p.type === "MEMBERSHIP" && (
-                                  <button onClick={() => sendMemberIdCard(p.userId)}
-                                    className="flex justify-center items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5">
-                                    <Send className="w-5 h-5" /> Send Digital ID Card
-                                  </button>
+                                  <div className="flex flex-wrap items-center gap-3">
+                                    <button 
+                                      onClick={() => handleDownloadMemberIdCard(p)}
+                                      className="flex-1 sm:flex-none flex justify-center items-center gap-2 px-5 py-2.5 bg-[#E8622A] hover:bg-[#D4551E] text-white rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 cursor-pointer"
+                                      title="Download Official ID Card PNG"
+                                    >
+                                      <Download className="w-4 h-4" /> Download ID Card
+                                    </button>
+                                    <button 
+                                      onClick={() => sendMemberIdCard(p.userId)}
+                                      className="flex-1 sm:flex-none flex justify-center items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 cursor-pointer"
+                                      title="Send ID Card & Receipt to User Email"
+                                    >
+                                      <Send className="w-4 h-4" /> Send Digital ID Card
+                                    </button>
+                                  </div>
                                 )}
                               </div>
                             )}
@@ -1497,7 +1758,7 @@ export default function AdminDashboard() {
                             <button 
                               onClick={handleSetup2FA}
                               disabled={setupLoading}
-                              className="px-4 py-2 bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white rounded-lg text-sm font-bold shadow-md hover:shadow-lg transition-all"
+                              className="px-4 py-2 bg-[#E8622A] hover:bg-[#D4551E] text-white rounded-lg text-sm font-bold shadow-md hover:shadow-lg transition-all cursor-pointer"
                             >
                               Setup 2FA
                             </button>
@@ -1558,7 +1819,7 @@ export default function AdminDashboard() {
                             <h4 className="font-semibold text-[#2C1810] group-hover:text-[#E8622A] transition-colors">New Registration Alerts</h4>
                             <p className="text-xs text-[#7A5C45] mt-0.5">Receive an email when a new ID is pending</p>
                           </div>
-                          <div className="w-12 h-6 bg-gradient-to-r from-[#E8622A] to-[#C04A18] rounded-full relative cursor-pointer shadow-inner transition-transform hover:scale-105">
+                          <div className="w-12 h-6 bg-[#E8622A] rounded-full relative cursor-pointer shadow-inner transition-transform hover:scale-105">
                             <div className="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5 shadow-md" />
                           </div>
                         </div>
@@ -1568,7 +1829,7 @@ export default function AdminDashboard() {
                             <h4 className="font-semibold text-[#2C1810] group-hover:text-[#E8622A] transition-colors">Weekly Digest</h4>
                             <p className="text-xs text-[#7A5C45] mt-0.5">Summary of platform activities</p>
                           </div>
-                          <div className="w-12 h-6 bg-gradient-to-r from-[#E8622A] to-[#C04A18] rounded-full relative cursor-pointer shadow-inner transition-transform hover:scale-105">
+                          <div className="w-12 h-6 bg-[#E8622A] rounded-full relative cursor-pointer shadow-inner transition-transform hover:scale-105">
                             <div className="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5 shadow-md" />
                           </div>
                         </div>
@@ -1761,6 +2022,94 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                 </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+        {/* RENAME USER MODAL */}
+        <AnimatePresence>
+          {renameModalOpen && renamingUser && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative"
+              >
+                <div className="bg-[#E8622A] p-4 text-white flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <Pencil className="w-5 h-5" />
+                    <h3 className="font-bold font-serif text-xl">Edit User Name</h3>
+                  </div>
+                  <button 
+                    onClick={() => { setRenameModalOpen(false); setRenamingUser(null); }} 
+                    className="hover:bg-white/20 p-1 rounded-full cursor-pointer"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleUpdateUserName} className="p-6 space-y-4">
+                  <div className="bg-orange-50/60 p-3 rounded-xl border border-orange-100/80">
+                    <p className="text-xs text-gray-500 font-medium">User Email</p>
+                    <p className="text-sm font-bold text-[#2C1810] break-all">{renamingUser.email}</p>
+                  </div>
+
+                  {renameError && (
+                    <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs font-semibold rounded-xl">
+                      {renameError}
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-sm font-bold text-[#2C1810] mb-1">First Name *</label>
+                    <input 
+                      required 
+                      type="text" 
+                      value={editFirstName} 
+                      onChange={e => setEditFirstName(e.target.value)} 
+                      placeholder="e.g. Rahul"
+                      className="w-full px-4 py-2.5 border border-[#F0D5B8] rounded-xl focus:ring-2 focus:ring-[#E8622A] focus:border-transparent text-sm font-medium" 
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-[#2C1810] mb-1">Last Name</label>
+                    <input 
+                      type="text" 
+                      value={editLastName} 
+                      onChange={e => setEditLastName(e.target.value)} 
+                      placeholder="e.g. Sharma"
+                      className="w-full px-4 py-2.5 border border-[#F0D5B8] rounded-xl focus:ring-2 focus:ring-[#E8622A] focus:border-transparent text-sm font-medium" 
+                    />
+                  </div>
+
+                  <p className="text-xs text-gray-400 italic">
+                    Note: If this user is an active member, their official ID card will be automatically re-rendered with the new name.
+                  </p>
+
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => { setRenameModalOpen(false); setRenamingUser(null); }}
+                      className="flex-1 py-2.5 border border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 transition-colors text-sm cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      disabled={renameLoading} 
+                      type="submit" 
+                      className="flex-1 py-2.5 bg-[#E8622A] text-white font-bold rounded-xl shadow hover:bg-[#D4880C] transition-colors disabled:opacity-50 text-sm flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      {renameLoading ? (
+                        <>
+                          <RotateCw className="w-4 h-4 animate-spin" />
+                          Saving...
+                        </>
+                      ) : "Save Name"}
+                    </button>
+                  </div>
+                </form>
               </motion.div>
             </div>
           )}

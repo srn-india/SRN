@@ -29,7 +29,7 @@ RUN npm run build
 # Production stage
 FROM node:22-alpine
 
-# Install runtime and build dependencies for canvas
+# Install runtime and build dependencies for canvas, including fonts
 RUN apk add --no-cache \
     build-base \
     g++ \
@@ -37,7 +37,9 @@ RUN apk add --no-cache \
     jpeg-dev \
     pango-dev \
     giflib-dev \
-    python3
+    python3 \
+    ttf-dejavu \
+    fontconfig
 
 WORKDIR /app
 
@@ -52,6 +54,8 @@ RUN npm config set fetch-retry-maxtimeout 600000 && \
 RUN npx prisma generate --schema=./prisma/schema.prisma
 
 COPY --from=builder /app/dist ./dist
+COPY src/assets ./src/assets
+COPY src/assets ./dist/assets
 
 EXPOSE 3000
 

@@ -96,6 +96,7 @@ router.delete('/users/:id', adminController.deleteUser);
  *         description: Role updated
  */
 router.patch('/users/:id/role', adminController.updateUserRole);
+router.patch('/users/:id/name', adminController.updateUserName);
 
 /**
  * @swagger

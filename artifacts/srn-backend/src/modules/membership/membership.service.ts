@@ -63,14 +63,45 @@ export const getAllMemberships = async (page: number = 1, limit: number = 10) =>
     prisma.membership.findMany({
       skip,
       take: limit,
-      include: { user: { select: { id: true, firstName: true, lastName: true, email: true } } },
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            phone: true,
+            gender: true,
+            state: true,
+            district: true,
+            postApplications: {
+              select: { currentOccupation: true, appliedPosition: true },
+              take: 1,
+              orderBy: { createdAt: 'desc' },
+            },
+          },
+        },
+      },
       orderBy: { createdAt: 'desc' },
     }),
     prisma.membership.count(),
   ]);
 
+  const formattedMemberships = memberships.map(m => {
+    const occupation = m.user?.postApplications?.[0]?.currentOccupation 
+      || m.user?.postApplications?.[0]?.appliedPosition 
+      || 'N/A';
+    return {
+      ...m,
+      user: m.user ? {
+        ...m.user,
+        occupation,
+      } : null,
+    };
+  });
+
   return {
-    memberships,
+    memberships: formattedMemberships,
     pagination: {
       total,
       page,

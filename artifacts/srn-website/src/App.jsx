@@ -136,18 +136,21 @@ function AdminLayout({ children }) {
 
 export default function App() {
   const [splashDone, setSplashDone] = useState(() => {
-    // Skip splash screen only if returning from OAuth redirect
-    return window.location.pathname.startsWith("/auth/success");
+    if (window.location.pathname.startsWith("/auth/success")) return true;
+    return !!sessionStorage.getItem("srn_splash_shown");
   });
   const [showPhonePopup, setShowPhonePopup] = useState(false);
 
   return (
     <MotionConfig reducedMotion="user">
       <>
-      {/* Splash screen — shown on fresh load */}
+      {/* Splash screen — shown only once per session */}
       <AnimatePresence>
         {!splashDone && (
-          <SplashScreen onDone={() => setSplashDone(true)} />
+          <SplashScreen onDone={() => {
+            sessionStorage.setItem("srn_splash_shown", "1");
+            setSplashDone(true);
+          }} />
         )}
       </AnimatePresence>
 

@@ -5,28 +5,51 @@ const AuthContext = createContext(null);
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(() => {
+    try {
+      const cached = localStorage.getItem("srn_cached_user");
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [loading, setLoading] = useState(() => {
+    return !localStorage.getItem("srn_cached_user") && !localStorage.getItem("accessToken");
+  });
 
   const checkAuth = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/auth/me`, { credentials: "include" });
+      const headers = {};
+      const token = localStorage.getItem("accessToken");
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const res = await fetch(`${API_BASE}/api/auth/me`, { 
+        headers,
+        credentials: "include" 
+      });
       if (res.ok) {
         const data = await res.json();
         if (data?.data?.user) {
           setUser(data.data.user);
+          localStorage.setItem("srn_cached_user", JSON.stringify(data.data.user));
           return data.data.user;
         }
+      } else if (res.status === 401) {
+        localStorage.removeItem("srn_cached_user");
+        localStorage.removeItem("accessToken");
+        setUser(null);
       }
     } catch (err) {
       console.error("Auth check failed:", err);
+    } finally {
+      setLoading(false);
     }
     return null;
   };
 
   useEffect(() => {
-    // On mount, check if user is already logged in via cookie
-    checkAuth().finally(() => setLoading(false));
+    // On mount, verify session
+    checkAuth();
   }, []);
 
   const login = async (email, password) => {
@@ -50,6 +73,9 @@ export function AuthProvider({ children }) {
     if (data.data?.accessToken) {
       localStorage.setItem("accessToken", data.data.accessToken);
     }
+    if (data.data?.user) {
+      localStorage.setItem("srn_cached_user", JSON.stringify(data.data.user));
+    }
     setUser(data.data.user);
     return data.data.user;
   };
@@ -71,6 +97,9 @@ export function AuthProvider({ children }) {
     if (data.data?.accessToken) {
       localStorage.setItem("accessToken", data.data.accessToken);
     }
+    if (data.data?.user) {
+      localStorage.setItem("srn_cached_user", JSON.stringify(data.data.user));
+    }
     setUser(data.data.user);
     return data.data.user;
   };
@@ -88,6 +117,9 @@ export function AuthProvider({ children }) {
     if (data.data?.accessToken) {
       localStorage.setItem("accessToken", data.data.accessToken);
     }
+    if (data.data?.user) {
+      localStorage.setItem("srn_cached_user", JSON.stringify(data.data.user));
+    }
     setUser(data.data.user);
     return data.data.user;
   };
@@ -98,12 +130,17 @@ export function AuthProvider({ children }) {
       credentials: "include",
     });
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("srn_cached_user");
     setUser(null);
   };
 
   const updateProfile = async (updates) => {
     // Optimistically update the frontend user state
-    setUser(prev => ({ ...prev, ...updates }));
+    setUser(prev => {
+      const next = { ...prev, ...updates };
+      localStorage.setItem("srn_cached_user", JSON.stringify(next));
+      return next;
+    });
     try {
       await fetch(`${API_BASE}/api/users/profile`, {
         method: "PATCH",

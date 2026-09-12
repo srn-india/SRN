@@ -33,3 +33,13 @@ export const updateUserRole = catchAsync(async (req: Request, res: Response) => 
   const user = await adminService.updateUserRole(req.params.id as string, role);
   sendSuccess(res, user, 'User role updated successfully');
 });
+
+export const updateUserName = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { firstName, lastName } = req.body;
+  if (!firstName || typeof firstName !== 'string' || !firstName.trim()) {
+    return sendError(res, 'First name is required', 400);
+  }
+  const user = await adminService.updateUserName(id as string, firstName, lastName);
+  sendSuccess(res, user, 'User name updated successfully');
+});

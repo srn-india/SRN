@@ -1,5 +1,6 @@
 import { prisma } from '../../lib/prisma';
 import { Role } from '@prisma/client';
+import * as idcardService from '../membership/idcard.service';
 
 /**
  * Fetches all users with pagination
@@ -84,7 +85,39 @@ export const updateUserRole = async (userId: string, role: Role) => {
 };
 
 /**
- * Fetches platform-wide analytics
+ * Updates a user's name (firstName, lastName) and regenerates active ID card
+ */
+export const updateUserName = async (userId: string, firstName: string, lastName?: string) => {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new Error('User not found');
+
+  const updatedUser = await prisma.user.update({
+    where: { id: userId },
+    data: {
+      firstName: firstName.trim(),
+      lastName: lastName !== undefined ? (lastName ? lastName.trim() : '') : user.lastName,
+    },
+    select: { id: true, firstName: true, lastName: true, email: true, role: true },
+  });
+
+  // If user has an active membership, regenerate their ID card with the updated name
+  const membership = await prisma.membership.findFirst({
+    where: { userId, status: 'ACTIVE' },
+    orderBy: { createdAt: 'desc' },
+  });
+  if (membership) {
+    try {
+      await idcardService.generateAndUploadIdCard(membership.id);
+    } catch (err) {
+      console.error('Failed to regenerate ID card after name update:', err);
+    }
+  }
+
+  return updatedUser;
+};
+
+/**
+ * Fetches platform-wide analytics including both Razorpay and Manual (UPI/Bank Transfer) payments
  */
 export const getAnalytics = async () => {
   const [
@@ -92,20 +125,20 @@ export const getAnalytics = async () => {
     totalMembers,
     totalPosts,
     totalEvents,
-    totalPayments,
-    totalRevenueResult,
-    membershipRevenueResult,
-    donationRevenueResult
+    razorpaySuccessCount,
+    manualApprovedCount,
+    razorpayMembershipRevenue,
+    razorpayDonationRevenue,
+    manualMembershipRevenue,
+    manualDonationRevenue
   ] = await Promise.all([
     prisma.user.count(),
     prisma.membership.count({ where: { status: 'ACTIVE' } }),
     prisma.post.count(),
     prisma.event.count(),
     prisma.payment.count({ where: { status: 'SUCCESS' } }),
-    prisma.payment.aggregate({
-      where: { status: 'SUCCESS' },
-      _sum: { amount: true },
-    }),
+    prisma.manualPayment.count({ where: { status: 'APPROVED' } }),
+    // Razorpay Online Payments
     prisma.payment.aggregate({
       where: { status: 'SUCCESS', type: 'MEMBERSHIP' },
       _sum: { amount: true },
@@ -114,7 +147,21 @@ export const getAnalytics = async () => {
       where: { status: 'SUCCESS', type: 'DONATION' },
       _sum: { amount: true },
     }),
+    // Manual Payments (UPI, QR & Bank Transfer)
+    prisma.manualPayment.aggregate({
+      where: { status: 'APPROVED', type: 'MEMBERSHIP' },
+      _sum: { amount: true },
+    }),
+    prisma.manualPayment.aggregate({
+      where: { status: 'APPROVED', type: 'DONATION' },
+      _sum: { amount: true },
+    }),
   ]);
+
+  const membershipRevenue = Number(razorpayMembershipRevenue._sum.amount || 0) + Number(manualMembershipRevenue._sum.amount || 0);
+  const donationRevenue = Number(razorpayDonationRevenue._sum.amount || 0) + Number(manualDonationRevenue._sum.amount || 0);
+  const totalRevenue = membershipRevenue + donationRevenue;
+  const totalPayments = razorpaySuccessCount + manualApprovedCount;
 
   return {
     totalUsers,
@@ -122,9 +169,9 @@ export const getAnalytics = async () => {
     totalPosts,
     totalEvents,
     totalPayments,
-    totalRevenue: totalRevenueResult._sum.amount ? Number(totalRevenueResult._sum.amount) : 0,
-    membershipRevenue: membershipRevenueResult._sum.amount ? Number(membershipRevenueResult._sum.amount) : 0,
-    donationRevenue: donationRevenueResult._sum.amount ? Number(donationRevenueResult._sum.amount) : 0,
+    totalRevenue,
+    membershipRevenue,
+    donationRevenue,
   };
 };
 
