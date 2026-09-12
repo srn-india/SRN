@@ -37,6 +37,7 @@ import articleRoutes from './modules/article/article.routes';
 import applicationRoutes from './modules/application/application.routes';
 import manualPaymentRoutes from './modules/manual-payment/manual-payment.routes';
 import { sendEmail } from './utils/email.service';
+import { getGmailDiagnostics } from './utils/gmail.service';
 import { createServer } from 'http';
 import { initSocket } from './lib/socket';
 import logger from './utils/logger';
@@ -130,28 +131,42 @@ app.get('/', (req: Request, res: Response) => {
 // Swagger Documentation
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// ── SMTP diagnostic endpoint (admin-secret protected, no auth token needed) ──
-// Usage: GET /api/admin/test-smtp  with header  X-Admin-Secret: <ADMIN_SECRET>
+// ── Mail diagnostic endpoints (admin-secret protected, no auth token needed) ──
+app.get('/api/admin/mail-status', (req: Request, res: Response) => {
+  const secret = process.env.ADMIN_SECRET || 'srn-admin-test-2026';
+  if (req.headers['x-admin-secret'] !== secret) {
+    return res.status(403).json({ success: false, message: 'Forbidden' });
+  }
+  res.json({
+    success: true,
+    diagnostics: getGmailDiagnostics(),
+  });
+});
+
 app.get('/api/admin/test-smtp', async (req: Request, res: Response) => {
   const secret = process.env.ADMIN_SECRET || 'srn-admin-test-2026';
   if (req.headers['x-admin-secret'] !== secret) {
     return res.status(403).json({ success: false, message: 'Forbidden' });
   }
   const to = (req.query.to as string) || process.env.EMAIL_USER || 'srnindia.admin@gmail.com';
+  const diag = getGmailDiagnostics();
   try {
+    const startTime = Date.now();
     const info = await sendEmail(
       to,
-      '✅ SRN SMTP Diagnostic Test',
-      `<h2>SMTP is working!</h2>
+      '✅ SRN Email Diagnostic Test',
+      `<h2>SRN Email Service Test</h2>
        <p>This is a diagnostic email sent from the deployed Render backend.</p>
        <p><b>Time:</b> ${new Date().toISOString()}</p>
+       <p><b>Gmail OAuth API Configured:</b> ${diag.isConfigured ? 'YES (High Speed)' : 'NO'}</p>
        <p><b>EMAIL_HOST:</b> ${process.env.EMAIL_HOST || '(not set — mock mode)'}</p>
        <p><b>EMAIL_USER:</b> ${process.env.EMAIL_USER || '(not set)'}</p>`,
-      'SRN SMTP test succeeded'
+      'SRN Email test succeeded'
     );
-    res.json({ success: true, message: 'Test email sent', to, info });
+    const duration = Date.now() - startTime;
+    res.json({ success: true, message: 'Test email sent successfully', durationMs: duration, to, diagnostics: diag, info });
   } catch (err: any) {
-    res.status(500).json({ success: false, message: 'SMTP failed', error: err.message });
+    res.status(500).json({ success: false, message: 'Email dispatch failed', diagnostics: diag, error: err.message });
   }
 });
 

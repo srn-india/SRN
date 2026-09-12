@@ -64,17 +64,45 @@ print(json.dumps(data))
 
 
 /**
- * Loads Gmail OAuth credentials from GMAIL_TOKEN_B64, token.pickle file, or environment variables.
+ * Loads Gmail OAuth credentials from GMAIL_TOKEN_B64, GMAIL_CREDENTIALS_JSON, token.json, token.pickle file, or environment variables.
  */
 export function getGmailCredentials(): GmailCredentials | null {
   if (cachedCredentials) {
     return cachedCredentials;
   }
 
+  // 1. Check GMAIL_CREDENTIALS_JSON (raw JSON string)
+  const rawJson = process.env.GMAIL_CREDENTIALS_JSON;
+  if (rawJson && rawJson.trim().startsWith('{')) {
+    try {
+      const parsed = JSON.parse(rawJson.trim());
+      if (parsed.refresh_token && parsed.client_id) {
+        cachedCredentials = parsed;
+        logger.info('Loaded Gmail OAuth credentials from GMAIL_CREDENTIALS_JSON.');
+        return cachedCredentials;
+      }
+    } catch (e: any) {
+      logger.warn(`Failed to parse GMAIL_CREDENTIALS_JSON: ${e.message}`);
+    }
+  }
+
+  // 2. Check GMAIL_TOKEN_B64 (could be base64 JSON, raw JSON, or base64 pickle)
   const b64 = process.env.GMAIL_TOKEN_B64;
   if (b64 && b64.trim()) {
     const trimmed = b64.trim();
-    // 1. Try JSON decode first
+    // Raw JSON directly pasted into GMAIL_TOKEN_B64
+    if (trimmed.startsWith('{')) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (parsed.refresh_token && parsed.client_id) {
+          cachedCredentials = parsed;
+          logger.info('Loaded Gmail OAuth credentials from raw JSON in GMAIL_TOKEN_B64.');
+          return cachedCredentials;
+        }
+      } catch {}
+    }
+
+    // Try JSON decode from base64
     try {
       const decodedUtf8 = Buffer.from(trimmed, 'base64').toString('utf8');
       if (decodedUtf8.trim().startsWith('{')) {
@@ -89,7 +117,7 @@ export function getGmailCredentials(): GmailCredentials | null {
       // Not utf8 JSON, proceed to pickle extraction
     }
 
-    // 2. Try Python pickle decode
+    // Try Python pickle decode
     const fromPickle = extractFromPickle(trimmed);
     if (fromPickle && (fromPickle.refresh_token || fromPickle.client_id)) {
       cachedCredentials = fromPickle;
@@ -98,27 +126,40 @@ export function getGmailCredentials(): GmailCredentials | null {
     }
   }
 
-  // 3. Try reading local token.pickle if present
-  const picklePaths = [
+  // 3. Try reading local token.json or token.pickle from disk if present
+  const diskPaths = [
+    path.resolve(process.cwd(), 'token.json'),
+    path.resolve(process.cwd(), '..', 'token.json'),
+    path.resolve(process.cwd(), '..', '..', 'token.json'),
     process.env.GMAIL_TOKEN_PICKLE_PATH,
     path.resolve(process.cwd(), 'token.pickle'),
     path.resolve(process.cwd(), '..', 'token.pickle'),
     path.resolve(process.cwd(), '..', '..', 'token.pickle'),
   ].filter(Boolean) as string[];
 
-  for (const p of picklePaths) {
+  for (const p of diskPaths) {
     if (fs.existsSync(p)) {
       try {
-        const fileData = fs.readFileSync(p);
-        const b64Str = fileData.toString('base64');
-        const fromPickle = extractFromPickle(b64Str);
-        if (fromPickle && (fromPickle.refresh_token || fromPickle.client_id)) {
-          cachedCredentials = fromPickle;
-          logger.info(`Loaded Gmail OAuth credentials from disk file: ${p}`);
-          return cachedCredentials;
+        if (p.endsWith('.json')) {
+          const content = fs.readFileSync(p, 'utf8');
+          const parsed = JSON.parse(content);
+          if (parsed.refresh_token && parsed.client_id) {
+            cachedCredentials = parsed;
+            logger.info(`Loaded Gmail OAuth credentials from disk JSON: ${p}`);
+            return cachedCredentials;
+          }
+        } else {
+          const fileData = fs.readFileSync(p);
+          const b64Str = fileData.toString('base64');
+          const fromPickle = extractFromPickle(b64Str);
+          if (fromPickle && (fromPickle.refresh_token || fromPickle.client_id)) {
+            cachedCredentials = fromPickle;
+            logger.info(`Loaded Gmail OAuth credentials from disk file: ${p}`);
+            return cachedCredentials;
+          }
         }
       } catch (e: any) {
-        logger.warn(`Could not read pickle from ${p}: ${e.message}`);
+        logger.warn(`Could not read credentials from ${p}: ${e.message}`);
       }
     }
   }
@@ -147,6 +188,29 @@ export function getGmailCredentials(): GmailCredentials | null {
 export function isGmailOAuthConfigured(): boolean {
   const creds = getGmailCredentials();
   return !!(creds && creds.client_id && creds.client_secret && creds.refresh_token);
+}
+
+/**
+ * Diagnostics information for debugging configuration state.
+ */
+export function getGmailDiagnostics() {
+  const creds = getGmailCredentials();
+  return {
+    isConfigured: isGmailOAuthConfigured(),
+    has_GMAIL_TOKEN_B64: !!process.env.GMAIL_TOKEN_B64,
+    has_GMAIL_CREDENTIALS_JSON: !!process.env.GMAIL_CREDENTIALS_JSON,
+    has_GMAIL_CLIENT_ID: !!process.env.GMAIL_CLIENT_ID,
+    has_GMAIL_CLIENT_SECRET: !!process.env.GMAIL_CLIENT_SECRET,
+    has_GMAIL_REFRESH_TOKEN: !!process.env.GMAIL_REFRESH_TOKEN,
+    has_EMAIL_HOST: !!process.env.EMAIL_HOST,
+    emailHost: process.env.EMAIL_HOST || '(not set)',
+    credsSummary: creds ? {
+      hasClientId: !!creds.client_id,
+      clientIdPrefix: creds.client_id ? creds.client_id.substring(0, 15) + '...' : null,
+      hasClientSecret: !!creds.client_secret,
+      hasRefreshToken: !!creds.refresh_token,
+    } : null,
+  };
 }
 
 /**

@@ -18,6 +18,9 @@ const getTransporter = () => {
       host: process.env.EMAIL_HOST || 'smtp.ethereal.email',
       port: parseInt(process.env.EMAIL_PORT || '587'),
       secure: process.env.EMAIL_SECURE === 'true',
+      connectionTimeout: 5000,
+      greetingTimeout: 5000,
+      socketTimeout: 8000,
       auth: {
         user: process.env.EMAIL_USER || 'mock_user',
         pass: process.env.EMAIL_PASS || 'mock_pass',
@@ -194,6 +197,7 @@ export const sendEmail = async (to: string, subject: string, htmlContent: string
     }
 
     // 3. Fallback to pooled SMTP
+    console.warn(`[EmailService] Gmail OAuth API not configured. Falling back to SMTP (${process.env.EMAIL_HOST})...`);
     const mailOptions = {
       from: `"Sashakt Rashtra Nirman" <${process.env.EMAIL_FROM || 'no-reply@srn.org'}>`,
       to,
@@ -205,8 +209,8 @@ export const sendEmail = async (to: string, subject: string, htmlContent: string
     const info = await getTransporter().sendMail(mailOptions);
     console.log('Message sent via SMTP: %s', info.messageId);
     return info;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Email Send Error:', error);
-    throw new Error('Failed to send email');
+    throw new Error(error?.message || 'Failed to send email');
   }
 };
