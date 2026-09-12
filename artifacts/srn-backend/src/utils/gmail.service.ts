@@ -233,9 +233,9 @@ function getOAuth2Client(): OAuth2Client {
   }
 
   const client = new OAuth2Client(creds.client_id, creds.client_secret);
+  // Set refresh_token only so OAuth2Client always automatically fetches a fresh access token
   client.setCredentials({
     refresh_token: creds.refresh_token,
-    access_token: creds.token,
   });
 
   cachedOAuth2Client = client;
@@ -271,14 +271,14 @@ export async function sendGmailViaAPI(options: SendGmailOptions): Promise<{ mess
   const raw = messageBuffer.toString('base64url');
 
   const client = getOAuth2Client();
-  const accessTokenResp = await client.getAccessToken();
-  const accessToken = accessTokenResp.token;
+  let accessTokenResp = await client.getAccessToken();
+  let accessToken = accessTokenResp.token;
 
   if (!accessToken) {
     throw new Error('Failed to obtain Google access token from refresh token.');
   }
 
-  const response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+  let response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
@@ -286,6 +286,21 @@ export async function sendGmailViaAPI(options: SendGmailOptions): Promise<{ mess
     },
     body: JSON.stringify({ raw }),
   });
+
+  // If token expired (401), force refresh and retry once
+  if (response.status === 401) {
+    logger.warn('Gmail API returned 401. Refreshing access token and retrying...');
+    const refreshRes = await client.refreshAccessToken();
+    accessToken = refreshRes.credentials.access_token;
+    response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ raw }),
+    });
+  }
 
   if (!response.ok) {
     const errorText = await response.text();
