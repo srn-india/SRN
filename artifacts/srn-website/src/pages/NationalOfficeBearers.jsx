@@ -276,7 +276,7 @@ export default function NationalOfficeBearers() {
       </section>
 
       {/* ── Sections and grids ───────────────────────────────────────── */}
-      <div className="max-w-6xl mx-auto px-6 py-16 relative z-10 space-y-14">
+      <div className="max-w-[1560px] mx-auto px-4 sm:px-6 py-16 relative z-10 space-y-14">
         
         {/* 1. National President */}
         <section className="flex flex-col items-center">
