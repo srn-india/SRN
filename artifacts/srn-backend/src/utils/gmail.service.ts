@@ -89,7 +89,13 @@ export function getGmailCredentials(): GmailCredentials | null {
   // 2. Check GMAIL_TOKEN_B64 (could be base64 JSON, raw JSON, or base64 pickle)
   const b64 = process.env.GMAIL_TOKEN_B64;
   if (b64 && b64.trim()) {
-    const trimmed = b64.trim();
+    let trimmed = b64.trim();
+    // Strip leading and trailing quotes if the user entered quotes in Render dashboard
+    if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+      trimmed = trimmed.slice(1, -1).trim();
+    }
+    const cleanB64 = trimmed.replace(/\s+/g, '');
+
     // Raw JSON directly pasted into GMAIL_TOKEN_B64
     if (trimmed.startsWith('{')) {
       try {
@@ -104,7 +110,7 @@ export function getGmailCredentials(): GmailCredentials | null {
 
     // Try JSON decode from base64
     try {
-      const decodedUtf8 = Buffer.from(trimmed, 'base64').toString('utf8');
+      const decodedUtf8 = Buffer.from(cleanB64, 'base64').toString('utf8');
       if (decodedUtf8.trim().startsWith('{')) {
         const parsed = JSON.parse(decodedUtf8);
         if (parsed.refresh_token || parsed.client_id) {
@@ -118,7 +124,7 @@ export function getGmailCredentials(): GmailCredentials | null {
     }
 
     // Try Python pickle decode
-    const fromPickle = extractFromPickle(trimmed);
+    const fromPickle = extractFromPickle(cleanB64);
     if (fromPickle && (fromPickle.refresh_token || fromPickle.client_id)) {
       cachedCredentials = fromPickle;
       logger.info('Loaded Gmail OAuth credentials from base64-encoded token.pickle.');
