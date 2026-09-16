@@ -100,6 +100,20 @@ const bearersData = {
         image: "/national_bearers/adhivakta-kripa-shankar.jpeg"
       },
       {
+        nameEn: "Shri Anand Singh Bisht",
+        nameHi: "श्री आनंद सिंह बिष्ट",
+        descEn: "Uttarakhand",
+        descHi: "उत्तराखंड",
+        image: "/national_bearers/anand-singh-bisht.jpeg"
+      },
+      {
+        nameEn: "Ms Vinishka Sriilakshmi",
+        nameHi: "सुश्री विनिष्का श्रीलक्ष्मी",
+        descEn: "Karnataka",
+        descHi: "कर्नाटक",
+        image: "/national_bearers/vinisha-sriilakshmi.jpeg"
+      },
+      {
         nameEn: "Shri Vikash Shankar",
         nameHi: "श्री विकाश शंकर",
         descEn: "Uttarakhand",
@@ -107,18 +121,18 @@ const bearersData = {
         image: "/national_bearers/vikas-shankar.jpeg"
       },
       {
-        nameEn: "Shri Rajesh Mehta",
-        nameHi: "श्री राजेश मेहता",
-        descEn: "Uttarakhand",
-        descHi: "उत्तराखंड",
-        image: "/national_bearers/rajesh-mehta.jpeg"
-      },
-      {
         nameEn: "Shri Dheeraj Pandey",
         nameHi: "श्री धीरज पाण्डेय",
         descEn: "Jharkhand",
         descHi: "झारखंड",
         image: "/national_bearers/dheeraj-pandey.jpeg"
+      },
+      {
+        nameEn: "Shri Rajesh Mehta",
+        nameHi: "श्री राजेश मेहता",
+        descEn: "Uttarakhand",
+        descHi: "उत्तराखंड",
+        image: "/national_bearers/rajesh-mehta.jpeg"
       }
     ]
   },
@@ -335,7 +349,7 @@ export default function NationalOfficeBearers() {
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 w-full justify-items-center justify-center max-w-5xl">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 w-full justify-items-center justify-center max-w-[1500px]">
             {bearersData.secretaries.members.map((member, i) => (
               <MemberCard key={i} member={member} lang={lang} />
             ))}
