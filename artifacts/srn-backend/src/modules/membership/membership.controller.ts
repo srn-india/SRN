@@ -12,21 +12,96 @@ export const getMyMembership = catchAsync(async (req: Request, res: Response) =>
 });
 
 export const registerNormal = catchAsync(async (req: Request, res: Response) => {
-  const { state, district, profession } = req.body;
+  const { 
+    firstName, 
+    lastName, 
+    email, 
+    phone, 
+    gender, 
+    dateOfBirth, 
+    govIdType, 
+    govIdNumber, 
+    panNumber,
+    state, 
+    district, 
+    profession,
+    profilePicture 
+  } = req.body;
 
-  if (state || district) {
+  let userId = req.user?.id;
+
+  if (!userId) {
+    if (!email) {
+      return sendError(res, 'Email is required to register membership', null, 400);
+    }
+    const cleanEmail = email.toLowerCase().trim();
+    let user = await prisma.user.findUnique({ where: { email: cleanEmail } });
+    const idNum = govIdNumber || panNumber || null;
+    const pan = (govIdType === 'PAN' ? govIdNumber : panNumber) || null;
+
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          firstName: firstName || 'Member',
+          lastName: lastName || '',
+          email: cleanEmail,
+          phone: phone || null,
+          gender: gender || null,
+          dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
+          govIdType: govIdType || null,
+          govIdNumber: idNum,
+          panNumber: pan,
+          state: state || null,
+          district: district || null,
+          avatar: profilePicture || null,
+          isVerified: true,
+        }
+      });
+    } else {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          firstName: firstName || user.firstName,
+          lastName: lastName || user.lastName,
+          phone: phone || user.phone,
+          gender: gender || user.gender,
+          dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : user.dateOfBirth,
+          govIdType: govIdType || user.govIdType,
+          govIdNumber: idNum || user.govIdNumber,
+          panNumber: pan || user.panNumber,
+          state: state || user.state,
+          district: district || user.district,
+          avatar: profilePicture || user.avatar,
+        }
+      });
+    }
+    userId = user.id;
+  } else {
+    const idNum = govIdNumber || panNumber || undefined;
+    const pan = (govIdType === 'PAN' ? govIdNumber : panNumber) || undefined;
+
     await prisma.user.update({
-      where: { id: req.user.id },
+      where: { id: userId },
       data: {
+        firstName: firstName || undefined,
+        lastName: lastName || undefined,
+        phone: phone || undefined,
+        gender: gender || undefined,
+        dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
+        govIdType: govIdType || undefined,
+        govIdNumber: idNum,
+        panNumber: pan,
         state: state || undefined,
         district: district || undefined,
+        avatar: profilePicture || undefined,
       },
     }).catch(console.error);
   }
 
-  const membership = await membershipService.registerNormalMembership(req.user.id);
+  const membership = await membershipService.registerNormalMembership(userId);
   sendSuccess(res, membership, 'Normal membership activated successfully');
 });
+
 
 export const cancelMyMembership = catchAsync(async (req: Request, res: Response) => {
   const result = await membershipService.cancelMembership(req.params.id as string, req.user.id);

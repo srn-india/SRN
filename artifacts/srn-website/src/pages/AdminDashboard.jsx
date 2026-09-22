@@ -30,6 +30,13 @@ const fadeVariants = {
   exit: { opacity: 0, scale: 0.98, transition: { duration: 0.2 } }
 };
 
+const GOV_ID_DISPLAY_NAMES = {
+  AADHAAR: "Aadhaar Card",
+  PAN: "PAN Card",
+  VOTER_ID: "Voter ID (EPIC)",
+  DRIVING_LICENSE: "Driving Licence",
+};
+
 export default function AdminDashboard() {
   const { user, logout, API_BASE, checkAuth } = useAuth();
   const navigate = useNavigate();
@@ -1766,27 +1773,36 @@ export default function AdminDashboard() {
                                     </div>
                                   </div>
 
-                                  {/* PAN Card */}
-                                  {p.user?.panNumber && (
+                                  {/* Government ID / PAN Card */}
+                                  {(p.user?.govIdNumber || p.user?.panNumber) && (
                                     <div className="flex items-start gap-3 bg-gray-50/80 p-3.5 rounded-2xl border border-gray-100 sm:col-span-2">
-                                      <div className="p-2 bg-white rounded-xl shadow-xs text-amber-600"><FileText className="w-4 h-4" /></div>
+                                      <div className="p-2 bg-white rounded-xl shadow-xs text-amber-600"><ShieldCheck className="w-4 h-4" /></div>
                                       <div className="flex-1 min-w-0">
                                         <div className="flex items-center justify-between">
-                                          <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">PAN Card Number</p>
+                                          <div className="flex items-center gap-1.5">
+                                            <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
+                                              {p.user?.govIdType ? (GOV_ID_DISPLAY_NAMES[p.user.govIdType] || p.user.govIdType) : "Government ID"}
+                                            </p>
+                                            {p.user?.govIdType && (
+                                              <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">
+                                                {p.user.govIdType}
+                                              </span>
+                                            )}
+                                          </div>
                                           <button
                                             type="button"
-                                            onClick={() => copyToClipboard(p.user.panNumber, `pan-${p.id}`)}
+                                            onClick={() => copyToClipboard(p.user.govIdNumber || p.user.panNumber, `govid-${p.id}`)}
                                             className="text-gray-400 hover:text-[#E8622A] cursor-pointer inline-flex items-center gap-1 text-[11px]"
-                                            title="Copy PAN"
+                                            title="Copy ID"
                                           >
-                                            {copiedField === `pan-${p.id}` ? (
+                                            {copiedField === `govid-${p.id}` ? (
                                               <span className="text-emerald-600 font-bold flex items-center gap-1"><Check className="w-3 h-3" /> Copied</span>
                                             ) : (
                                               <span className="flex items-center gap-1"><Copy className="w-3 h-3" /> Copy</span>
                                             )}
                                           </button>
                                         </div>
-                                        <p className="text-sm font-mono font-bold text-[#2C1810] tracking-wider uppercase select-all">{p.user.panNumber}</p>
+                                        <p className="text-sm font-mono font-bold text-[#2C1810] tracking-wider uppercase select-all">{p.user.govIdNumber || p.user.panNumber}</p>
                                       </div>
                                     </div>
                                   )}

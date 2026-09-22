@@ -8,6 +8,7 @@
 ## Quick Tasks Completed
 | Task | Date | Status | Description |
 |------|------|--------|-------------|
+| `005-public-membership-govid` | 2026-09-23 | COMPLETE ✓ | Public membership route, multi-document Government ID (Aadhaar, PAN, Voter ID, DL) with database sync |
 | `004-resend-email-integration` | 2026-09-23 | COMPLETE ✓ | Resend HTTPS REST API integration replacing SMTP (bypasses Render port blocks) |
 | `003-membership-email-otp` | 2026-09-23 | COMPLETE ✓ | Gmail OTP verification with bespoke emails for Rashtra Mitra & Rashtra Nirman Karta |
 | `002-membership-tiers` | 2026-09-16 | COMPLETE ✓ | Stepper with Active vs Normal membership and benefit comparisons |

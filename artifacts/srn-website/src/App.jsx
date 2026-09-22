@@ -172,9 +172,7 @@ export default function App() {
               <Route path="/events" element={<Layout onPhoneClick={() => setShowPhonePopup(true)}><Events /></Layout>} />
               <Route path="/forums" element={<Layout onPhoneClick={() => setShowPhonePopup(true)}><Forums /></Layout>} />
               <Route path="/become-member" element={
-                <ProtectedRoute>
-                  <Layout onPhoneClick={() => setShowPhonePopup(true)}><BecomeMember /></Layout>
-                </ProtectedRoute>
+                <Layout onPhoneClick={() => setShowPhonePopup(true)}><BecomeMember /></Layout>
               } />
               <Route path="/donate" element={
                 <ProtectedRoute>

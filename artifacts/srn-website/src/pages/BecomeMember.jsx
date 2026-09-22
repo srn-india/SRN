@@ -32,6 +32,76 @@ const steps = [
   { id: 3, title: "Confirmation", titleHi: "पुष्टिकरण", icon: ShieldCheck },
 ];
 
+export const GOV_ID_TYPES = {
+  AADHAAR: {
+    key: "AADHAAR",
+    labelEn: "Aadhaar Card",
+    labelHi: "आधार कार्ड",
+    shortName: "Aadhaar",
+    placeholder: "XXXX XXXX XXXX",
+    example: "2345 6789 0123",
+    hintEn: "12-digit UIDAI number (cannot start with 0 or 1)",
+    hintHi: "12 अंकों का विशिष्ट आधार नंबर (0 या 1 से शुरू नहीं)",
+    maxLength: 14,
+    format: (val) => {
+      const digits = val.replace(/\D/g, "").slice(0, 12);
+      return digits.replace(/(\d{4})(?=\d)/g, "$1 ").trim();
+    },
+    validate: (val) => {
+      const clean = (val || "").replace(/\s+/g, "");
+      return clean.length === 12 && /^[2-9]{1}[0-9]{11}$/.test(clean);
+    },
+    errorEn: "Aadhaar must be 12 digits and cannot start with 0 or 1",
+    errorHi: "आधार 12 अंकों का होना चाहिए और 0 या 1 से शुरू नहीं हो सकता"
+  },
+  PAN: {
+    key: "PAN",
+    labelEn: "PAN Card",
+    labelHi: "पैन कार्ड",
+    shortName: "PAN",
+    placeholder: "ABCDE1234F",
+    example: "ABCDE1234F",
+    hintEn: "10-character alphanumeric (5 letters, 4 digits, 1 letter)",
+    hintHi: "10 अक्षरों का आयकर पैन (5 अक्षर, 4 अंक, 1 अक्षर)",
+    maxLength: 10,
+    format: (val) => (val || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 10),
+    validate: (val) => /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test((val || "").toUpperCase().trim()),
+    errorEn: "PAN must be 10 characters (e.g. ABCDE1234F)",
+    errorHi: "पैन 10 अक्षरों का होना चाहिए (उदा. ABCDE1234F)"
+  },
+  VOTER_ID: {
+    key: "VOTER_ID",
+    labelEn: "Voter ID (EPIC)",
+    labelHi: "मतदाता पहचान पत्र",
+    shortName: "Voter ID",
+    placeholder: "WDX1234567",
+    example: "WDX1234567",
+    hintEn: "Election Commission EPIC number (2-3 letters + 7-8 digits)",
+    hintHi: "निर्वाचन पहचान पत्र (2-3 अक्षर + 7-8 अंक)",
+    maxLength: 11,
+    format: (val) => (val || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 11),
+    validate: (val) => /^[A-Z]{2,3}[0-9]{7,8}$/.test((val || "").toUpperCase().trim()),
+    errorEn: "Voter ID must be 2-3 letters followed by 7-8 digits (e.g. WDX1234567)",
+    errorHi: "मतदाता पहचान पत्र 2-3 अक्षर और 7-8 अंक होना चाहिए (उदा. WDX1234567)"
+  },
+  DRIVING_LICENSE: {
+    key: "DRIVING_LICENSE",
+    labelEn: "Driving Licence",
+    labelHi: "ड्राइविंग लाइसेंस",
+    shortName: "DL",
+    placeholder: "DL1420110012345",
+    example: "DL1420110012345",
+    hintEn: "Valid Indian Driving Licence (15-16 characters)",
+    hintHi: "मान्य भारतीय ड्राइविंग लाइसेंस (15-16 अक्षर)",
+    maxLength: 16,
+    format: (val) => (val || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 16),
+    validate: (val) => /^[A-Z]{2}[0-9]{2}[0-9A-Z]{11,12}$/.test((val || "").toUpperCase().trim()),
+    errorEn: "Driving Licence must be valid 15-16 characters (e.g. DL1420110012345)",
+    errorHi: "ड्राइविंग लाइसेंस 15-16 अक्षरों का होना चाहिए (उदा. DL1420110012345)"
+  }
+};
+
+
 /**
  * CustomSelect - High-end styled dropdown menu with optional live search,
  * rich subtitle descriptions, checkmark indicators, and click-outside dismissal.
@@ -314,6 +384,8 @@ export default function BecomeMember() {
     phone: user?.phone || "", 
     gender: user?.gender || "",
     dob: user?.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split('T')[0] : "",
+    govIdType: user?.govIdType || (user?.panNumber ? "PAN" : "AADHAAR"),
+    govIdNumber: user?.govIdNumber || user?.panNumber || "",
     panNumber: user?.panNumber || "",
     state: user?.state || "", 
     city: user?.district || "", 
@@ -341,6 +413,8 @@ export default function BecomeMember() {
         phone: prev.phone || user.phone || "",
         gender: prev.gender || user.gender || "",
         dob: prev.dob || (user.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split('T')[0] : ""),
+        govIdType: prev.govIdType || user.govIdType || (user.panNumber ? "PAN" : "AADHAAR"),
+        govIdNumber: prev.govIdNumber || user.govIdNumber || user.panNumber || "",
         panNumber: prev.panNumber || user.panNumber || "",
         state: prev.state || user.state || "",
         city: prev.city || user.district || "",
@@ -508,6 +582,31 @@ export default function BecomeMember() {
     }
   };
 
+  const handleGovIdTypeChange = (type) => {
+    setFormData(prev => ({
+      ...prev,
+      govIdType: type,
+      govIdNumber: "",
+    }));
+    if (errors.govIdNumber) {
+      setErrors(prev => ({ ...prev, govIdNumber: false }));
+    }
+  };
+
+  const handleGovIdNumberChange = (e) => {
+    const raw = e.target.value;
+    const config = GOV_ID_TYPES[formData.govIdType] || GOV_ID_TYPES.AADHAAR;
+    const formatted = config.format(raw);
+    setFormData(prev => ({
+      ...prev,
+      govIdNumber: formatted,
+      panNumber: prev.govIdType === "PAN" ? formatted : prev.panNumber,
+    }));
+    if (errors.govIdNumber) {
+      setErrors(prev => ({ ...prev, govIdNumber: false }));
+    }
+  };
+
   const handleNext = () => {
     let newErrors = {};
     if (currentStep === 2) {
@@ -536,6 +635,13 @@ export default function BecomeMember() {
         });
       }
 
+      if (formData.govIdNumber && formData.govIdNumber.trim()) {
+        const config = GOV_ID_TYPES[formData.govIdType] || GOV_ID_TYPES.AADHAAR;
+        if (!config.validate(formData.govIdNumber)) {
+          newErrors.govIdNumber = true;
+        }
+      }
+
       if (membershipTier === "active" && !idPhoto && !idPhotoPreview && !user?.profilePicture && !user?.avatar) {
         newErrors.idPhoto = true;
       }
@@ -554,39 +660,61 @@ export default function BecomeMember() {
   const handleNormalMemberSubmit = async () => {
     setLoading(true);
     try {
-      // 1. Update user profile
-      await fetch(`${API_BASE}/api/users/profile`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email || undefined,
-          phone: formData.phone,
-          gender: formData.gender || undefined,
-          dateOfBirth: formData.dob || undefined,
-          panNumber: formData.panNumber ? formData.panNumber.toUpperCase().trim() : undefined,
-          state: formData.state,
-          district: formData.city
-        })
-      });
+      const cleanGovId = formData.govIdNumber
+        ? (formData.govIdType === "AADHAAR" ? formData.govIdNumber.replace(/\s+/g, "") : formData.govIdNumber.trim().toUpperCase())
+        : undefined;
 
-      // 2. Activate Normal Membership
+      const token = localStorage.getItem("accessToken");
+
+      // 1. Update user profile if authenticated
+      if (token) {
+        try {
+          await fetch(`${API_BASE}/api/users/profile`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              email: formData.email || undefined,
+              phone: formData.phone,
+              gender: formData.gender || undefined,
+              dateOfBirth: formData.dob || undefined,
+              govIdType: formData.govIdType || undefined,
+              govIdNumber: cleanGovId,
+              panNumber: formData.govIdType === "PAN" ? cleanGovId : (formData.panNumber ? formData.panNumber.toUpperCase().trim() : undefined),
+              state: formData.state,
+              district: formData.city
+            })
+          });
+        } catch (profileErr) {
+          console.warn("Failed to patch user profile:", profileErr);
+        }
+      }
+
+      // 2. Activate Normal Membership (works for both logged in users and guests with verified email)
       const res = await fetch(`${API_BASE}/api/memberships/register-normal`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
+          ...(token ? { "Authorization": `Bearer ${token}` } : {})
         },
         credentials: "include",
         body: JSON.stringify({
           state: formData.state,
           district: formData.city,
-          profession: formData.profession
+          profession: formData.profession,
+          email: formData.email ? formData.email.trim().toLowerCase() : undefined,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: formData.phone,
+          gender: formData.gender,
+          dateOfBirth: formData.dob,
+          govIdType: formData.govIdType,
+          govIdNumber: cleanGovId,
         })
       });
 
@@ -595,7 +723,7 @@ export default function BecomeMember() {
         throw new Error(data.message || "Failed to activate normal membership");
       }
 
-      await checkAuth();
+      if (checkAuth) await checkAuth();
       setSubmitted(true);
     } catch (err) {
       alert("Registration failed: " + err.message);
@@ -618,6 +746,10 @@ export default function BecomeMember() {
 
     setLoading(true);
     try {
+      const cleanGovId = formData.govIdNumber
+        ? (formData.govIdType === "AADHAAR" ? formData.govIdNumber.replace(/\s+/g, "") : formData.govIdNumber.trim().toUpperCase())
+        : undefined;
+
       await fetch(`${API_BASE}/api/users/profile`, {
         method: "PATCH",
         headers: { 
@@ -628,7 +760,13 @@ export default function BecomeMember() {
         body: JSON.stringify({
           firstName: formData.firstName,
           lastName: formData.lastName,
+          email: formData.email || undefined,
           phone: formData.phone,
+          gender: formData.gender || undefined,
+          dateOfBirth: formData.dob || undefined,
+          govIdType: formData.govIdType || undefined,
+          govIdNumber: cleanGovId,
+          panNumber: formData.govIdType === "PAN" ? cleanGovId : (formData.panNumber ? formData.panNumber.toUpperCase().trim() : undefined),
           state: formData.state,
           district: formData.city,
           ...(idPhoto ? { profilePicture: idPhoto } : {})
@@ -699,9 +837,9 @@ export default function BecomeMember() {
           }
         },
         prefill: {
-          name: `${user.firstName} ${user.lastName}`,
-          email: user.email,
-          contact: user.phone
+          name: `${user?.firstName || formData.firstName} ${user?.lastName || formData.lastName}`,
+          email: user?.email || formData.email,
+          contact: user?.phone || formData.phone
         },
         theme: {
           color: "#E8622A"
@@ -720,34 +858,46 @@ export default function BecomeMember() {
 
   // ── Active Membership (UPI / QR Flow) ─────────────────────────────────────────
   const handleQRMemberSubmit = async () => {
-    if (!user) { setIsModalOpen(true); return; }
-    if (!user.profilePicture && !user.avatar && !idPhoto) { setIsModalOpen(true); return; }
-    if (!utrNumber.trim()) { alert("Please enter your UTR / Transaction ID."); return; }
-    if (!screenshotFile) { alert("Please upload your payment screenshot."); return; }
+    if (!utrNumber.trim()) { alert(en ? "Please enter your UTR / Transaction ID." : "कृपया अपना UTR / ट्रांजेक्शन ID दर्ज करें।"); return; }
+    if (!screenshotFile) { alert(en ? "Please upload your payment screenshot." : "कृपया अपने भुगतान का स्क्रीनशॉट अपलोड करें।"); return; }
     setQrSubmitting(true);
     try {
-      // Sync and persist all user details and ID photo to profile
-      await fetch(`${API_BASE}/api/users/profile`, {
-        method: "PATCH",
-        headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email || undefined,
-          phone: formData.phone,
-          gender: formData.gender || undefined,
-          dateOfBirth: formData.dob || undefined,
-          panNumber: formData.panNumber ? formData.panNumber.toUpperCase().trim() : undefined,
-          state: formData.state,
-          district: formData.city,
-          ...(idPhoto ? { profilePicture: idPhoto } : {})
-        })
-      });
-      if (checkAuth) await checkAuth();
+      const cleanGovId = formData.govIdNumber
+        ? (formData.govIdType === "AADHAAR" ? formData.govIdNumber.replace(/\s+/g, "") : formData.govIdNumber.trim().toUpperCase())
+        : undefined;
+
+      const token = localStorage.getItem("accessToken");
+
+      // Sync and persist all user details and ID photo to profile if authenticated
+      if (token) {
+        try {
+          await fetch(`${API_BASE}/api/users/profile`, {
+            method: "PATCH",
+            headers: { 
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              email: formData.email || undefined,
+              phone: formData.phone,
+              gender: formData.gender || undefined,
+              dateOfBirth: formData.dob || undefined,
+              govIdType: formData.govIdType || undefined,
+              govIdNumber: cleanGovId,
+              panNumber: formData.govIdType === "PAN" ? cleanGovId : (formData.panNumber ? formData.panNumber.toUpperCase().trim() : undefined),
+              state: formData.state,
+              district: formData.city,
+              ...(idPhoto ? { profilePicture: idPhoto } : {})
+            })
+          });
+          if (checkAuth) await checkAuth();
+        } catch (profileErr) {
+          console.warn("Failed to patch user profile:", profileErr);
+        }
+      }
 
       let screenshotUrl = "";
       if (screenshotFile) {
@@ -755,7 +905,9 @@ export default function BecomeMember() {
         uploadForm.append("file", screenshotFile);
         const uploadRes = await fetch(`${API_BASE}/api/manual-payments/upload-screenshot`, {
           method: "POST",
-          headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
+          },
           credentials: "include",
           body: uploadForm,
         });
@@ -764,16 +916,33 @@ export default function BecomeMember() {
           screenshotUrl = uploadData.data?.url || "";
         }
       }
+
+      const idBadge = GOV_ID_TYPES[formData.govIdType]?.shortName || formData.govIdType || "ID";
+      const idStr = formData.govIdNumber ? ` | ${idBadge}: ${formData.govIdNumber}` : (formData.panNumber ? ` | PAN: ${formData.panNumber.toUpperCase()}` : "");
+
       const res = await fetch(`${API_BASE}/api/manual-payments/submit`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
         credentials: "include",
         body: JSON.stringify({ 
           amount: MEMBER_AMOUNT_QR, 
           type: "MEMBERSHIP", 
           utrNumber: utrNumber.trim(), 
           screenshot: screenshotUrl,
-          purpose: `[ACTIVE MEMBERSHIP] ${formData.firstName} ${formData.lastName} | Phone: ${formData.phone}${formData.panNumber ? ` | PAN: ${formData.panNumber.toUpperCase()}` : ''}${formData.gender ? ` | Gender: ${formData.gender}` : ''} | State: ${formData.state} | District: ${formData.city} | Role: ${formData.interest}`
+          email: formData.email ? formData.email.trim().toLowerCase() : undefined,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: formData.phone,
+          state: formData.state,
+          district: formData.city,
+          gender: formData.gender,
+          dateOfBirth: formData.dob,
+          govIdType: formData.govIdType,
+          govIdNumber: cleanGovId,
+          purpose: `[ACTIVE MEMBERSHIP] ${formData.firstName} ${formData.lastName} | Phone: ${formData.phone}${idStr}${formData.gender ? ` | Gender: ${formData.gender}` : ''} | State: ${formData.state} | District: ${formData.city} | Role: ${formData.interest}`
         }),
       });
       if (!res.ok) throw new Error((await res.json()).message);
@@ -1563,19 +1732,95 @@ export default function BecomeMember() {
                               <label className={labelClass}>{en ? "City / District" : "शहर / जिला"} *</label>
                               <input type="text" name="city" value={formData.city} onChange={handleChange} className={getInputClass("city")} placeholder="New Delhi" />
                             </div>
-                            <div>
-                              <label className={labelClass}>
-                                <span className="flex items-center gap-2"><FileText className="w-3.5 h-3.5 text-[#E8622A]" /> {en ? "PAN Card Number" : "पैन कार्ड नंबर"}</span>
-                              </label>
-                              <input 
-                                type="text" 
-                                name="panNumber" 
-                                value={formData.panNumber} 
-                                maxLength={10} 
-                                onChange={e => setFormData({ ...formData, panNumber: e.target.value.toUpperCase() })} 
-                                className={`${getInputClass("panNumber")} font-mono uppercase tracking-wider`} 
-                                placeholder="ABCDE1234F" 
-                              />
+                            {/* Government ID Document Section */}
+                            <div className="sm:col-span-2 p-4 sm:p-5 rounded-2xl bg-[#FFFDF9] border border-[#E8D5B8]/80 shadow-xs space-y-3">
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                                <label className="text-xs sm:text-sm font-bold text-[#2C1810] flex items-center gap-2">
+                                  <ShieldCheck className="w-4 h-4 text-[#E8622A]" />
+                                  <span>{en ? "Government ID Proof" : "सरकारी पहचान पत्र"}</span>
+                                  <span className="text-[11px] font-normal text-gray-500">
+                                    ({en ? "Driving Licence, Aadhaar, PAN or Voter ID" : "ड्राइविंग लाइसेंस, आधार, पैन या वोटर आईडी"})
+                                  </span>
+                                </label>
+                                {formData.govIdNumber && (GOV_ID_TYPES[formData.govIdType] || GOV_ID_TYPES.AADHAAR).validate(formData.govIdNumber) && (
+                                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-100/80 px-2.5 py-0.5 rounded-full border border-emerald-300 shrink-0 self-start sm:self-auto">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                    {en ? "Valid Format" : "मान्य प्रारूप"}
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* 4-Pill Document Selector */}
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                {Object.values(GOV_ID_TYPES).map((opt) => {
+                                  const isSelected = formData.govIdType === opt.key;
+                                  return (
+                                    <button
+                                      key={opt.key}
+                                      type="button"
+                                      onClick={() => handleGovIdTypeChange(opt.key)}
+                                      className={`px-3 py-2.5 rounded-xl text-xs font-bold transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer text-center ${
+                                        isSelected
+                                          ? "bg-[#E8622A] text-white shadow-xs ring-2 ring-[#E8622A]/20"
+                                          : "bg-white text-[#5C3A1E] border border-[#E8D5B8] hover:border-[#E8622A]/60 hover:bg-orange-50/40"
+                                      }`}
+                                    >
+                                      <span className="truncate w-full">{en ? opt.labelEn : opt.labelHi}</span>
+                                      <span className={`text-[10px] font-medium ${isSelected ? "text-orange-100" : "text-gray-400"}`}>
+                                        {opt.shortName}
+                                      </span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+
+                              {/* ID Number Input with Auto-formatting and Live Validation */}
+                              <div className="space-y-1 pt-0.5">
+                                {(() => {
+                                  const currentConfig = GOV_ID_TYPES[formData.govIdType] || GOV_ID_TYPES.AADHAAR;
+                                  const isValid = currentConfig.validate(formData.govIdNumber);
+                                  return (
+                                    <>
+                                      <div className="relative">
+                                        <input
+                                          type="text"
+                                          name="govIdNumber"
+                                          value={formData.govIdNumber}
+                                          maxLength={currentConfig.maxLength}
+                                          onChange={handleGovIdNumberChange}
+                                          className={`${getInputClass("govIdNumber")} font-mono uppercase tracking-wider pr-12`}
+                                          placeholder={currentConfig.placeholder}
+                                        />
+                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
+                                          {formData.govIdNumber ? (
+                                            isValid ? (
+                                              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                                            ) : (
+                                              <AlertCircle className="w-5 h-5 text-amber-500" />
+                                            )
+                                          ) : (
+                                            <FileText className="w-4 h-4 text-gray-400" />
+                                          )}
+                                        </div>
+                                      </div>
+
+                                      {errors.govIdNumber ? (
+                                        <p className="text-xs text-red-600 font-semibold flex items-center gap-1.5 mt-1">
+                                          <AlertCircle className="w-3.5 h-3.5 shrink-0 text-red-500" />
+                                          {en ? currentConfig.errorEn : currentConfig.errorHi}
+                                        </p>
+                                      ) : (
+                                        <p className="text-[11px] text-[#7A5C45] flex items-center justify-between gap-2 mt-1">
+                                          <span>{en ? currentConfig.hintEn : currentConfig.hintHi}</span>
+                                          <span className="font-mono text-gray-400 font-medium shrink-0">
+                                            {en ? "Example" : "उदा."}: {currentConfig.example}
+                                          </span>
+                                        </p>
+                                      )}
+                                    </>
+                                  );
+                                })()}
+                              </div>
                             </div>
                             <div>
                               <label className={labelClass}>{en ? "Profession / Occupation" : "पेशा / व्यवसाय"}</label>
@@ -1694,8 +1939,17 @@ export default function BecomeMember() {
                                 <span className="font-bold text-[#2C1810] text-base">{formData.gender || "—"}{formData.dob ? ` · ${formData.dob}` : ""}</span>
                               </div>
                               <div className="p-4 sm:p-5 bg-white/80 rounded-2xl border border-orange-100/60">
-                                <span className="text-gray-400 block mb-1 font-semibold">{en ? "PAN Card" : "पैन कार्ड"}:</span>
-                                <span className="font-mono font-bold text-[#2C1810] text-base uppercase">{formData.panNumber || (en ? "Not provided" : "उपलब्ध नहीं")}</span>
+                                <span className="text-gray-400 block mb-1 font-semibold">{en ? "Government ID" : "सरकारी पहचान पत्र"}:</span>
+                                <div className="flex items-center gap-2">
+                                  {formData.govIdType && (
+                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-orange-100 text-[#E8622A]">
+                                      {GOV_ID_TYPES[formData.govIdType]?.shortName || formData.govIdType}
+                                    </span>
+                                  )}
+                                  <span className="font-mono font-bold text-[#2C1810] text-base uppercase">
+                                    {formData.govIdNumber || formData.panNumber || (en ? "Not provided" : "उपलब्ध नहीं")}
+                                  </span>
+                                </div>
                               </div>
 
                               {idPhotoPreview && (
@@ -1764,7 +2018,7 @@ export default function BecomeMember() {
                                 <h4 className="text-sm sm:text-base font-bold text-[#2C1810] truncate">{formData.firstName} {formData.lastName}</h4>
                                 <p className="text-xs text-[#7A5C45] truncate">{formData.city ? `${formData.city}, ${formData.state}` : formData.state} · {formData.phone}</p>
                                 <p className="text-[11px] text-gray-500 truncate mt-0.5">
-                                  {formData.gender ? `${formData.gender}` : ""}{formData.dob ? ` · DOB: ${formData.dob}` : ""}{formData.panNumber ? ` · PAN: ${formData.panNumber.toUpperCase()}` : ""}
+                                  {formData.gender ? `${formData.gender}` : ""}{formData.dob ? ` · DOB: ${formData.dob}` : ""}{formData.govIdNumber ? ` · ${GOV_ID_TYPES[formData.govIdType]?.shortName || 'ID'}: ${formData.govIdNumber}` : (formData.panNumber ? ` · PAN: ${formData.panNumber.toUpperCase()}` : "")}
                                 </p>
                               </div>
                             </div>

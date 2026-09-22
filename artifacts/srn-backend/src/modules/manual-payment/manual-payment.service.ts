@@ -139,6 +139,8 @@ export const getAllPayments = async (status?: string) => {
           gender: true,
           dateOfBirth: true,
           panNumber: true,
+          govIdType: true,
+          govIdNumber: true,
           role: true,
           isVerified: true,
           createdAt: true,

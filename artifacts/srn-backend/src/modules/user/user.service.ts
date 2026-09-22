@@ -14,6 +14,9 @@ export const getUserProfile = async (userId: string) => {
       district: true,
       gender: true,
       dateOfBirth: true,
+      govIdType: true,
+      govIdNumber: true,
+      panNumber: true,
       avatar: true,
       role: true,
       isVerified: true,
@@ -26,6 +29,10 @@ export const getUserProfile = async (userId: string) => {
 };
 
 export const updateUserProfile = async (userId: string, data: any) => {
+  const pan = data.panNumber || (data.govIdType === 'PAN' ? data.govIdNumber : undefined);
+  const govIdNum = data.govIdNumber || data.panNumber;
+  const govIdType = data.govIdType || (data.panNumber ? 'PAN' : undefined);
+
   return await prisma.user.update({
     where: { id: userId },
     data: {
@@ -36,6 +43,9 @@ export const updateUserProfile = async (userId: string, data: any) => {
       district: data.district,
       gender: data.gender,
       dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : undefined,
+      govIdType: govIdType || undefined,
+      govIdNumber: govIdNum || undefined,
+      panNumber: pan || undefined,
       avatar: data.avatar,
     },
     select: {
@@ -43,11 +53,15 @@ export const updateUserProfile = async (userId: string, data: any) => {
       firstName: true,
       lastName: true,
       email: true,
+      govIdType: true,
+      govIdNumber: true,
+      panNumber: true,
       avatar: true,
       role: true,
     },
   });
 };
+
 
 export const changePassword = async (userId: string, data: any) => {
   const user = await prisma.user.findUnique({ where: { id: userId } });
