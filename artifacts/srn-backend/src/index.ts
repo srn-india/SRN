@@ -36,7 +36,7 @@ import complaintRoutes from './modules/complaint/complaint.routes';
 import articleRoutes from './modules/article/article.routes';
 import applicationRoutes from './modules/application/application.routes';
 import manualPaymentRoutes from './modules/manual-payment/manual-payment.routes';
-import { sendEmail } from './utils/email.service';
+import { sendEmail, getEmailDiagnostics } from './utils/email.service';
 import { getGmailDiagnostics } from './utils/gmail.service';
 import { createServer } from 'http';
 import { initSocket } from './lib/socket';
@@ -150,6 +150,7 @@ app.get('/api/admin/test-smtp', async (req: Request, res: Response) => {
   }
   const to = (req.query.to as string) || process.env.EMAIL_USER || 'srnindia.admin@gmail.com';
   const diag = getGmailDiagnostics();
+  const emailDiag = getEmailDiagnostics();
   try {
     const startTime = Date.now();
     const info = await sendEmail(
@@ -158,17 +159,18 @@ app.get('/api/admin/test-smtp', async (req: Request, res: Response) => {
       `<h2>SRN Email Service Test</h2>
        <p>This is a diagnostic email sent from the deployed Render backend.</p>
        <p><b>Time:</b> ${new Date().toISOString()}</p>
-       <p><b>Gmail OAuth API Configured:</b> ${diag.isConfigured ? 'YES (High Speed)' : 'NO'}</p>
-       <p><b>EMAIL_HOST:</b> ${process.env.EMAIL_HOST || '(not set — mock mode)'}</p>
-       <p><b>EMAIL_USER:</b> ${process.env.EMAIL_USER || '(not set)'}</p>`,
+       <p><b>Resend Configured:</b> ${emailDiag.hasResendApiKey ? 'YES' : 'NO'}</p>
+       <p><b>Gmail OAuth API Configured:</b> ${diag.isConfigured ? 'YES' : 'NO'}</p>
+       <p><b>EMAIL_HOST:</b> ${process.env.EMAIL_HOST || '(not set)'}</p>`,
       'SRN Email test succeeded'
     );
     const duration = Date.now() - startTime;
-    res.json({ success: true, message: 'Test email sent successfully', durationMs: duration, to, diagnostics: diag, info });
+    res.json({ success: true, message: 'Test email sent successfully', durationMs: duration, to, diagnostics: diag, emailDiagnostics: emailDiag, info });
   } catch (err: any) {
-    res.status(500).json({ success: false, message: 'Email dispatch failed', diagnostics: diag, error: err.message });
+    res.status(500).json({ success: false, message: 'Email dispatch failed', diagnostics: diag, emailDiagnostics: emailDiag, error: err.message });
   }
 });
+
 
 // Route Middleware
 app.use('/api/auth', authRoutes);

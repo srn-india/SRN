@@ -13,12 +13,25 @@ import { isGmailOAuthConfigured, sendGmailViaAPI } from './gmail.service';
 
 let resendClient: Resend | null = null;
 export const getResendClient = (): Resend | null => {
-  const apiKey = process.env.RESEND_API_KEY;
+  let apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return null;
+  apiKey = apiKey.replace(/^["']|["']$/g, '').trim();
   if (!apiKey) return null;
   if (!resendClient) {
     resendClient = new Resend(apiKey);
   }
   return resendClient;
+};
+
+export const getEmailDiagnostics = () => {
+  const resendKey = process.env.RESEND_API_KEY?.replace(/^["']|["']$/g, '').trim();
+  return {
+    hasResendApiKey: !!resendKey,
+    resendApiKeyPrefix: resendKey ? resendKey.substring(0, 7) + '...' : null,
+    resendFromEmail: (process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev').replace(/^["']|["']$/g, '').trim(),
+    hasEmailHost: !!process.env.EMAIL_HOST,
+    emailHost: process.env.EMAIL_HOST || null,
+  };
 };
 
 let pooledTransporter: nodemailer.Transporter | null = null;
@@ -323,7 +336,8 @@ export const sendEmail = async (to: string, subject: string, htmlContent: string
     // 1. Prioritize Resend HTTPS REST API (Bypasses Render free tier SMTP port 587/465 blocks)
     const resend = getResendClient();
     if (resend) {
-      const fromEmail = process.env.RESEND_FROM_EMAIL || 'Sashakt Rashtra Nirman <onboarding@resend.dev>';
+      let fromEmail = process.env.RESEND_FROM_EMAIL || 'Sashakt Rashtra Nirman <onboarding@resend.dev>';
+      fromEmail = fromEmail.replace(/^["']|["']$/g, '').trim();
       console.info(`[EmailService] Dispatching email via Resend API to: ${to} (from: ${fromEmail})...`);
 
       const resendAttachments = attachments?.map((att) => ({
