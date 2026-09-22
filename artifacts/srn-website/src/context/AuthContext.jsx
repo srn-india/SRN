@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 
 const AuthContext = createContext(null);
 
@@ -14,10 +14,13 @@ export function AuthProvider({ children }) {
     }
   });
   const [loading, setLoading] = useState(() => {
-    return !localStorage.getItem("srn_cached_user") && !localStorage.getItem("accessToken");
+    const cached = localStorage.getItem("srn_cached_user");
+    if (cached) return false;
+    const token = localStorage.getItem("accessToken");
+    return Boolean(token);
   });
 
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
       const headers = {};
       const token = localStorage.getItem("accessToken");
@@ -45,12 +48,12 @@ export function AuthProvider({ children }) {
       setLoading(false);
     }
     return null;
-  };
+  }, []);
 
   useEffect(() => {
     // On mount, verify session
     checkAuth();
-  }, []);
+  }, [checkAuth]);
 
   const login = async (email, password) => {
     const res = await fetch(`${API_BASE}/api/auth/login`, {

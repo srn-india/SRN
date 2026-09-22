@@ -14,10 +14,12 @@ export default function ProtectedRoute({ children, requireRole }) {
   }
 
   if (!user) {
+    if (location.pathname === "/login") return null;
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (requireRole && user.role !== requireRole) {
+    if (location.pathname === "/dashboard") return null;
     return <Navigate to="/dashboard" replace />;
   }
 

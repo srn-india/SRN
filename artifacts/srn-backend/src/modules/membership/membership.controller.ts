@@ -11,6 +11,23 @@ export const getMyMembership = catchAsync(async (req: Request, res: Response) =>
   sendSuccess(res, membership, 'Membership details fetched successfully');
 });
 
+export const registerNormal = catchAsync(async (req: Request, res: Response) => {
+  const { state, district, profession } = req.body;
+
+  if (state || district) {
+    await prisma.user.update({
+      where: { id: req.user.id },
+      data: {
+        state: state || undefined,
+        district: district || undefined,
+      },
+    }).catch(console.error);
+  }
+
+  const membership = await membershipService.registerNormalMembership(req.user.id);
+  sendSuccess(res, membership, 'Normal membership activated successfully');
+});
+
 export const cancelMyMembership = catchAsync(async (req: Request, res: Response) => {
   const result = await membershipService.cancelMembership(req.params.id as string, req.user.id);
   sendSuccess(res, result, 'Membership cancelled successfully');
@@ -56,4 +73,34 @@ export const generateIdCard = catchAsync(async (req: Request, res: Response) => 
   }
 
   res.redirect(publicUrl);
+});
+
+export const sendMembershipOtp = catchAsync(async (req: Request, res: Response) => {
+  const { email, tier, name } = req.body;
+  if (!email) {
+    return sendError(res, 'Email address is required', null, 400);
+  }
+
+  const result = await membershipService.sendMembershipOtp({
+    email,
+    tier: tier === 'active' ? 'active' : 'normal',
+    name: name || (req.user ? `${req.user.firstName} ${req.user.lastName}` : undefined),
+  });
+
+  sendSuccess(res, result, result.message);
+});
+
+export const verifyMembershipOtp = catchAsync(async (req: Request, res: Response) => {
+  const { email, otp, tier } = req.body;
+  if (!email || !otp) {
+    return sendError(res, 'Email and 6-digit OTP code are required', null, 400);
+  }
+
+  const result = await membershipService.verifyMembershipOtp({
+    email,
+    otp,
+    tier,
+  });
+
+  sendSuccess(res, result, result.message);
 });

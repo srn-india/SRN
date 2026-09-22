@@ -153,6 +153,138 @@ export const notifyAdminOfPayment = async (paymentDetails: any) => {
   return sendEmail(adminEmail, 'New Payment Received', content, 'A new payment was successfully processed');
 };
 
+export const sendRashtraNirmanKartaOtpEmail = async (email: string, otpCode: string, applicantName?: string) => {
+  const greeting = applicantName?.trim() ? `Dear ${applicantName.trim()},` : 'Dear Nation Builder,';
+  const preheader = `Your verification code is ${otpCode} - Welcome to Sashakt Rashtra Nirman Active Membership`;
+
+  const content = `
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div style="display: inline-block; padding: 6px 16px; background-color: #FEF3C7; border: 1px solid #F59E0B; border-radius: 9999px; color: #92400E; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">
+        🇮🇳 Rashtra Nirman Karta · Active Membership
+      </div>
+      <h2 style="color: #2C1810; margin-top: 14px; margin-bottom: 6px; font-size: 24px; font-weight: 800;">
+        Active Membership Verification Code
+      </h2>
+      <p style="color: #7A5C45; font-size: 14px; margin: 0;">
+        Complete your email verification for Sashakt Rashtra Nirman
+      </p>
+    </div>
+
+    <p style="font-size: 16px; color: #2C1810; font-weight: 600; margin-bottom: 8px;">
+      ${greeting}
+    </p>
+    <p style="color: #4B5563; font-size: 14px; line-height: 1.7; margin-bottom: 16px;">
+      Thank you for stepping forward to serve the nation as an active member (<strong>Rashtra Nirman Karta</strong>) with <strong>Sashakt Rashtra Nirman (SRN)</strong>. To verify your email address and proceed with your official registration, please use the 6-digit confidential One-Time Password (OTP) below:
+    </p>
+
+    <!-- OTP Card -->
+    <div style="margin: 28px 0; padding: 24px; background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); border: 2px solid #F59E0B; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);">
+      <div style="font-size: 12px; text-transform: uppercase; font-weight: 800; color: #B45309; letter-spacing: 1.5px; margin-bottom: 8px;">
+        Official Verification Code (6-Digit OTP)
+      </div>
+      <div style="font-size: 38px; font-weight: 900; letter-spacing: 8px; color: #E8622A; font-family: monospace; line-height: 1.2;">
+        ${otpCode}
+      </div>
+      <div style="margin-top: 10px; font-size: 12px; color: #78350F; font-weight: 600;">
+        ⏱️ Valid for 10 minutes only · Do not share this code
+      </div>
+    </div>
+
+    <!-- Active Membership Role Highlights -->
+    <div style="margin: 24px 0; padding: 18px 20px; background-color: #FDF5EC; border-left: 4px solid #E8622A; border-radius: 0 8px 8px 0;">
+      <h4 style="margin: 0 0 10px 0; color: #2C1810; font-size: 14px; font-weight: 800;">
+        🎖️ Key Privileges of a Rashtra Nirman Karta:
+      </h4>
+      <ul style="margin: 0; padding-left: 18px; color: #4B5563; font-size: 13px; line-height: 1.8;">
+        <li><strong>Grassroots Leadership:</strong> Direct eligibility to hold executive posts across Block, District, and State committees.</li>
+        <li><strong>Official Verified ID Card:</strong> Issuance of a verified digital and physical SRN Membership Card with secure QR validation.</li>
+        <li><strong>Decision-Making Authority:</strong> Direct consultation and strategic coordination with state and national leadership.</li>
+      </ul>
+    </div>
+
+    <p style="color: #6B7280; font-size: 12px; line-height: 1.6; margin-top: 20px;">
+      ⚠️ <em>Security Notice: This verification code is strictly confidential. If you did not request this verification, please disregard this email.</em>
+    </p>
+
+    <div style="text-align: center; margin-top: 28px; padding-top: 16px; border-top: 1px solid #E5E7EB; color: #92400E; font-weight: 700; font-size: 13px;">
+      "Empowered Citizens, Resilient Society, Stronger Nation"
+    </div>
+  `;
+
+  return sendEmail(
+    email,
+    `[SRN] Verification Code for Rashtra Nirman Karta (Active Membership): ${otpCode}`,
+    content,
+    preheader
+  );
+};
+
+export const sendRashtraMitraOtpEmail = async (email: string, otpCode: string, applicantName?: string) => {
+  const greeting = applicantName?.trim() ? `Dear ${applicantName.trim()},` : 'Dear Supporter,';
+  const preheader = `Your verification code is ${otpCode} - Welcome to the Rashtra Mitra Network`;
+
+  const content = `
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div style="display: inline-block; padding: 6px 16px; background-color: #ECFDF5; border: 1px solid #10B981; border-radius: 9999px; color: #065F46; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">
+        🤝 Rashtra Mitra · Supporter Membership
+      </div>
+      <h2 style="color: #2C1810; margin-top: 14px; margin-bottom: 6px; font-size: 24px; font-weight: 800;">
+        Rashtra Mitra Verification Code
+      </h2>
+      <p style="color: #7A5C45; font-size: 14px; margin: 0;">
+        Complete your email verification for Sashakt Rashtra Nirman
+      </p>
+    </div>
+
+    <p style="font-size: 16px; color: #2C1810; font-weight: 600; margin-bottom: 8px;">
+      ${greeting}
+    </p>
+    <p style="color: #4B5563; font-size: 14px; line-height: 1.7; margin-bottom: 16px;">
+      Welcome to the <strong>Sashakt Rashtra Nirman (SRN)</strong> family as a <strong>Rashtra Mitra</strong> (Supporter Member). We are honored to have you join our nationwide civic initiative. To verify your email address and activate your supporter membership, please enter the 6-digit One-Time Password (OTP) below:
+    </p>
+
+    <!-- OTP Card -->
+    <div style="margin: 28px 0; padding: 24px; background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%); border: 2px solid #10B981; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);">
+      <div style="font-size: 12px; text-transform: uppercase; font-weight: 800; color: #047857; letter-spacing: 1.5px; margin-bottom: 8px;">
+        Official Verification Code (6-Digit OTP)
+      </div>
+      <div style="font-size: 38px; font-weight: 900; letter-spacing: 8px; color: #059669; font-family: monospace; line-height: 1.2;">
+        ${otpCode}
+      </div>
+      <div style="margin-top: 10px; font-size: 12px; color: #065F46; font-weight: 600;">
+        ⏱️ Valid for 10 minutes only · Do not share this code
+      </div>
+    </div>
+
+    <!-- Rashtra Mitra Benefits Highlights -->
+    <div style="margin: 24px 0; padding: 18px 20px; background-color: #FDF5EC; border-left: 4px solid #10B981; border-radius: 0 8px 8px 0;">
+      <h4 style="margin: 0 0 10px 0; color: #2C1810; font-size: 14px; font-weight: 800;">
+        🌱 Your Role as a Rashtra Mitra:
+      </h4>
+      <ul style="margin: 0; padding-left: 18px; color: #4B5563; font-size: 13px; line-height: 1.8;">
+        <li><strong>Community Action:</strong> Invitations to join blood donation camps, cleanliness drives, and disaster relief activities.</li>
+        <li><strong>Janmant Open Platform:</strong> Complimentary access to citizen journalism articles and open national discourse forums.</li>
+        <li><strong>Monthly Circulars:</strong> Direct digital updates on key social campaigns and community progress across India.</li>
+      </ul>
+    </div>
+
+    <p style="color: #6B7280; font-size: 12px; line-height: 1.6; margin-top: 20px;">
+      ⚠️ <em>Security Notice: This verification code is confidential. If you did not request this, you can safely ignore this email.</em>
+    </p>
+
+    <div style="text-align: center; margin-top: 28px; padding-top: 16px; border-top: 1px solid #E5E7EB; color: #047857; font-weight: 700; font-size: 13px;">
+      "One Step for the Nation · Citizen Action for National Progress"
+    </div>
+  `;
+
+  return sendEmail(
+    email,
+    `[SRN] Verification Code for Rashtra Mitra (Supporter Membership): ${otpCode}`,
+    content,
+    preheader
+  );
+};
+
 export const notifyUserOfOTP = async (email: string, otpCode: string) => {
   const content = `
     <h2>Verify Your Identity</h2>
@@ -178,12 +310,16 @@ export const sendEmail = async (to: string, subject: string, htmlContent: string
 
     // 1. Prioritize Gmail API via OAuth2 (fastest ~150-250ms, no SMTP handshake)
     if (isGmailOAuthConfigured()) {
-      return await sendGmailViaAPI({
-        to,
-        subject,
-        html: brandedHtml,
-        attachments,
-      });
+      try {
+        return await sendGmailViaAPI({
+          to,
+          subject,
+          html: brandedHtml,
+          attachments,
+        });
+      } catch (oauthError: any) {
+        console.warn(`[EmailService] Gmail OAuth API failed (${oauthError?.message || oauthError}). Falling back to SMTP...`);
+      }
     }
 
     // 2. Mock mode for local dev if neither Gmail OAuth nor SMTP host is configured
@@ -196,8 +332,10 @@ export const sendEmail = async (to: string, subject: string, htmlContent: string
       return { messageId: 'mock_id' };
     }
 
-    // 3. Fallback to pooled SMTP
-    console.warn(`[EmailService] Gmail OAuth API not configured. Falling back to SMTP (${process.env.EMAIL_HOST})...`);
+    // 3. Pooled SMTP
+    if (!isGmailOAuthConfigured()) {
+      console.info(`[EmailService] Sending via SMTP (${process.env.EMAIL_HOST})...`);
+    }
     const mailOptions = {
       from: `"Sashakt Rashtra Nirman" <${process.env.EMAIL_FROM || 'no-reply@srn.org'}>`,
       to,

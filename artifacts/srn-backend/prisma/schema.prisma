@@ -66,6 +66,18 @@ enum ManualPaymentStatus {
   REJECTED
 }
 
+enum DonationPaymentMethod {
+  UPI
+  BANK_TRANSFER
+  RAZORPAY
+}
+
+enum DonationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
 model User {
   id            String         @id @default(uuid())
   firstName     String
@@ -76,6 +88,7 @@ model User {
   district      String?
   gender        String?
   dateOfBirth   DateTime?
+  panNumber     String?
   password      String?
   avatar        String?
   twoFactorSecret String?
@@ -92,6 +105,7 @@ model User {
   memberships      Membership[]
   payments         Payment[]
   manualPayments   ManualPayment[]
+  donations        DonationRecord[]
   posts            Post[]
   forumThreads     ForumThread[]
   forumComments    ForumComment[]
@@ -324,3 +338,41 @@ model RefreshToken {
 
   @@index([userId])
 }
+
+model DonationRecord {
+  id                String                @id @default(uuid())
+  receiptNumber     String                @unique
+  amount            Float
+  currency          String                @default("INR")
+  campaign          String
+  donorFirstName    String
+  donorLastName     String
+  donorEmail        String
+  donorPhone        String
+  donorPan          String?
+  donorAddress      String?
+  donorState        String
+  donorCity         String
+  paymentMethod     DonationPaymentMethod
+  status            DonationStatus        @default(PENDING)
+  utrNumber         String?
+  screenshotUrl     String?
+  razorpayOrderId   String?
+  razorpayPaymentId String?
+  userId            String?
+  user              User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
+  is80GEligible     Boolean               @default(true)
+  receiptPdfUrl     String?
+  adminNotes        String?
+  verifiedAt        DateTime?
+  verifiedBy        String?
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([donorEmail])
+  @@index([utrNumber])
+  @@index([createdAt])
+}
+

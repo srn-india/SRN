@@ -1,9 +1,13 @@
 import { Router } from 'express';
 import * as membershipController from './membership.controller';
-import { protect } from '../../middleware/auth';
+import { protect, optionalAuth } from '../../middleware/auth';
 import { restrictTo } from '../../middleware/role';
 
 const router = Router();
+
+// Public / Optional Auth routes for membership OTP verification
+router.post('/send-otp', optionalAuth, membershipController.sendMembershipOtp);
+router.post('/verify-otp', optionalAuth, membershipController.verifyMembershipOtp);
 
 router.use(protect);
 
@@ -20,6 +24,7 @@ router.use(protect);
  *         description: Membership details
  */
 router.get('/me', membershipController.getMyMembership);
+router.post('/register-normal', membershipController.registerNormal);
 
 /**
  * @swagger

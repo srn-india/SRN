@@ -2,12 +2,18 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import QRCode from "react-qr-code";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, ShieldCheck, IndianRupee, ArrowRight, CheckCircle2, ChevronDown, Lock, ArrowLeft, QrCode, CreditCard, Upload, X, Clock } from "lucide-react";
+import { 
+  Heart, ShieldCheck, IndianRupee, ArrowRight, CheckCircle2, ChevronDown, 
+  Lock, QrCode, CreditCard, Upload, X, Copy, Check, FileText, 
+  MapPin, User, Mail, Phone, Building2, Award, Sparkles, BookOpen, 
+  Stethoscope, Landmark, Users, Trees
+} from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 import { useAuth } from "../context/AuthContext";
 import ProfileCompletionModal from "../components/ProfileCompletionModal";
 import imageCompression from 'browser-image-compression';
 import { loadRazorpayScript } from "../utils/razorpay";
+import { INDIAN_STATES } from "./Signup";
 
 const UPI_ID = "sashaktrashtranirman@cbin";
 const QR_IMAGE = "/srn-upi-qr.png";
@@ -17,7 +23,7 @@ const BANK_ACCOUNT_NUMBER = "4120309580";
 const BANK_IFSC = "CBIN0280301";
 const BANK_NAME = "Central Bank of India";
 
-const QUICK_AMOUNTS = [1100, 2100, 5100, 11000];
+const QUICK_AMOUNTS = [5100, 11000, 21000, 51000];
 
 export default function Donate() {
   const { lang } = useLanguage();
@@ -26,15 +32,15 @@ export default function Donate() {
   const en = lang === "en";
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [amount, setAmount] = useState(1000);
+  const [amount, setAmount] = useState(5100);
   const [customAmount, setCustomAmount] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [showPurposeDropdown, setShowPurposeDropdown] = useState(false);
+  const [copiedField, setCopiedField] = useState("");
 
-  // QR / UPI / Bank tab state
-  const [activeTab, setActiveTab] = useState("upi"); // "razorpay" | "upi" | "bank"
+  // Payment method tab state
+  const [activeTab, setActiveTab] = useState("upi"); // "upi" | "bank" | "razorpay"
   const [utrNumber, setUtrNumber] = useState("");
   const [screenshotFile, setScreenshotFile] = useState(null);
   const [screenshotPreview, setScreenshotPreview] = useState("");
@@ -42,30 +48,76 @@ export default function Donate() {
   const [qrSubmitted, setQrSubmitted] = useState(false);
   const fileInputRef = useRef(null);
 
-  const donationPurposes = [
-    { value: "General Fund", label: en ? "General Fund" : "सामान्य कोष" },
-    { value: "Education", label: en ? "Education & Literacy" : "शिक्षा और साक्षरता" },
-    { value: "Healthcare", label: en ? "Healthcare Support" : "स्वास्थ्य सहायता" },
-    { value: "Culture", label: en ? "Cultural Preservation" : "सांस्कृतिक संरक्षण" }
+  const campaigns = [
+    { 
+      value: "General Fund", 
+      icon: Heart,
+      label: en ? "General Welfare" : "सामान्य कल्याण", 
+      desc: en ? "Nation building & rapid relief" : "राष्ट्र निर्माण एवं त्वरित सहायता" 
+    },
+    { 
+      value: "Education", 
+      icon: BookOpen,
+      label: en ? "Education & Literacy" : "शिक्षा और साक्षरता", 
+      desc: en ? "Youth schooling & study kits" : "छात्रवृत्ति एवं अध्ययन किट" 
+    },
+    { 
+      value: "Healthcare", 
+      icon: Stethoscope,
+      label: en ? "Healthcare Relief" : "स्वास्थ्य सहायता", 
+      desc: en ? "Free medical checkup camps" : "निःशुल्क चिकित्सा शिविर" 
+    },
+    { 
+      value: "Culture", 
+      icon: Landmark,
+      label: en ? "Cultural Heritage" : "सांस्कृतिक विरासत", 
+      desc: en ? "National pride & arts preservation" : "ऐतिहासिक धरोहर संरक्षण" 
+    },
+    { 
+      value: "Youth & Women", 
+      icon: Users,
+      label: en ? "Youth & Women" : "युवा व महिला", 
+      desc: en ? "Vocational skills & livelihood" : "कौशल विकास व आजीविका" 
+    },
+    { 
+      value: "Environment", 
+      icon: Trees,
+      label: en ? "Nature & Greenery" : "पर्यावरण संरक्षण", 
+      desc: en ? "Tree plantation & clean water" : "वृक्षारोपण व जल संरक्षण" 
+    }
   ];
 
   const [formData, setFormData] = useState({
-    fullName: user ? `${user.firstName || ""} ${user.lastName || ""}`.trim() : "",
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
     email: user?.email || "",
     phone: user?.phone || "",
-    purpose: "General Fund"
+    panNumber: "",
+    address: "",
+    state: user?.state || "",
+    city: user?.district || "",
+    campaign: "General Fund"
   });
 
   useEffect(() => {
     if (user) {
       setFormData(prev => ({
         ...prev,
-        fullName: prev.fullName || `${user.firstName || ""} ${user.lastName || ""}`.trim(),
+        firstName: prev.firstName || user.firstName || "",
+        lastName: prev.lastName || user.lastName || "",
         email: prev.email || user.email || "",
-        phone: prev.phone || user.phone || ""
+        phone: prev.phone || user.phone || "",
+        state: prev.state || user.state || "",
+        city: prev.city || user.district || ""
       }));
     }
   }, [user]);
+
+  const handleCopy = (text, fieldName) => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(fieldName);
+    setTimeout(() => setCopiedField(""), 2000);
+  };
 
   const handleQuickSelect = (val) => {
     setAmount(val);
@@ -78,21 +130,47 @@ export default function Donate() {
     setAmount(Number(val));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!user || (!user.profilePicture && !user.avatar)) {
-      setIsModalOpen(true);
-      return;
+  const validateDonorDetails = () => {
+    if (!formData.firstName.trim() || !formData.lastName.trim()) {
+      alert(en ? "Please enter both first and last name." : "कृपया पहला और अंतिम दोनों नाम दर्ज करें।");
+      return false;
     }
-    
+    if (!formData.phone.trim()) {
+      alert(en ? "Please enter your mobile number." : "कृपया अपना मोबाइल नंबर दर्ज करें।");
+      return false;
+    }
+    if (!formData.email.trim()) {
+      alert(en ? "Please enter your email address." : "कृपया अपना ईमेल पता दर्ज करें।");
+      return false;
+    }
+    if (formData.panNumber.trim() && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(formData.panNumber.trim())) {
+      alert(en ? "Invalid PAN format. Please enter a valid 10-character PAN (e.g. ABCDE1234F)." : "अमान्य पैन प्रारूप। कृपया एक वैध 10-अक्षरीय पैन दर्ज करें (उदा. ABCDE1234F)।");
+      return false;
+    }
+    if (!formData.state.trim() || !formData.city.trim()) {
+      alert(en ? "Please select your state and city." : "कृपया अपना राज्य और शहर चुनें।");
+      return false;
+    }
     if (amount < 1000) {
       alert(en ? "Minimum donation amount is ₹1000" : "न्यूनतम दान राशि ₹1000 है");
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmitRazorpay = async (e) => {
+    e.preventDefault();
+    if (!validateDonorDetails()) return;
+
+    if (!user || (!user.profilePicture && !user.avatar)) {
+      setIsModalOpen(true);
       return;
     }
 
     setLoading(true);
     try {
-      // 1. Create Order
+      const detailedPurpose = `[RAZORPAY] Campaign: ${formData.campaign} | Donor: ${formData.firstName} ${formData.lastName} | PAN: ${formData.panNumber.toUpperCase() || 'N/A'} | City: ${formData.city}, ${formData.state} | Address: ${formData.address}`;
+      
       const orderRes = await fetch(`${API_BASE}/api/payments/order`, {
         method: "POST",
         headers: { 
@@ -100,12 +178,16 @@ export default function Donate() {
           "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
         },
         credentials: "include",
-        body: JSON.stringify({ amount: amount || 1000, currency: "INR", type: "DONATION", purpose: formData.purpose })
+        body: JSON.stringify({ 
+          amount: amount || 5100, 
+          currency: "INR", 
+          type: "DONATION", 
+          purpose: detailedPurpose 
+        })
       });
       const orderData = await orderRes.json();
       if (!orderRes.ok) throw new Error(orderData.message || "Failed to create order");
 
-      // 2. Get Razorpay Key
       const keyRes = await fetch(`${API_BASE}/api/payments/key`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
@@ -126,12 +208,11 @@ export default function Donate() {
         amount: orderData.data.amount,
         currency: orderData.data.currency || "INR",
         name: "Sashakt Rashtra Nirman",
-        description: "Donation",
+        description: `Donation: ${formData.campaign}`,
         order_id: orderData.data.razorpayOrderId,
         handler: async function (response) {
           setIsProcessingPayment(true);
           try {
-            // 3. Verify Payment
             const verifyRes = await fetch(`${API_BASE}/api/payments/verify`, {
               method: "POST",
               headers: { 
@@ -139,14 +220,13 @@ export default function Donate() {
                 "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
               },
               credentials: "include",
-              body: JSON.stringify({ 
+              body: JSON.stringify({
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature,
-                purpose: formData.purpose
+                razorpay_signature: response.razorpay_signature
               })
             });
-            
+
             if (!verifyRes.ok) {
               const errorData = await verifyRes.json();
               throw new Error(errorData.message || "Payment verification failed");
@@ -155,7 +235,7 @@ export default function Donate() {
             setSubmitted(true);
             setTimeout(() => {
               setSubmitted(false);
-              setAmount(1000);
+              setAmount(5100);
               setCustomAmount("");
             }, 4000);
             setIsProcessingPayment(false);
@@ -166,7 +246,7 @@ export default function Donate() {
           }
         },
         prefill: {
-          name: formData.fullName,
+          name: `${formData.firstName} ${formData.lastName}`.trim(),
           email: formData.email,
           contact: formData.phone
         },
@@ -174,39 +254,38 @@ export default function Donate() {
           color: "#E8622A"
         }
       };
-      
+
       const paymentObject = new window.Razorpay(options);
       paymentObject.open();
-      
       setLoading(false);
+
     } catch (err) {
-      console.error("Donation failed:", err);
-      alert("Something went wrong processing your donation.");
+      console.error("Donation creation failed:", err);
+      alert(`Payment failed: ${err.message}`);
       setLoading(false);
     }
   };
 
   const handleQRSubmit = async (e) => {
     e.preventDefault();
+    if (!validateDonorDetails()) return;
+
     if (!user || (!user.profilePicture && !user.avatar)) {
       setIsModalOpen(true);
       return;
     }
-    if (amount < 1000) {
-      alert(en ? "Minimum donation amount is ₹1000" : "न्यूनतम दान राशि ₹1000 है");
-      return;
-    }
+
     if (!utrNumber.trim()) {
-      alert("Please enter your UTR / Transaction ID.");
+      alert(en ? "Please enter your UTR / Transaction ID." : "कृपया अपना UTR / लेन-देन ID दर्ज करें।");
       return;
     }
     if (!screenshotFile) {
-      alert("Please upload your payment screenshot.");
+      alert(en ? "Please upload your payment screenshot." : "कृपया अपना भुगतान स्क्रीनशॉट अपलोड करें।");
       return;
     }
+
     setQrSubmitting(true);
     try {
-      // Upload screenshot to backend storage
       let screenshotUrl = "";
       if (screenshotFile) {
         const uploadForm = new FormData();
@@ -223,6 +302,8 @@ export default function Donate() {
         }
       }
 
+      const detailedPurpose = `[${activeTab === 'bank' ? 'BANK TRANSFER' : 'UPI'}] Campaign: ${formData.campaign} | Donor: ${formData.firstName} ${formData.lastName} | PAN: ${formData.panNumber.toUpperCase() || 'N/A'} | City: ${formData.city}, ${formData.state} | Address: ${formData.address}`;
+
       const res = await fetch(`${API_BASE}/api/manual-payments/submit`, {
         method: "POST",
         headers: {
@@ -231,11 +312,11 @@ export default function Donate() {
         },
         credentials: "include",
         body: JSON.stringify({
-          amount: amount || 1000,
+          amount: amount || 5100,
           type: "DONATION",
           utrNumber: utrNumber.trim(),
           screenshot: screenshotUrl,
-          purpose: `[${activeTab === 'bank' ? 'BANK TRANSFER' : 'UPI'}] ${formData.purpose}`,
+          purpose: detailedPurpose,
           email: formData.email,
         }),
       });
@@ -263,382 +344,666 @@ export default function Donate() {
       setScreenshotPreview(URL.createObjectURL(compressedFile));
     } catch (error) {
       console.error('Error compressing image:', error);
-      setScreenshotFile(file); // fallback to original
+      setScreenshotFile(file);
       setScreenshotPreview(URL.createObjectURL(file));
     }
   };
 
+  const selectedCampaignObj = campaigns.find(c => c.value === formData.campaign) || campaigns[0];
+
   return (
-    <div className="min-h-screen bg-[#FDF5EC] py-24 px-6 relative overflow-hidden">
-      {/* Background Decor */}
-      
-      
+    <div className="min-h-screen bg-[#FDF5EC] pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 px-4 sm:px-6 relative overflow-hidden">
+      {/* Background Ambience Glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1100px] h-[350px] bg-gradient-to-b from-[#E8622A]/10 via-[#D4880C]/5 to-transparent rounded-full blur-3xl pointer-events-none -z-0" />
 
       <div className="max-w-6xl mx-auto relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-start">
-          
-          {/* ── LEFT: Impact & Context ── */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            className="flex flex-col justify-center"
-          >
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#E8622A] to-[#C04A18] flex items-center justify-center mb-6 shadow-lg shadow-orange-900/20">
-              <Heart className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold font-serif text-[#5C1010] leading-tight mb-6">
-              {en ? "Empower the Future of the Nation" : "राष्ट्र के भविष्य को सशक्त बनाएं"}
-            </h1>
-            <p className="text-[#7A5C45] text-lg leading-relaxed mb-10">
-              {en 
-                ? "Your contribution directly fuels initiatives that promote self-reliance, cultural pride, and holistic community development across India." 
-                : "आपका योगदान सीधे तौर पर उन पहलों को बढ़ावा देता है जो पूरे भारत में आत्मनिर्भरता, सांस्कृतिक गौरव और समग्र सामुदायिक विकास को बढ़ावा देते हैं।"}
-            </p>
 
-            <div className="space-y-6">
-              {[
-                { title: en ? "Transparent Use of Funds" : "निधियों का पारदर्शी उपयोग", desc: en ? "We maintain strict auditing and regular reporting." : "हम सख्त ऑडिटिंग और नियमित रिपोर्टिंग बनाए रखते हैं।" },
-                { title: en ? "Direct Impact" : "सीधा प्रभाव", desc: en ? "90% of your donation goes directly to field programs." : "आपके दान का 90% सीधे क्षेत्रीय कार्यक्रमों में जाता है।" },
-              ].map((item, i) => (
-                <div key={i} className="flex gap-4">
-                  <div className="w-10 h-10 rounded-full bg-white border border-[#E8622A]/30 flex items-center justify-center shrink-0 shadow-sm">
-                    <ShieldCheck className="w-5 h-5 text-[#E8622A]" />
+        {/* ── COMPACT, ELEGANT HEADER ── */}
+        <motion.div
+          initial={{ opacity: 0, y: -15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-8 md:mb-10"
+        >
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-orange-100/90 border border-[#E8622A]/30 text-[#C04A18] text-xs font-semibold mb-3 shadow-xs">
+            <Sparkles className="w-3.5 h-3.5 text-[#E8622A]" />
+            <span>{en ? "Sashakt Rashtra Nirman · Official Contribution Portal" : "सशक्त राष्ट्र निर्माण · आधिकारिक योगदान पोर्टल"}</span>
+          </div>
+
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold font-serif text-[#5C1010] leading-tight mb-2">
+            {en ? "Empower the Future of the Nation" : "राष्ट्र के भविष्य को सशक्त बनाएं"}
+          </h1>
+
+          <p className="text-[#7A5C45] text-xs sm:text-sm md:text-base max-w-xl mx-auto leading-relaxed">
+            {en 
+              ? "Your contributions directly support grassroots social initiatives across India. Transparent, 100% accountable, and 80G tax benefit compliant." 
+              : "आपका योगदान पूरे भारत में आत्मनिर्भरता, शिक्षा और सामाजिक उत्थान को गति प्रदान करता है। पारदर्शी, जवाबदेह और 80G कर लाभ अनुरूप।"}
+          </p>
+        </motion.div>
+
+        {/* ── UNIFIED MASTER CARD (2 BALANCED COLUMNS) ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="bg-white rounded-3xl shadow-2xl border border-orange-100/90 overflow-hidden"
+        >
+          {/* Top Brand Gradient Ribbon */}
+          <div className="h-2 w-full bg-gradient-to-r from-[#E8622A] via-[#F48F42] to-[#C04A18]" />
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
+
+            {/* ══════════════════════════════════════════════════════════════
+                LEFT COLUMN (lg:col-span-7): 
+                Step 1: Amount | Step 2: Campaign | Step 3: Donor Details
+               ══════════════════════════════════════════════════════════════ */}
+            <div className="lg:col-span-7 p-6 sm:p-8 lg:p-10 border-b lg:border-b-0 lg:border-r border-orange-100 flex flex-col justify-between space-y-8">
+              
+              {/* ── STEP 1: DONATION AMOUNT ── */}
+              <div>
+                <div className="flex items-center justify-between mb-3.5">
+                  <label className="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#5C1010] flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-[#E8622A] text-white flex items-center justify-center text-xs font-bold">1</span>
+                    {en ? "Contribution Amount (INR)" : "योगदान राशि चुनें (INR)"}
+                  </label>
+                  <span className="text-xs text-gray-400 font-medium">{en ? "Min ₹1,000" : "न्यूनतम ₹1,000"}</span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3.5">
+                  {QUICK_AMOUNTS.map((val) => (
+                    <button
+                      key={val}
+                      type="button"
+                      onClick={() => handleQuickSelect(val)}
+                      className={`py-3.5 px-3 rounded-xl font-bold text-sm sm:text-base transition-all duration-150 border-2 flex items-center justify-center cursor-pointer ${
+                        amount === val && !customAmount
+                          ? "bg-[#E8622A] border-[#E8622A] text-white shadow-md shadow-orange-900/20 scale-[1.01]"
+                          : "bg-orange-50/30 border-orange-100 text-[#5C1010] hover:bg-orange-100/50 hover:border-orange-300"
+                      }`}
+                    >
+                      ₹{val.toLocaleString("en-IN")}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <IndianRupee className="h-4 w-4 text-[#E8622A]" />
                   </div>
-                  <div>
-                    <h3 className="font-bold text-[#1E0F05]">{item.title}</h3>
-                    <p className="text-sm text-[#7A5C45] mt-1">{item.desc}</p>
+                  <input
+                    type="number"
+                    min="1000"
+                    placeholder={en ? "Or enter custom amount (Min ₹1,000)" : "या अन्य राशि दर्ज करें (न्यूनतम ₹1,000)"}
+                    value={customAmount}
+                    onChange={handleCustomChange}
+                    className="block w-full pl-10 pr-4 py-3 bg-gray-50/80 border border-gray-200 rounded-xl text-sm text-[#1E0F05] font-semibold placeholder:text-gray-400 focus:bg-white focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] transition-all outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* ── STEP 2: SELECT CAMPAIGN (CLEAN CHIP GRID) ── */}
+              <div>
+                <div className="flex items-center justify-between mb-3.5">
+                  <label className="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#5C1010] flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-[#E8622A] text-white flex items-center justify-center text-xs font-bold">2</span>
+                    {en ? "Select Cause / Initiative" : "अभियान / उद्देश्य चुनें"}
+                  </label>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
+                  {campaigns.map((c) => {
+                    const Icon = c.icon;
+                    const isSelected = formData.campaign === c.value;
+                    return (
+                      <button
+                        key={c.value}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, campaign: c.value })}
+                        className={`p-3 rounded-xl border text-left transition-all duration-150 cursor-pointer flex flex-col justify-between ${
+                          isSelected
+                            ? "border-[#E8622A] bg-orange-50/90 text-[#5C1010] shadow-sm ring-1 ring-[#E8622A]"
+                            : "border-gray-200 bg-gray-50/50 hover:bg-orange-50/30 hover:border-orange-200 text-gray-700"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <Icon className={`w-4 h-4 shrink-0 ${isSelected ? "text-[#E8622A]" : "text-gray-500"}`} />
+                          <p className="font-bold text-xs truncate">{c.label}</p>
+                        </div>
+                        <p className="text-[11px] text-[#7A5C45] line-clamp-1">{c.desc}</p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* ── STEP 3: DONOR DETAILS (FOR 80G RECEIPT) ── */}
+              <div className="bg-orange-50/30 border border-orange-100/90 rounded-2xl p-5 sm:p-6">
+                <div className="flex items-center justify-between mb-4 pb-1">
+                  <label className="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#5C1010] flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-[#E8622A] text-white flex items-center justify-center text-xs font-bold">3</span>
+                    {en ? "Donor Details (For 80G Tax Exemption)" : "दाता विवरण (80G कर छूट रसीद)"}
+                  </label>
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#E8622A] bg-white px-3 py-1 rounded-full border border-orange-200 shadow-2xs">
+                    <FileText className="w-3.5 h-3.5" />
+                    {en ? "80G Compliant" : "धारा 80G वैध"}
+                  </span>
+                </div>
+
+                <div className="space-y-4">
+                  {/* First & Last Name */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-[#7A5C45] mb-1.5 uppercase flex items-center gap-1.5">
+                        <User className="w-3.5 h-3.5 text-[#E8622A]" />
+                        {en ? "First Name" : "पहला नाम"} <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        required
+                        type="text"
+                        placeholder={en ? "Rajesh" : "राजेश"}
+                        value={formData.firstName}
+                        onChange={e => setFormData({ ...formData, firstName: e.target.value })}
+                        className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none text-sm text-[#1E0F05]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#7A5C45] mb-1.5 uppercase flex items-center gap-1.5">
+                        <User className="w-3.5 h-3.5 text-[#E8622A]" />
+                        {en ? "Last Name" : "अंतिम नाम"} <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        required
+                        type="text"
+                        placeholder={en ? "Sharma" : "शर्मा"}
+                        value={formData.lastName}
+                        onChange={e => setFormData({ ...formData, lastName: e.target.value })}
+                        className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none text-sm text-[#1E0F05]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Mobile & Email */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-[#7A5C45] mb-1.5 uppercase flex items-center gap-1.5">
+                        <Phone className="w-3.5 h-3.5 text-[#E8622A]" />
+                        {en ? "Mobile Number" : "मोबाइल नंबर"} <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-xs font-bold text-gray-500 pointer-events-none">+91</span>
+                        <input
+                          required
+                          type="tel"
+                          maxLength={10}
+                          placeholder="9876543210"
+                          value={formData.phone}
+                          onChange={e => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '') })}
+                          className="w-full pl-11 pr-3.5 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none text-sm text-[#1E0F05]"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#7A5C45] mb-1.5 uppercase flex items-center gap-1.5">
+                        <Mail className="w-3.5 h-3.5 text-[#E8622A]" />
+                        {en ? "Email ID" : "ईमेल आईडी"} <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        required
+                        type="email"
+                        placeholder="rajesh@example.com"
+                        value={formData.email}
+                        onChange={e => setFormData({ ...formData, email: e.target.value })}
+                        className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none text-sm text-[#1E0F05]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* PAN & Address */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-[#7A5C45] mb-1.5 uppercase flex items-center justify-between">
+                        <span className="flex items-center gap-1.5">
+                          <Award className="w-3.5 h-3.5 text-[#E8622A]" />
+                          {en ? "PAN Number" : "पैन कार्ड"}
+                        </span>
+                        <span className="text-[10px] text-[#E8622A] font-semibold lowercase">({en ? "for 80G" : "80G रसीद"})</span>
+                      </label>
+                      <input
+                        type="text"
+                        maxLength={10}
+                        placeholder="ABCDE1234F"
+                        value={formData.panNumber}
+                        onChange={e => setFormData({ ...formData, panNumber: e.target.value.toUpperCase() })}
+                        className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none text-sm text-[#1E0F05] font-mono uppercase tracking-wider"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#7A5C45] mb-1.5 uppercase flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5 text-[#E8622A]" />
+                        {en ? "Street Address" : "पता / मोहल्ला"}
+                      </label>
+                      <input
+                        type="text"
+                        placeholder={en ? "Street / Colony" : "सड़क / कॉलोनी"}
+                        value={formData.address}
+                        onChange={e => setFormData({ ...formData, address: e.target.value })}
+                        className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none text-sm text-[#1E0F05]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* State & City */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-[#7A5C45] mb-1.5 uppercase flex items-center gap-1.5">
+                        <Building2 className="w-3.5 h-3.5 text-[#E8622A]" />
+                        {en ? "State / UT" : "राज्य / केंद्र शासित प्रदेश"} <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        required
+                        value={formData.state}
+                        onChange={e => setFormData({ ...formData, state: e.target.value })}
+                        className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none text-sm text-[#1E0F05] cursor-pointer"
+                      >
+                        <option value="">{en ? "-- Select State --" : "-- राज्य चुनें --"}</option>
+                        {INDIAN_STATES.map(st => (
+                          <option key={st} value={st}>{st}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#7A5C45] mb-1.5 uppercase flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5 text-[#E8622A]" />
+                        {en ? "City / District" : "शहर / ज़िला"} <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        required
+                        type="text"
+                        placeholder={en ? "New Delhi" : "नई दिल्ली"}
+                        value={formData.city}
+                        onChange={e => setFormData({ ...formData, city: e.target.value })}
+                        className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none text-sm text-[#1E0F05]"
+                      />
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          </motion.div>
+              </div>
 
-          {/* ── RIGHT: Donation Form ── */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="bg-white rounded-3xl p-8 md:p-10 shadow-2xl border border-[#E8622A]/10 relative overflow-visible"
-          >
-            {/* Top decorative bar */}
-            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#E8622A] to-[#D4880C] rounded-t-3xl" />
-
-            {/* ── Payment Method Tabs ── */}
-            <div className="flex gap-2 mb-6 bg-gray-100 p-1 rounded-xl">
-              <button
-                type="button"
-                disabled={true}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-semibold transition-all duration-200 opacity-50 cursor-not-allowed bg-gray-200 text-gray-500"
-              >
-                <Lock className="w-4 h-4" />
-                {en ? "Pay Online" : "ऑनलाइन भुगतान"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab("upi")}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                  activeTab === "upi" ? "bg-white shadow text-[#E8622A]" : "text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                <QrCode className="w-4 h-4" />
-                {en ? "Pay via UPI/QR" : "UPI/QR से भुगतान"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab("bank")}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                  activeTab === "bank" ? "bg-white shadow text-[#E8622A]" : "text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                <CreditCard className="w-4 h-4" />
-                {en ? "Bank Transfer" : "बैंक ट्रांसफर"}
-              </button>
             </div>
 
-            <AnimatePresence mode="wait">
 
-              {/* ── RAZORPAY TAB ── */}
-              {activeTab === "razorpay" && (
-                <motion.div key="razorpay" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
-                  {submitted ? (
-                    <div className="flex flex-col items-center justify-center text-center py-20">
-                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6">
-                        <CheckCircle2 className="w-10 h-10" />
-                      </motion.div>
-                      <h3 className="text-2xl font-bold text-[#5C1010] font-serif mb-2">{en ? "Thank You!" : "धन्यवाद!"}</h3>
-                      <p className="text-[#7A5C45]">{en ? "Your generous contribution has been received." : "आपका उदार योगदान प्राप्त हो गया है।"}</p>
-                    </div>
-                  ) : (
-                    <form onSubmit={handleSubmit} className="flex flex-col h-full">
-                      <h2 className="text-2xl font-bold font-serif text-[#1E0F05] mb-6">{en ? "Make a Secure Donation" : "सुरक्षित दान करें"}</h2>
-                      <div className="mb-8">
-                        <label className="block text-sm font-semibold text-[#7A5C45] mb-3 uppercase tracking-wider">{en ? "Select Amount (INR)" : "राशि चुनें (INR)"}</label>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                          {QUICK_AMOUNTS.map((val) => (
-                            <button key={val} type="button" onClick={() => handleQuickSelect(val)}
-                              className={`py-3 rounded-xl font-bold text-lg transition-all duration-200 border-2 ${amount === val && !customAmount ? "bg-[#E8622A]/10 border-[#E8622A] text-[#E8622A]" : "bg-gray-50 border-transparent text-gray-500 hover:bg-gray-100"}`}>
-                              ₹{val}
-                            </button>
-                          ))}
-                        </div>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><IndianRupee className="h-5 w-5 text-gray-400" /></div>
-                          <input type="number" min="1000" placeholder={en ? "Custom Amount (Min ₹1000)" : "अन्य राशि (न्यूनतम ₹1000)"} value={customAmount} onChange={handleCustomChange}
-                            className="block w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-[#1E0F05] focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] transition-colors" />
-                        </div>
-                      </div>
-                      <div className="space-y-4 mb-8">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-xs font-semibold text-[#7A5C45] mb-1.5 uppercase">{en ? "Full Name" : "पूरा नाम"} *</label>
-                            <input required type="text" value={formData.fullName} onChange={e => setFormData({ ...formData, fullName: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none" />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-semibold text-[#7A5C45] mb-1.5 uppercase">{en ? "Phone Number" : "फ़ोन नंबर"} *</label>
-                            <input required type="tel" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none" />
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-xs font-semibold text-[#7A5C45] mb-1.5 uppercase">{en ? "Email Address" : "ईमेल"} *</label>
-                            <input required type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none" />
-                          </div>
-                          <div className="relative">
-                            <label className="block text-xs font-semibold text-[#7A5C45] mb-1.5 uppercase">{en ? "Purpose of Donation" : "दान का उद्देश्य"}</label>
-                            <button type="button" onClick={() => setShowPurposeDropdown(!showPurposeDropdown)}
-                              className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none text-left flex justify-between items-center text-[#1E0F05] text-sm shadow-sm">
-                              <span className="font-medium">{donationPurposes.find(p => p.value === formData.purpose)?.label || formData.purpose}</span>
-                              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showPurposeDropdown ? "rotate-180" : ""}`} />
-                            </button>
-                            <AnimatePresence>
-                              {showPurposeDropdown && (
-                                <><div className="fixed inset-0 z-10" onClick={() => setShowPurposeDropdown(false)} />
-                                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                                  className="absolute z-20 w-full mt-2 bg-white border border-gray-100 rounded-xl shadow-xl max-h-48 overflow-y-auto">
-                                  {donationPurposes.map((p) => (
-                                    <button key={p.value} type="button" onClick={() => { setFormData({ ...formData, purpose: p.value }); setShowPurposeDropdown(false); }}
-                                      className={`w-full px-4 py-3 text-left text-sm hover:bg-orange-50 hover:text-[#E8622A] transition-colors ${formData.purpose === p.value ? "bg-orange-50 text-[#E8622A] font-semibold" : "text-gray-700"}`}>
-                                      {p.label}
-                                    </button>
-                                  ))}
-                                </motion.div></>
-                              )}
-                            </AnimatePresence>
-                          </div>
-                        </div>
-                      </div>
-                      <button type="submit" disabled={loading}
-                        className="w-full py-4 bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-orange-900/30 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50">
-                        {loading ? "Processing..." : (en ? "Proceed to Pay" : "भुगतान करें")} ₹{amount || 0}
-                        <ArrowRight className="w-5 h-5" />
-                      </button>
-                      <p className="text-center text-xs text-gray-400 mt-4">{en ? "Secured via industry-standard encryption." : "उद्योग-मानक एन्क्रिप्शन के माध्यम से सुरक्षित।"}</p>
-                    </form>
-                  )}
-                </motion.div>
-              )}
+            {/* ══════════════════════════════════════════════════════════════
+                RIGHT COLUMN (lg:col-span-5): 
+                Step 4: Choose Payment Method + QR/Bank/Card + Verification
+               ══════════════════════════════════════════════════════════════ */}
+            <div className="lg:col-span-5 p-6 sm:p-8 lg:p-10 bg-gradient-to-b from-[#FFFDF9] via-[#FAF4EE] to-[#F7EFE4] flex flex-col justify-between">
+              
+              <div>
+                {/* Header with Amount Badge */}
+                <div className="flex items-center justify-between mb-5">
+                  <label className="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#5C1010] flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-[#E8622A] text-white flex items-center justify-center text-xs font-bold">4</span>
+                    {en ? "Choose Payment Method" : "भुगतान विधि चुनें"}
+                  </label>
+                  <span className="text-xs font-extrabold text-[#E8622A] bg-white px-3 py-1 rounded-lg border border-orange-200 shadow-2xs">
+                    ₹{amount.toLocaleString("en-IN")}
+                  </span>
+                </div>
 
-              {/* ── UPI / QR TAB ── */}
-              {activeTab === "upi" && (
-                <motion.div key="upi" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }}>
-                  {qrSubmitted ? (
-                    <div className="flex flex-col items-center justify-center text-center py-16">
-                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6">
-                        <CheckCircle2 className="w-10 h-10" />
-                      </motion.div>
-                      <h3 className="text-2xl font-bold text-[#5C1010] font-serif mb-2">{en ? "Donation Received" : "दान प्राप्त हुआ"}</h3>
-                      <p className="text-[#7A5C45] max-w-xs">
-                        {en ? "Thank you! Your donation details have been submitted and a receipt has been sent to your email." : "धन्यवाद! आपका दान सफलतापूर्वक प्राप्त हो गया है और आपकी ईमेल पर एक रसीद भेज दी गई है।"}
-                      </p>
-                    </div>
-                  ) : (
-                    <form onSubmit={handleQRSubmit}>
-                      <h2 className="text-xl font-bold font-serif text-[#1E0F05] mb-5">{en ? "Pay via UPI / QR Code" : "UPI / QR कोड से भुगतान करें"}</h2>
+                {/* Tabs */}
+                <div className="grid grid-cols-3 gap-1.5 p-1 bg-gray-200/60 rounded-xl mb-6">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("upi")}
+                    className={`flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer ${
+                      activeTab === "upi"
+                        ? "bg-white shadow-xs text-[#E8622A]"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    <QrCode className="w-3.5 h-3.5 shrink-0" />
+                    <span>UPI / QR</span>
+                  </button>
 
-                      {/* Amount selector */}
-                      <div className="mb-5">
-                        <label className="block text-sm font-semibold text-[#7A5C45] mb-2 uppercase tracking-wider">{en ? "Donation Amount" : "दान राशि"}</label>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
-                          {QUICK_AMOUNTS.map((val) => (
-                            <button key={val} type="button" onClick={() => handleQuickSelect(val)}
-                              className={`py-3 rounded-xl font-bold text-lg transition-all border-2 ${amount === val && !customAmount ? "bg-[#E8622A]/10 border-[#E8622A] text-[#E8622A]" : "bg-gray-50 border-transparent text-gray-500 hover:bg-gray-100"}`}>
-                              ₹{val}
-                            </button>
-                          ))}
-                        </div>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><IndianRupee className="h-5 w-5 text-gray-400" /></div>
-                          <input type="number" min="1000" placeholder={en ? "Custom Amount (Min ₹1000)" : "अन्य राशि (न्यूनतम ₹1000)"} value={customAmount} onChange={handleCustomChange}
-                            className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-[#1E0F05] focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] transition-colors" />
-                        </div>
-                      </div>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("bank")}
+                    className={`flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer ${
+                      activeTab === "bank"
+                        ? "bg-white shadow-xs text-[#E8622A]"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    <Building2 className="w-3.5 h-3.5 shrink-0" />
+                    <span>{en ? "Bank" : "बैंक"}</span>
+                  </button>
 
-                      {/* QR Code display */}
-                      <div className="flex flex-col items-center bg-gradient-to-b from-orange-50 to-white border border-orange-100 rounded-2xl p-5 mb-5 relative">
-                        {amount < 1000 && (
-                          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm rounded-2xl p-4 text-center">
-                            <Lock className="w-8 h-8 text-[#E8622A] mb-2" />
-                            <p className="text-[#5C1010] font-bold">
-                              {en ? "Enter an amount of ₹1000 or more to generate QR" : "QR देखने के लिए ₹1000 या अधिक दर्ज करें"}
+                  <button
+                    type="button"
+                    disabled={true}
+                    className="flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-lg text-xs font-bold opacity-50 cursor-not-allowed bg-transparent text-gray-400"
+                  >
+                    <Lock className="w-3.5 h-3.5 shrink-0" />
+                    <span>{en ? "Online" : "ऑनलाइन"}</span>
+                  </button>
+                </div>
+
+                {/* Tab Content */}
+                <AnimatePresence mode="wait">
+
+                  {/* ── UPI / QR CODE TAB ── */}
+                  {activeTab === "upi" && (
+                    <motion.div
+                      key="upi"
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      {qrSubmitted ? (
+                        <div className="flex flex-col items-center justify-center text-center py-12 bg-green-50 rounded-2xl border border-green-200 p-5">
+                          <CheckCircle2 className="w-12 h-12 text-green-600 mb-3" />
+                          <h3 className="text-lg font-bold text-[#5C1010] font-serif mb-1">{en ? "Donation Received!" : "दान प्राप्त हुआ!"}</h3>
+                          <p className="text-[#7A5C45] text-xs leading-relaxed">
+                            {en 
+                              ? "Thank you! Your payment details have been submitted. Our team will verify and dispatch your 80G tax receipt within 24 hours." 
+                              : "धन्यवाद! आपका भुगतान सबमिट हो गया है। हमारी टीम 24 घंटों में 80G रसीद ईमेल करेगी।"}
+                          </p>
+                        </div>
+                      ) : (
+                        <form onSubmit={handleQRSubmit} className="space-y-4">
+                          
+                          {/* QR Box */}
+                          <div className="flex flex-col items-center bg-white border border-orange-200/80 rounded-2xl p-5 shadow-xs text-center">
+                            <p className="text-xs font-bold text-[#5C1010] mb-3">
+                              {en ? `Scan & Pay ₹${amount >= 1000 ? amount.toLocaleString("en-IN") : 0}` : `₹${amount >= 1000 ? amount.toLocaleString("en-IN") : 0} स्कैन करें और भुगतान करें`}
                             </p>
+
+                            <div className="w-44 h-44 rounded-xl border border-orange-200 shadow-2xs flex items-center justify-center bg-white p-3">
+                              <QRCode
+                                value={`upi://pay?pa=${UPI_ID}&pn=SASHAKT%20RASHTRA%20NIRMAN&am=${amount >= 1000 ? amount : 5100}&cu=INR`}
+                                size={155}
+                                className="w-full h-full"
+                              />
+                            </div>
+
+                            {/* UPI ID Pill */}
+                            <div className="mt-3.5 flex items-center gap-2 bg-orange-50/70 px-3.5 py-1.5 rounded-full border border-orange-200/80">
+                              <span className="text-xs font-mono font-bold text-[#5C1010]">{UPI_ID}</span>
+                              <button
+                                type="button"
+                                onClick={() => handleCopy(UPI_ID, "upi")}
+                                className="p-0.5 text-[#E8622A] hover:text-[#C04A18] cursor-pointer"
+                                title="Copy UPI ID"
+                              >
+                                {copiedField === "upi" ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5" />}
+                              </button>
+                            </div>
+                            <p className="text-[11px] text-gray-400 mt-2">{en ? "Supported on GPay, PhonePe, Paytm, BHIM & all UPI apps" : "सभी प्रमुख UPI ऐप्स समर्थित"}</p>
                           </div>
-                        )}
-                        <p className="text-sm text-[#7A5C45] font-semibold mb-3">
-                          {en ? `Scan & Pay ₹${amount >= 1000 ? amount : 0}` : `₹${amount >= 1000 ? amount : 0} स्कैन करें और भुगतान करें`}
-                        </p>
-                        <div className="w-56 h-56 sm:w-64 sm:h-64 overflow-hidden rounded-xl border border-orange-200 shadow flex items-center justify-center bg-white p-4">
-                          <QRCode value={`upi://pay?pa=${UPI_ID}&pn=SASHAKT%20RASHTRA%20NIRMAN&am=${amount >= 1000 ? amount : 1000}&cu=INR`} size={256} className={`w-full h-full ${amount < 1000 ? 'opacity-20' : ''}`} />
+
+                          {/* UTR Input */}
+                          <div>
+                            <label className="block text-xs font-bold text-[#7A5C45] mb-1.5 uppercase flex items-center gap-1.5">
+                              <FileText className="w-3.5 h-3.5 text-[#E8622A]" />
+                              {en ? "UTR / Transaction ID" : "UTR / लेन-देन ID"} <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              required
+                              type="text"
+                              value={utrNumber}
+                              onChange={e => setUtrNumber(e.target.value)}
+                              placeholder={en ? "12-digit UTR (e.g. 426812345678)" : "12-अंकीय UTR (जैसे 426812345678)"}
+                              className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none font-mono text-xs"
+                            />
+                          </div>
+
+                          {/* Screenshot Upload */}
+                          <div>
+                            <label className="block text-xs font-bold text-[#7A5C45] mb-1.5 uppercase flex items-center gap-1.5">
+                              <Upload className="w-3.5 h-3.5 text-[#E8622A]" />
+                              {en ? "Payment Screenshot" : "भुगतान स्क्रीनशॉट"} <span className="text-red-500">*</span>
+                            </label>
+                            {screenshotPreview ? (
+                              <div className="relative rounded-xl overflow-hidden border border-orange-200 h-22 bg-black/5">
+                                <img src={screenshotPreview} alt="Screenshot preview" className="w-full h-full object-cover" />
+                                <button
+                                  type="button"
+                                  onClick={() => { setScreenshotFile(null); setScreenshotPreview(""); }}
+                                  className="absolute top-1.5 right-1.5 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 shadow-md cursor-pointer"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                className="w-full h-20 border border-dashed border-orange-200 hover:border-[#E8622A] rounded-xl flex items-center justify-center gap-2 hover:bg-orange-50/40 transition-all bg-white cursor-pointer px-4 text-center"
+                              >
+                                <Upload className="w-4 h-4 text-[#E8622A] shrink-0" />
+                                <span className="text-xs font-semibold text-gray-600">{en ? "Upload screenshot (JPG, PNG)" : "स्क्रीनशॉट अपलोड करें"}</span>
+                              </button>
+                            )}
+                            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleScreenshotChange} />
+                          </div>
+
+                          {/* Submit Button */}
+                          <button
+                            type="submit"
+                            disabled={qrSubmitting}
+                            className="w-full py-4 bg-gradient-to-r from-[#E8622A] via-[#F48F42] to-[#C04A18] text-white rounded-xl font-bold text-sm sm:text-base shadow-lg shadow-orange-900/15 hover:shadow-orange-900/25 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+                          >
+                            {qrSubmitting ? (
+                              <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                <span>{en ? "Submitting..." : "सबमिट हो रहा है..."}</span>
+                              </div>
+                            ) : (
+                              <>
+                                <span>{en ? `I Have Paid ₹${amount.toLocaleString("en-IN")} — Submit for 80G` : `मैंने ₹${amount.toLocaleString("en-IN")} भुगतान किया — 80G सबमिट करें`}</span>
+                                <ArrowRight className="w-4 h-4 shrink-0" />
+                              </>
+                            )}
+                          </button>
+                        </form>
+                      )}
+                    </motion.div>
+                  )}
+
+                  {/* ── BANK TRANSFER TAB ── */}
+                  {activeTab === "bank" && (
+                    <motion.div
+                      key="bank"
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      {qrSubmitted ? (
+                        <div className="flex flex-col items-center justify-center text-center py-12 bg-green-50 rounded-2xl border border-green-200 p-5">
+                          <CheckCircle2 className="w-12 h-12 text-green-600 mb-3" />
+                          <h3 className="text-lg font-bold text-[#5C1010] font-serif mb-1">{en ? "Transfer Received!" : "ट्रांसफर प्राप्त हुआ!"}</h3>
+                          <p className="text-[#7A5C45] text-xs leading-relaxed">
+                            {en 
+                              ? "Thank you! Your bank transfer donation has been submitted for verification. We will issue your 80G certificate within 24 hours." 
+                              : "धन्यवाद! आपका बैंक ट्रांसफर सबमिट हो गया है। 80G प्रमाणपत्र 24 घंटों में जारी किया जाएगा।"}
+                          </p>
                         </div>
-                        <p className="mt-3 text-xs text-gray-500 font-mono tracking-wider">{UPI_ID}</p>
-                        <p className="text-xs text-gray-400 mt-1">{en ? "Open any UPI app and scan" : "कोई भी UPI ऐप खोलें और स्कैन करें"}</p>
+                      ) : (
+                        <form onSubmit={handleQRSubmit} className="space-y-4">
+                          
+                          {/* Bank Card */}
+                          <div className="bg-white border border-orange-200 rounded-2xl p-4.5 shadow-xs space-y-2.5 text-xs">
+                            <div className="flex justify-between items-center pb-2 border-b border-orange-100">
+                              <span className="text-gray-500">{en ? "Account Name" : "खाता नाम"}:</span>
+                              <span className="font-bold text-[#1E0F05] text-right">{BANK_ACCOUNT_NAME}</span>
+                            </div>
+
+                            <div className="flex justify-between items-center pb-2 border-b border-orange-100">
+                              <span className="text-gray-500">{en ? "Account No" : "खाता संख्या"}:</span>
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono font-bold text-[#1E0F05]">{BANK_ACCOUNT_NUMBER}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopy(BANK_ACCOUNT_NUMBER, "acc")}
+                                  className="p-0.5 text-[#E8622A] hover:text-[#C04A18] cursor-pointer"
+                                >
+                                  {copiedField === "acc" ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5" />}
+                                </button>
+                              </div>
+                            </div>
+
+                            <div className="flex justify-between items-center pb-2 border-b border-orange-100">
+                              <span className="text-gray-500">{en ? "IFSC Code" : "IFSC कोड"}:</span>
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono font-bold text-[#1E0F05]">{BANK_IFSC}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopy(BANK_IFSC, "ifsc")}
+                                  className="p-0.5 text-[#E8622A] hover:text-[#C04A18] cursor-pointer"
+                                >
+                                  {copiedField === "ifsc" ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5" />}
+                                </button>
+                              </div>
+                            </div>
+
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-500">{en ? "Bank & Branch" : "बैंक"}:</span>
+                              <span className="font-bold text-[#1E0F05] text-right">{BANK_NAME}</span>
+                            </div>
+                          </div>
+
+                          {/* UTR Input */}
+                          <div>
+                            <label className="block text-xs font-bold text-[#7A5C45] mb-1.5 uppercase flex items-center gap-1.5">
+                              <FileText className="w-3.5 h-3.5 text-[#E8622A]" />
+                              {en ? "Bank UTR / Reference No" : "बैंक UTR / संदर्भ संख्या"} <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              required
+                              type="text"
+                              value={utrNumber}
+                              onChange={e => setUtrNumber(e.target.value)}
+                              placeholder={en ? "e.g. CBINR52024123456" : "उदा. CBINR52024123456"}
+                              className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none font-mono text-xs"
+                            />
+                          </div>
+
+                          {/* Screenshot Upload */}
+                          <div>
+                            <label className="block text-xs font-bold text-[#7A5C45] mb-1.5 uppercase flex items-center gap-1.5">
+                              <Upload className="w-3.5 h-3.5 text-[#E8622A]" />
+                              {en ? "Transfer Receipt Screenshot" : "ट्रांसफर रसीद"} <span className="text-red-500">*</span>
+                            </label>
+                            {screenshotPreview ? (
+                              <div className="relative rounded-xl overflow-hidden border border-orange-200 h-22 bg-black/5">
+                                <img src={screenshotPreview} alt="Screenshot preview" className="w-full h-full object-cover" />
+                                <button
+                                  type="button"
+                                  onClick={() => { setScreenshotFile(null); setScreenshotPreview(""); }}
+                                  className="absolute top-1.5 right-1.5 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 shadow-md cursor-pointer"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                className="w-full h-20 border border-dashed border-orange-200 hover:border-[#E8622A] rounded-xl flex items-center justify-center gap-2 hover:bg-orange-50/40 transition-all bg-white cursor-pointer px-4 text-center"
+                              >
+                                <Upload className="w-4 h-4 text-[#E8622A] shrink-0" />
+                                <span className="text-xs font-semibold text-gray-600">{en ? "Upload transfer receipt" : "ट्रांसफर रसीद अपलोड करें"}</span>
+                              </button>
+                            )}
+                            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleScreenshotChange} />
+                          </div>
+
+                          {/* Submit Button */}
+                          <button
+                            type="submit"
+                            disabled={qrSubmitting}
+                            className="w-full py-4 bg-gradient-to-r from-[#E8622A] via-[#F48F42] to-[#C04A18] text-white rounded-xl font-bold text-sm sm:text-base shadow-lg shadow-orange-900/15 hover:shadow-orange-900/25 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+                          >
+                            {qrSubmitting ? (
+                              <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                <span>{en ? "Submitting..." : "सबमिट हो रहा है..."}</span>
+                              </div>
+                            ) : (
+                              <>
+                                <span>{en ? `I Have Transferred ₹${amount.toLocaleString("en-IN")} — Submit` : `मैंने ₹${amount.toLocaleString("en-IN")} ट्रांसफर किया — सबमिट करें`}</span>
+                                <ArrowRight className="w-4 h-4 shrink-0" />
+                              </>
+                            )}
+                          </button>
+                        </form>
+                      )}
+                    </motion.div>
+                  )}
+
+                  {/* ── CARD / NETBANKING TAB ── */}
+                  {activeTab === "razorpay" && (
+                    <motion.div
+                      key="razorpay"
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.15 }}
+                      className="space-y-4"
+                    >
+                      <div className="p-5 bg-white rounded-2xl border border-orange-200 text-center">
+                        <p className="text-xs text-gray-500 mb-1">{en ? "Total Payable Amount" : "कुल देय राशि"}</p>
+                        <p className="text-2xl font-extrabold text-[#5C1010] font-serif">₹{amount.toLocaleString("en-IN")}</p>
+                        <p className="text-xs text-[#E8622A] font-semibold mt-1.5">{selectedCampaignObj.label}</p>
                       </div>
 
-                      {/* UTR Input */}
-                      <div className="mb-4">
-                        <label className="block text-xs font-semibold text-[#7A5C45] mb-1.5 uppercase">{en ? "UTR / Transaction ID *" : "UTR / लेन-देन ID *"}</label>
-                        <input required type="text" value={utrNumber} onChange={e => setUtrNumber(e.target.value)}
-                          placeholder={en ? "e.g. 426812345678" : "जैसे. 426812345678"}
-                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none font-mono" />
-                        <p className="text-xs text-gray-400 mt-1">{en ? "Found in your UPI app under payment history." : "आपके UPI ऐप में भुगतान इतिहास में मिलेगा।"}</p>
-                      </div>
-
-                      {/* Screenshot Upload */}
-                      <div className="mb-5">
-                        <label className="block text-xs font-semibold text-[#7A5C45] mb-1.5 uppercase">{en ? "Payment Screenshot *" : "भुगतान स्क्रीनशॉट *"}</label>
-                        {screenshotPreview ? (
-                          <div className="relative">
-                            <img src={screenshotPreview} alt="Screenshot preview" className="w-full h-32 object-cover rounded-xl border border-gray-200" />
-                            <button type="button" onClick={() => { setScreenshotFile(null); setScreenshotPreview(""); }}
-                              className="absolute top-2 right-2 w-7 h-7 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600">
-                              <X className="w-3 h-3" />
-                            </button>
+                      <button
+                        type="button"
+                        onClick={handleSubmitRazorpay}
+                        disabled={loading}
+                        className="w-full py-4 bg-gradient-to-r from-[#E8622A] via-[#F48F42] to-[#C04A18] text-white rounded-xl font-bold text-sm sm:text-base shadow-lg shadow-orange-900/15 hover:shadow-orange-900/25 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+                      >
+                        {loading ? (
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            <span>{en ? "Opening Gateway..." : "गेटवे खुल रहा है..."}</span>
                           </div>
                         ) : (
-                          <button type="button" onClick={() => fileInputRef.current?.click()}
-                            className="w-full h-24 border-2 border-dashed border-orange-200 rounded-xl flex flex-col items-center justify-center gap-2 hover:border-[#E8622A] hover:bg-orange-50 transition-all">
-                            <Upload className="w-6 h-6 text-[#E8622A]" />
-                            <span className="text-sm text-gray-500">{en ? "Click to upload screenshot" : "स्क्रीनशॉट अपलोड करें"}</span>
-                          </button>
+                          <>
+                            <span>{en ? `Proceed to Pay ₹${amount.toLocaleString("en-IN")}` : `₹${amount.toLocaleString("en-IN")} का ऑनलाइन भुगतान करें`}</span>
+                            <ArrowRight className="w-4 h-4 shrink-0" />
+                          </>
                         )}
-                        <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleScreenshotChange} />
-                      </div>
-
-                      <button type="submit" disabled={qrSubmitting}
-                        className="w-full py-4 bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-orange-900/30 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50">
-                        {qrSubmitting ? (en ? "Submitting..." : "सबमिट हो रहा है...") : (en ? "I Have Paid — Submit for Verification" : "मैंने भुगतान किया — सत्यापन के लिए सबमिट करें")}
-                        <ArrowRight className="w-5 h-5" />
                       </button>
-                      <p className="text-center text-xs text-gray-400 mt-3">
-                        {en ? "Your payment will be verified by our team within 24 hours." : "आपका भुगतान 24 घंटों के भीतर हमारी टीम द्वारा सत्यापित किया जाएगा।"}
-                      </p>
-                    </form>
+                    </motion.div>
                   )}
-                </motion.div>
-              )}
 
-              {/* ── BANK TRANSFER TAB ── */}
-              {activeTab === "bank" && (
-                <motion.div key="bank" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }}>
-                  {qrSubmitted ? (
-                    <div className="flex flex-col items-center justify-center text-center py-16">
-                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6">
-                        <CheckCircle2 className="w-10 h-10" />
-                      </motion.div>
-                      <h3 className="text-2xl font-bold text-[#5C1010] font-serif mb-2">{en ? "Donation Received" : "दान प्राप्त हुआ"}</h3>
-                      <p className="text-[#7A5C45] max-w-xs">
-                        {en ? "Thank you! Your donation details have been submitted and a receipt has been sent to your email." : "धन्यवाद! आपका दान सफलतापूर्वक प्राप्त हो गया है और आपकी ईमेल पर एक रसीद भेज दी गई है।"}
-                      </p>
-                    </div>
-                  ) : (
-                    <form onSubmit={handleQRSubmit}>
-                      <h2 className="text-xl font-bold font-serif text-[#1E0F05] mb-5">{en ? "Pay via Bank Transfer" : "बैंक ट्रांसफर से भुगतान करें"}</h2>
+                </AnimatePresence>
+              </div>
 
-                      {/* Amount selector */}
-                      <div className="mb-5">
-                        <label className="block text-sm font-semibold text-[#7A5C45] mb-2 uppercase tracking-wider">{en ? "Donation Amount" : "दान राशि"}</label>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
-                          {QUICK_AMOUNTS.map((val) => (
-                            <button key={val} type="button" onClick={() => handleQuickSelect(val)}
-                              className={`py-3 rounded-xl font-bold text-lg transition-all border-2 ${amount === val && !customAmount ? "bg-[#E8622A]/10 border-[#E8622A] text-[#E8622A]" : "bg-gray-50 border-transparent text-gray-500 hover:bg-gray-100"}`}>
-                              ₹{val}
-                            </button>
-                          ))}
-                        </div>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><IndianRupee className="h-5 w-5 text-gray-400" /></div>
-                          <input type="number" min="1000" placeholder={en ? "Custom Amount (Min ₹1000)" : "अन्य राशि (न्यूनतम ₹1000)"} value={customAmount} onChange={handleCustomChange}
-                            className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-[#1E0F05] focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] transition-colors" />
-                        </div>
-                      </div>
+              {/* ── EMBEDDED TRUST ASSURANCE PILLS ── */}
+              <div className="mt-7 pt-5 border-t border-orange-200/60 space-y-2.5 text-xs">
+                <div className="flex items-center gap-2.5 text-[#5C1010]">
+                  <ShieldCheck className="w-4 h-4 text-[#E8622A] shrink-0" />
+                  <span className="font-semibold">{en ? "80G Tax Exemption (Income Tax Act)" : "धारा 80G के तहत 100% कर छूट"}</span>
+                </div>
+                <div className="flex items-center gap-2.5 text-[#5C1010]">
+                  <Award className="w-4 h-4 text-[#E8622A] shrink-0" />
+                  <span className="font-semibold">{en ? "Strict Statutory Audit & Transparency" : "कड़े वैधानिक ऑडिट एवं पूर्ण वित्तीय पारदर्शिता"}</span>
+                </div>
+                <div className="flex items-center gap-2.5 text-[#5C1010]">
+                  <CheckCircle2 className="w-4 h-4 text-[#E8622A] shrink-0" />
+                  <span className="font-semibold">{en ? "Instant Digital 80G Certificate Dispatch" : "डिजिटल 80G प्रमाण पत्र सीधे ईमेल पर"}</span>
+                </div>
+              </div>
 
-                      {/* Bank Details display */}
-                      <div className="flex flex-col items-center bg-gradient-to-b from-orange-50 to-white border border-orange-100 rounded-2xl p-5 mb-5 w-full relative">
-                        {amount < 1000 && (
-                          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm rounded-2xl p-4 text-center">
-                            <Lock className="w-8 h-8 text-[#E8622A] mb-2" />
-                            <p className="text-[#5C1010] font-bold">
-                              {en ? "Enter an amount of ₹1000 or more to view Bank Details" : "बैंक विवरण देखने के लिए ₹1000 या अधिक दर्ज करें"}
-                            </p>
-                          </div>
-                        )}
-                        <p className="text-sm text-[#7A5C45] font-semibold mb-3">
-                          {en ? `Transfer ₹${amount >= 1000 ? amount : 0} to:` : `₹${amount >= 1000 ? amount : 0} यहाँ ट्रांसफर करें:`}
-                        </p>
-                        <div className={`w-full text-left space-y-2 text-sm text-[#1E0F05] ${amount < 1000 ? 'opacity-20' : ''}`}>
-                          <div className="flex justify-between border-b border-orange-100 pb-2"><span className="text-gray-500">{en ? "Account Name:" : "खाता नाम:"}</span> <strong className="text-right">{BANK_ACCOUNT_NAME}</strong></div>
-                          <div className="flex justify-between border-b border-orange-100 pb-2 pt-1"><span className="text-gray-500">{en ? "Account No:" : "खाता संख्या:"}</span> <strong className="font-mono text-right">{BANK_ACCOUNT_NUMBER}</strong></div>
-                          <div className="flex justify-between border-b border-orange-100 pb-2 pt-1"><span className="text-gray-500">{en ? "IFSC Code:" : "IFSC कोड:"}</span> <strong className="font-mono text-right">{BANK_IFSC}</strong></div>
-                          <div className="flex justify-between pt-1"><span className="text-gray-500">{en ? "Bank Name:" : "बैंक का नाम:"}</span> <strong className="text-right">{BANK_NAME}</strong></div>
-                        </div>
-                        <p className="text-xs text-center text-gray-400 mt-4">{en ? "Please use NEFT/RTGS/IMPS to transfer the amount." : "कृपया राशि ट्रांसफर करने के लिए NEFT/RTGS/IMPS का उपयोग करें।"}</p>
-                      </div>
+            </div>
 
-                      {/* UTR Input */}
-                      <div className="mb-4">
-                        <label className="block text-xs font-semibold text-[#7A5C45] mb-1.5 uppercase">{en ? "Transaction ID / UTR *" : "लेन-देन ID / UTR *"}</label>
-                        <input required type="text" value={utrNumber} onChange={e => setUtrNumber(e.target.value)}
-                          placeholder={en ? "e.g. 426812345678" : "जैसे. 426812345678"}
-                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none font-mono" />
-                        <p className="text-xs text-gray-400 mt-1">{en ? "Found in your bank app under payment history." : "आपके बैंक ऐप में भुगतान इतिहास में मिलेगा।"}</p>
-                      </div>
+          </div>
+        </motion.div>
 
-                      {/* Screenshot Upload */}
-                      <div className="mb-5">
-                        <label className="block text-xs font-semibold text-[#7A5C45] mb-1.5 uppercase">{en ? "Payment Screenshot *" : "भुगतान स्क्रीनशॉट *"}</label>
-                        {screenshotPreview ? (
-                          <div className="relative">
-                            <img src={screenshotPreview} alt="Screenshot preview" className="w-full h-32 object-cover rounded-xl border border-gray-200" />
-                            <button type="button" onClick={() => { setScreenshotFile(null); setScreenshotPreview(""); }}
-                              className="absolute top-2 right-2 w-7 h-7 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600">
-                              <X className="w-3 h-3" />
-                            </button>
-                          </div>
-                        ) : (
-                          <button type="button" onClick={() => fileInputRef.current?.click()}
-                            className="w-full h-24 border-2 border-dashed border-orange-200 rounded-xl flex flex-col items-center justify-center gap-2 hover:border-[#E8622A] hover:bg-orange-50 transition-all">
-                            <Upload className="w-6 h-6 text-[#E8622A]" />
-                            <span className="text-sm text-gray-500">{en ? "Click to upload screenshot" : "स्क्रीनशॉट अपलोड करें"}</span>
-                          </button>
-                        )}
-                        <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleScreenshotChange} />
-                      </div>
-
-                      <button type="submit" disabled={qrSubmitting}
-                        className="w-full py-4 bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-orange-900/30 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50">
-                        {qrSubmitting ? (en ? "Submitting..." : "सबमिट हो रहा है...") : (en ? "I Have Paid — Submit for Verification" : "मैंने भुगतान किया — सत्यापन के लिए सबमिट करें")}
-                        <ArrowRight className="w-5 h-5" />
-                      </button>
-                      <p className="text-center text-xs text-gray-400 mt-3">
-                        {en ? "Your payment will be verified by our team within 24 hours." : "आपका भुगतान 24 घंटों के भीतर हमारी टीम द्वारा सत्यापित किया जाएगा।"}
-                      </p>
-                    </form>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-        </div>
       </div>
 
       <ProfileCompletionModal 
@@ -646,7 +1011,6 @@ export default function Donate() {
         onClose={() => setIsModalOpen(false)} 
         onComplete={() => {
           setIsModalOpen(false);
-          // Allow user to click 'Make a Secure Donation' again manually
         }} 
       />
 

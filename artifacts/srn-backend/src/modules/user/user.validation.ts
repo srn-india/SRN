@@ -9,6 +9,7 @@ export const updateProfileSchema = z.object({
     district: z.string().min(2, 'District is required').optional(),
     gender: z.string().min(1, 'Gender is required').optional(),
     dateOfBirth: z.string().optional().transform((val) => val ? new Date(val) : undefined),
+    panNumber: z.string().max(10).optional(),
     avatar: z.string().url('Must be a valid URL').optional(),
     profilePicture: z.string().optional(),
   }),

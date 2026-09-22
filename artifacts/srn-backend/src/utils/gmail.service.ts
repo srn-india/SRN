@@ -192,6 +192,9 @@ export function getGmailCredentials(): GmailCredentials | null {
  * Returns true if Gmail OAuth API is configured and ready.
  */
 export function isGmailOAuthConfigured(): boolean {
+  if (process.env.ENABLE_GMAIL_API === 'false' || process.env.USE_GMAIL_API === 'false') {
+    return false;
+  }
   const creds = getGmailCredentials();
   return !!(creds && creds.client_id && creds.client_secret && creds.refresh_token);
 }

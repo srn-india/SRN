@@ -49,6 +49,35 @@ html {
   display: none;
 }
 
+/* Custom scrollbar explicitly for dropdown menus & popups */
+.srn-dropdown-scroll {
+  scrollbar-width: thin !important;
+  scrollbar-color: #E8622A #FAF3EA !important;
+  -ms-overflow-style: auto !important;
+  overscroll-behavior: contain !important;
+  touch-action: pan-y !important;
+}
+
+.srn-dropdown-scroll::-webkit-scrollbar {
+  display: block !important;
+  width: 6px !important;
+}
+
+.srn-dropdown-scroll::-webkit-scrollbar-track {
+  background: #FAF3EA !important;
+  border-radius: 8px !important;
+  margin: 4px 0 !important;
+}
+
+.srn-dropdown-scroll::-webkit-scrollbar-thumb {
+  background: #E8622A !important;
+  border-radius: 8px !important;
+}
+
+.srn-dropdown-scroll::-webkit-scrollbar-thumb:hover {
+  background: #C04A18 !important;
+}
+
 * {
   box-sizing: border-box;
 }

@@ -6,7 +6,8 @@ import {
   ArrowLeft, LogOut, UserCircle, Calendar, MessageSquare, 
   ShieldCheck, CheckCircle2, XCircle, Plus, Trash2, ShieldAlert,
   Settings, Sliders, Bell, LayoutDashboard, Key, TrendingUp, Download, MapPin,
-  BookOpen, AlertCircle, Briefcase, FileText, X, Eye, GraduationCap, Heart, CalendarDays, User, Users, RotateCw, QrCode, Send, Pencil
+  BookOpen, AlertCircle, Briefcase, FileText, X, Eye, GraduationCap, Heart, CalendarDays, User, Users, RotateCw, QrCode, Send, Pencil,
+  Phone, Mail, Copy, Check, ExternalLink, Camera, Sparkles, UserCheck, Shield
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -41,6 +42,15 @@ export default function AdminDashboard() {
   const [rejectReason, setRejectReason] = useState("");
   const [mpFilter, setMpFilter] = useState("PENDING");
   const [paymentTypeFilter, setPaymentTypeFilter] = useState("ALL");
+  const [imageLightbox, setImageLightbox] = useState(null);
+  const [copiedField, setCopiedField] = useState("");
+
+  const copyToClipboard = (text, fieldId) => {
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    setCopiedField(fieldId);
+    setTimeout(() => setCopiedField(""), 2000);
+  };
   
   // 2FA Setup State
   const [qrCodeUrl, setQrCodeUrl] = useState(null);
@@ -1520,64 +1530,108 @@ export default function AdminDashboard() {
                         <div className="text-center py-10 text-gray-500">No {paymentTypeFilter !== "ALL" ? paymentTypeFilter.toLowerCase() : ""} payments found in this category.</div>
                       ) : (
                         manualPayments.filter(p => paymentTypeFilter === "ALL" || p.type === paymentTypeFilter).map(p => (
-                          <div key={p.id} className="bg-white border border-gray-100 rounded-[2rem] p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                          <div key={p.id} className="bg-white border border-gray-100 rounded-[2.5rem] p-6 sm:p-8 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
                             {/* Decorative Background */}
-                            <div className={`absolute top-0 right-0 w-32 h-32 rounded-bl-full pointer-events-none opacity-20 transition-transform group-hover:scale-110 ${
+                            <div className={`absolute top-0 right-0 w-36 h-36 rounded-bl-full pointer-events-none opacity-20 transition-transform group-hover:scale-110 ${
                               p.status === "PENDING" ? "bg-gradient-to-br from-amber-400 to-transparent" :
                               p.status === "APPROVED" ? "bg-gradient-to-br from-emerald-400 to-transparent" :
                               "bg-gradient-to-br from-red-400 to-transparent"
                             }`} />
                             
-                            <div className="flex flex-wrap lg:flex-nowrap gap-8 items-start justify-between relative z-10">
-                              {/* Left Content */}
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2.5 flex-wrap mb-4">
-                                  <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                                    p.status === "PENDING" ? "bg-amber-100 text-amber-700 border border-amber-200" :
-                                    p.status === "APPROVED" ? "bg-emerald-100 text-emerald-700 border border-emerald-200" :
-                                    "bg-red-100 text-red-700 border border-red-200"
-                                  }`}>
-                                    <div className="flex items-center gap-1.5">
-                                      {p.status === "PENDING" && <RotateCw className="w-3 h-3 animate-spin-slow" />}
-                                      {p.status === "APPROVED" && <CheckCircle2 className="w-3 h-3" />}
-                                      {p.status === "REJECTED" && <XCircle className="w-3 h-3" />}
-                                      {p.status}
+                            {/* Top Meta Bar */}
+                            <div className="flex items-center justify-between flex-wrap gap-3 pb-5 border-b border-gray-100 mb-6 relative z-10">
+                              <div className="flex items-center gap-2.5 flex-wrap">
+                                <span className={`px-3.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                                  p.status === "PENDING" ? "bg-amber-100 text-amber-700 border border-amber-200" :
+                                  p.status === "APPROVED" ? "bg-emerald-100 text-emerald-700 border border-emerald-200" :
+                                  "bg-red-100 text-red-700 border border-red-200"
+                                }`}>
+                                  <div className="flex items-center gap-1.5">
+                                    {p.status === "PENDING" && <RotateCw className="w-3 h-3 animate-spin-slow" />}
+                                    {p.status === "APPROVED" && <CheckCircle2 className="w-3 h-3" />}
+                                    {p.status === "REJECTED" && <XCircle className="w-3 h-3" />}
+                                    {p.status}
+                                  </div>
+                                </span>
+                                <span className="text-xs text-gray-400 font-medium bg-gray-50 px-3 py-1 rounded-full border border-gray-100">
+                                  {new Date(p.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+                                </span>
+                                <span className={`text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full border ${p.type === "MEMBERSHIP" ? "bg-purple-50 text-purple-600 border-purple-100" : "bg-blue-50 text-blue-600 border-blue-100"}`}>
+                                  {p.type}
+                                </span>
+                                {(() => {
+                                  let methodTag = "Manual";
+                                  let cleanPurpose = p.purpose || "";
+                                  if (cleanPurpose.includes("[BANK TRANSFER]")) {
+                                    methodTag = "Bank Transfer";
+                                    cleanPurpose = cleanPurpose.replace("[BANK TRANSFER]", "").trim();
+                                  } else if (cleanPurpose.includes("[UPI]")) {
+                                    methodTag = "UPI";
+                                    cleanPurpose = cleanPurpose.replace("[UPI]", "").trim();
+                                  }
+                                  p.cleanPurpose = cleanPurpose;
+                                  
+                                  return (
+                                    <span className={`text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full border ${methodTag === "Bank Transfer" ? "bg-indigo-50 text-indigo-600 border-indigo-100" : "bg-teal-50 text-teal-600 border-teal-100"}`}>
+                                      {methodTag}
+                                    </span>
+                                  );
+                                })()}
+                              </div>
+
+                              <div className="flex items-baseline gap-2">
+                                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Amount:</span>
+                                <h3 className="text-3xl font-extrabold font-serif text-[#2C1810]">₹{p.amount}</h3>
+                              </div>
+                            </div>
+
+                            {/* Main Content: Full User Profile & Proof Layout */}
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 items-start relative z-10">
+                              
+                              {/* Left & Middle (2 Cols): Comprehensive User Details */}
+                              <div className="lg:col-span-2 space-y-5">
+                                
+                                {/* User Identity Header Box */}
+                                <div className="bg-[#FAF6F0]/70 p-5 sm:p-6 rounded-3xl border border-orange-200/80 shadow-xs flex flex-col sm:flex-row items-start sm:items-center gap-5">
+                                  
+                                  {/* Official ID Card Photo */}
+                                  <div className="relative group shrink-0">
+                                    <div 
+                                      onClick={() => p.user?.avatar && setImageLightbox({ url: p.user.avatar, title: `${p.user.firstName} ${p.user.lastName} — Official ID Card Photo` })}
+                                      className={`w-20 h-24 sm:w-24 sm:h-28 rounded-2xl overflow-hidden border-2 bg-white shadow-xs flex items-center justify-center transition-all ${
+                                        p.user?.avatar ? "border-[#E8622A]/50 cursor-pointer hover:border-[#E8622A] hover:shadow-md" : "border-gray-200"
+                                      }`}
+                                    >
+                                      {p.user?.avatar ? (
+                                        <img src={p.user.avatar} alt="User ID Card Photo" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                                      ) : (
+                                        <div className="flex flex-col items-center text-center p-2 text-gray-400">
+                                          <User className="w-8 h-8 text-gray-300 mb-1" />
+                                          <span className="text-[10px] font-bold leading-tight text-gray-400">No Photo</span>
+                                        </div>
+                                      )}
+                                      {p.user?.avatar && (
+                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                          <div className="bg-white/95 p-2 rounded-full shadow-md">
+                                            <Eye className="w-4 h-4 text-[#E8622A]" />
+                                          </div>
+                                        </div>
+                                      )}
                                     </div>
-                                  </span>
-                                  <span className="text-xs text-gray-400 font-medium bg-gray-50 px-3 py-1 rounded-full border border-gray-100">
-                                    {new Date(p.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
-                                  </span>
-                                  <span className={`text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full border ${p.type === "MEMBERSHIP" ? "bg-purple-50 text-purple-600 border-purple-100" : "bg-blue-50 text-blue-600 border-blue-100"}`}>
-                                    {p.type}
-                                  </span>
-                                  {(() => {
-                                    let methodTag = "Manual";
-                                    let cleanPurpose = p.purpose || "";
-                                    if (cleanPurpose.includes("[BANK TRANSFER]")) {
-                                      methodTag = "Bank Transfer";
-                                      cleanPurpose = cleanPurpose.replace("[BANK TRANSFER]", "").trim();
-                                    } else if (cleanPurpose.includes("[UPI]")) {
-                                      methodTag = "UPI";
-                                      cleanPurpose = cleanPurpose.replace("[UPI]", "").trim();
-                                    }
-                                    p.cleanPurpose = cleanPurpose;
-                                    
-                                    return (
-                                      <span className={`text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full border ${methodTag === "Bank Transfer" ? "bg-indigo-50 text-indigo-600 border-indigo-100" : "bg-teal-50 text-teal-600 border-teal-100"}`}>
-                                        {methodTag}
-                                      </span>
-                                    );
-                                  })()}
-                                </div>
-                                
-                                <h3 className="text-4xl font-bold font-serif text-[#2C1810] mb-6">₹{p.amount}</h3>
-                                
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                  <div className="flex items-start gap-3 bg-gray-50/80 p-3 rounded-2xl border border-gray-100">
-                                    <div className="p-2 bg-white rounded-xl shadow-sm text-gray-500"><User className="w-4 h-4" /></div>
-                                    <div className="flex-1 min-w-0">
-                                      <div className="flex items-center justify-between gap-1">
-                                        <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Sender Name</p>
+                                    <span className={`block text-center mt-1.5 text-[9px] font-black tracking-wider uppercase px-2 py-0.5 rounded-md ${
+                                      p.user?.avatar ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-amber-50 text-amber-700 border border-amber-200"
+                                    }`}>
+                                      {p.user?.avatar ? "ID Photo Attached" : "Photo Missing"}
+                                    </span>
+                                  </div>
+
+                                  {/* User Summary Info */}
+                                  <div className="flex-1 min-w-0 space-y-2">
+                                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                                      <div className="flex items-center gap-2 flex-wrap">
+                                        <h4 className="text-lg sm:text-xl font-bold text-[#2C1810]">
+                                          {p.user?.firstName} {p.user?.lastName}
+                                        </h4>
                                         {p.user && (
                                           <button
                                             onClick={() => {
@@ -1587,47 +1641,194 @@ export default function AdminDashboard() {
                                               setRenameError('');
                                               setRenameModalOpen(true);
                                             }}
-                                            className="text-gray-400 hover:text-[#E8622A] text-xs font-bold inline-flex items-center gap-1 cursor-pointer transition-colors"
-                                            title="Rename User"
+                                            className="p-1 text-gray-400 hover:text-[#E8622A] rounded-md hover:bg-orange-100/50 transition-colors"
+                                            title="Edit user name"
                                           >
-                                            <Pencil className="w-3 h-3" /> Edit
+                                            <Pencil className="w-3.5 h-3.5" />
                                           </button>
                                         )}
                                       </div>
-                                      <p className="text-sm font-bold text-[#2C1810] truncate">{p.user?.firstName} {p.user?.lastName}</p>
+
+                                      <div className="flex items-center gap-1.5">
+                                        <span className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-md ${
+                                          p.user?.role === "ADMIN" ? "bg-purple-100 text-purple-700 border border-purple-200" : "bg-gray-100 text-gray-600 border border-gray-200"
+                                        }`}>
+                                          {p.user?.role || "USER"}
+                                        </span>
+                                        <span className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-md ${
+                                          p.user?.isVerified ? "bg-emerald-100 text-emerald-700 border border-emerald-200" : "bg-amber-100 text-amber-700 border border-amber-200"
+                                        }`}>
+                                          {p.user?.isVerified ? "Email Verified" : "Unverified"}
+                                        </span>
+                                      </div>
                                     </div>
-                                  </div>
-                                  
-                                  <div className="flex items-start gap-3 bg-gray-50/80 p-3 rounded-2xl border border-gray-100">
-                                    <div className="p-2 bg-white rounded-xl shadow-sm text-gray-500"><Send className="w-4 h-4" /></div>
-                                    <div className="truncate">
-                                      <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Email Address</p>
-                                      <p className="text-sm font-semibold text-[#7A5C45] truncate">{p.user?.email}</p>
+
+                                    <div className="flex items-center gap-2 text-xs text-gray-500 flex-wrap">
+                                      <span className="font-mono bg-white px-2 py-0.5 rounded-md border border-gray-200 text-gray-600 inline-flex items-center gap-1 text-[11px]">
+                                        <span>User ID: {p.user?.id ? `${p.user.id.slice(0, 10)}...` : (p.userId ? `${p.userId.slice(0, 10)}...` : 'N/A')}</span>
+                                        <button 
+                                          type="button"
+                                          onClick={() => copyToClipboard(p.user?.id || p.userId, `id-${p.id}`)}
+                                          className="hover:text-[#E8622A] cursor-pointer"
+                                          title="Copy User ID"
+                                        >
+                                          {copiedField === `id-${p.id}` ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                                        </button>
+                                      </span>
+                                      <span>·</span>
+                                      <span>Registered: {p.user?.createdAt ? new Date(p.user.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium" }) : "N/A"}</span>
                                     </div>
+
+                                    {p.user?.memberships?.[0] && (
+                                      <div className="pt-1 flex items-center gap-2 text-xs">
+                                        <span className="text-gray-500 font-medium">Membership Record:</span>
+                                        <span className="font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200 text-[11px]">
+                                          {p.user.memberships[0].plan} · {p.user.memberships[0].status}
+                                        </span>
+                                      </div>
+                                    )}
                                   </div>
+                                </div>
+
+                                {/* Full Contact & Demographics Grid */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
                                   
-                                  <div className="flex items-start gap-3 bg-gray-50/80 p-3 rounded-2xl border border-gray-100">
-                                    <div className="p-2 bg-white rounded-xl shadow-sm text-gray-500"><FileText className="w-4 h-4" /></div>
-                                    <div>
-                                      <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">UTR / Transaction ID</p>
-                                      <p className="text-sm font-mono font-bold text-blue-600">{p.utrNumber}</p>
+                                  {/* Phone */}
+                                  <div className="flex items-start gap-3 bg-gray-50/80 p-3.5 rounded-2xl border border-gray-100">
+                                    <div className="p-2 bg-white rounded-xl shadow-xs text-orange-600"><Phone className="w-4 h-4" /></div>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center justify-between">
+                                        <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Phone Number</p>
+                                        {p.user?.phone && (
+                                          <button
+                                            type="button"
+                                            onClick={() => copyToClipboard(p.user.phone, `phone-${p.id}`)}
+                                            className="text-gray-400 hover:text-[#E8622A] cursor-pointer"
+                                            title="Copy Phone"
+                                          >
+                                            {copiedField === `phone-${p.id}` ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                                          </button>
+                                        )}
+                                      </div>
+                                      {p.user?.phone ? (
+                                        <a href={`tel:${p.user.phone}`} className="text-sm font-bold text-[#2C1810] hover:text-[#E8622A] transition-colors block truncate">
+                                          {p.user.phone}
+                                        </a>
+                                      ) : (
+                                        <p className="text-xs text-gray-400 italic">Not provided</p>
+                                      )}
                                     </div>
                                   </div>
 
+                                  {/* Email */}
+                                  <div className="flex items-start gap-3 bg-gray-50/80 p-3.5 rounded-2xl border border-gray-100">
+                                    <div className="p-2 bg-white rounded-xl shadow-xs text-blue-600"><Mail className="w-4 h-4" /></div>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center justify-between">
+                                        <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Email Address</p>
+                                        {p.user?.email && (
+                                          <button
+                                            type="button"
+                                            onClick={() => copyToClipboard(p.user.email, `email-${p.id}`)}
+                                            className="text-gray-400 hover:text-[#E8622A] cursor-pointer"
+                                            title="Copy Email"
+                                          >
+                                            {copiedField === `email-${p.id}` ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                                          </button>
+                                        )}
+                                      </div>
+                                      <a href={`mailto:${p.user?.email}`} className="text-sm font-semibold text-[#7A5C45] hover:text-[#E8622A] transition-colors block truncate">
+                                        {p.user?.email}
+                                      </a>
+                                    </div>
+                                  </div>
+
+                                  {/* State & District */}
+                                  <div className="flex items-start gap-3 bg-gray-50/80 p-3.5 rounded-2xl border border-gray-100">
+                                    <div className="p-2 bg-white rounded-xl shadow-xs text-emerald-600"><MapPin className="w-4 h-4" /></div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Location / Chapter</p>
+                                      <p className="text-sm font-bold text-[#2C1810] truncate">
+                                        {p.user?.district ? `${p.user.district}, ` : ""}{p.user?.state || "Not specified"}
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  {/* Gender & DOB */}
+                                  <div className="flex items-start gap-3 bg-gray-50/80 p-3.5 rounded-2xl border border-gray-100">
+                                    <div className="p-2 bg-white rounded-xl shadow-xs text-purple-600"><UserCircle className="w-4 h-4" /></div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Gender & Birth Date</p>
+                                      <p className="text-sm font-medium text-[#7A5C45] truncate">
+                                        {p.user?.gender || "Not specified"}
+                                        {p.user?.dateOfBirth ? ` · DOB: ${new Date(p.user.dateOfBirth).toLocaleDateString("en-IN")}` : ""}
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  {/* PAN Card */}
+                                  {p.user?.panNumber && (
+                                    <div className="flex items-start gap-3 bg-gray-50/80 p-3.5 rounded-2xl border border-gray-100 sm:col-span-2">
+                                      <div className="p-2 bg-white rounded-xl shadow-xs text-amber-600"><FileText className="w-4 h-4" /></div>
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between">
+                                          <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">PAN Card Number</p>
+                                          <button
+                                            type="button"
+                                            onClick={() => copyToClipboard(p.user.panNumber, `pan-${p.id}`)}
+                                            className="text-gray-400 hover:text-[#E8622A] cursor-pointer inline-flex items-center gap-1 text-[11px]"
+                                            title="Copy PAN"
+                                          >
+                                            {copiedField === `pan-${p.id}` ? (
+                                              <span className="text-emerald-600 font-bold flex items-center gap-1"><Check className="w-3 h-3" /> Copied</span>
+                                            ) : (
+                                              <span className="flex items-center gap-1"><Copy className="w-3 h-3" /> Copy</span>
+                                            )}
+                                          </button>
+                                        </div>
+                                        <p className="text-sm font-mono font-bold text-[#2C1810] tracking-wider uppercase select-all">{p.user.panNumber}</p>
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* UTR / Transaction ID */}
+                                  <div className="flex items-start gap-3 bg-gray-50/80 p-3.5 rounded-2xl border border-gray-100 sm:col-span-2">
+                                    <div className="p-2 bg-white rounded-xl shadow-xs text-indigo-600"><FileText className="w-4 h-4" /></div>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center justify-between">
+                                        <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">UTR / Transaction ID</p>
+                                        <button
+                                          type="button"
+                                          onClick={() => copyToClipboard(p.utrNumber, `utr-${p.id}`)}
+                                          className="text-gray-400 hover:text-[#E8622A] cursor-pointer inline-flex items-center gap-1 text-[11px]"
+                                          title="Copy UTR"
+                                        >
+                                          {copiedField === `utr-${p.id}` ? (
+                                            <span className="text-emerald-600 font-bold flex items-center gap-1"><Check className="w-3 h-3" /> Copied</span>
+                                          ) : (
+                                            <span className="flex items-center gap-1"><Copy className="w-3 h-3" /> Copy</span>
+                                          )}
+                                        </button>
+                                      </div>
+                                      <p className="text-sm font-mono font-bold text-blue-700 tracking-wide select-all">{p.utrNumber}</p>
+                                    </div>
+                                  </div>
+
+                                  {/* Stated Purpose / Application Details */}
                                   {p.cleanPurpose && (
-                                    <div className="flex items-start gap-3 bg-gray-50/80 p-3 rounded-2xl border border-gray-100">
-                                      <div className="p-2 bg-white rounded-xl shadow-sm text-gray-500"><MessageSquare className="w-4 h-4" /></div>
-                                      <div>
-                                        <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Purpose</p>
-                                        <p className="text-sm font-semibold text-[#7A5C45] line-clamp-2">{p.cleanPurpose}</p>
+                                    <div className="flex items-start gap-3 bg-amber-50/60 p-3.5 rounded-2xl border border-amber-200/70 sm:col-span-2">
+                                      <div className="p-2 bg-white rounded-xl shadow-xs text-[#E8622A]"><MessageSquare className="w-4 h-4" /></div>
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-[10px] uppercase font-bold text-amber-800 tracking-wider">Stated Purpose & Application Details</p>
+                                        <p className="text-xs sm:text-sm font-semibold text-[#5C3A1E] leading-relaxed mt-0.5">{p.cleanPurpose}</p>
                                       </div>
                                     </div>
                                   )}
                                 </div>
-                                
+
                                 {p.adminNote && (
-                                  <div className="mt-4 p-4 bg-red-50/80 border border-red-100 rounded-2xl flex items-start gap-3">
-                                    <ShieldAlert className="w-5 h-5 text-red-500 shrink-0" />
+                                  <div className="p-4 bg-red-50/80 border border-red-200 rounded-2xl flex items-start gap-3">
+                                    <ShieldAlert className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
                                     <div>
                                       <p className="text-xs font-bold text-red-600 uppercase tracking-widest mb-0.5">Admin Rejection Note</p>
                                       <p className="text-sm text-red-700 font-medium">{p.adminNote}</p>
@@ -1636,22 +1837,31 @@ export default function AdminDashboard() {
                                 )}
                               </div>
                               
-                              {/* Right Screenshot */}
-                              {p.screenshot && (
-                                <div className="w-full lg:w-48 xl:w-56 shrink-0 flex flex-col gap-2">
-                                  <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Attached Proof</p>
-                                  <a href={p.screenshot} target="_blank" rel="noopener noreferrer" className="block group/img">
-                                    <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-gray-100 shadow-sm group-hover/img:shadow-md transition-all">
-                                      <img src={p.screenshot} alt="Payment proof" className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500" />
-                                      <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/10 transition-colors flex items-center justify-center">
-                                        <div className="bg-white/90 backdrop-blur-sm p-3 rounded-full opacity-0 group-hover/img:opacity-100 transition-opacity transform group-hover/img:scale-100 scale-90">
-                                          <Eye className="w-5 h-5 text-gray-700" />
-                                        </div>
+                              {/* Right (1 Col): Payment Screenshot / Receipt Proof */}
+                              <div className="w-full flex flex-col gap-2.5">
+                                <p className="text-xs font-bold text-[#7A5C45] uppercase tracking-wider flex items-center gap-1.5">
+                                  <FileText className="w-3.5 h-3.5 text-[#E8622A]" />
+                                  Payment Proof (Screenshot)
+                                </p>
+                                {p.screenshot ? (
+                                  <div 
+                                    onClick={() => setImageLightbox({ url: p.screenshot, title: `Payment Receipt Proof — UTR: ${p.utrNumber}` })}
+                                    className="relative aspect-[3/4] max-h-80 rounded-2xl overflow-hidden border-2 border-gray-200 shadow-xs hover:shadow-md transition-all group/img cursor-pointer bg-black/5"
+                                  >
+                                    <img src={p.screenshot} alt="Payment proof" className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500" />
+                                    <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/20 transition-colors flex items-center justify-center">
+                                      <div className="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-full opacity-0 group-hover/img:opacity-100 transition-opacity transform group-hover/img:scale-100 scale-90 shadow-md flex items-center gap-2 text-xs font-bold text-[#2C1810]">
+                                        <Eye className="w-4 h-4 text-[#E8622A]" /> Click to Zoom
                                       </div>
                                     </div>
-                                  </a>
-                                </div>
-                              )}
+                                  </div>
+                                ) : (
+                                  <div className="aspect-[3/4] max-h-80 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 flex flex-col items-center justify-center p-6 text-center text-gray-400">
+                                    <QrCode className="w-10 h-10 mb-2 opacity-30" />
+                                    <p className="text-xs font-medium">No screenshot attached</p>
+                                  </div>
+                                )}
+                              </div>
                             </div>
 
                             {/* Action Buttons */}
@@ -1716,6 +1926,52 @@ export default function AdminDashboard() {
                               className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold transition-colors">Confirm Reject</button>
                             <button onClick={() => { setRejectModal(null); setRejectReason(""); }}
                               className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold transition-colors">Cancel</button>
+                          </div>
+                        </motion.div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Image Lightbox Modal for ID Photos & Receipts */}
+                  <AnimatePresence>
+                    {imageLightbox && (
+                      <motion.div 
+                        initial={{ opacity: 0 }} 
+                        animate={{ opacity: 1 }} 
+                        exit={{ opacity: 0 }}
+                        onClick={() => setImageLightbox(null)}
+                        className="fixed inset-0 z-[300] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 sm:p-6"
+                      >
+                        <motion.div 
+                          initial={{ scale: 0.9, opacity: 0 }} 
+                          animate={{ scale: 1, opacity: 1 }} 
+                          exit={{ scale: 0.9, opacity: 0 }}
+                          onClick={e => e.stopPropagation()}
+                          className="bg-white rounded-3xl p-5 sm:p-6 w-full max-w-2xl shadow-2xl space-y-4"
+                        >
+                          <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+                            <h4 className="text-sm sm:text-base font-bold text-[#2C1810] truncate pr-4">{imageLightbox.title}</h4>
+                            <button 
+                              onClick={() => setImageLightbox(null)} 
+                              className="p-2 hover:bg-gray-100 rounded-full text-gray-500 hover:text-gray-900 transition-colors cursor-pointer"
+                            >
+                              <X className="w-5 h-5" />
+                            </button>
+                          </div>
+
+                          <div className="max-h-[70vh] overflow-auto flex items-center justify-center bg-gray-50 rounded-2xl p-2 sm:p-4 border border-gray-100">
+                            <img src={imageLightbox.url} alt="Lightbox Preview" className="max-h-[65vh] w-auto object-contain rounded-xl shadow-xs" />
+                          </div>
+
+                          <div className="flex justify-end pt-1">
+                            <a 
+                              href={imageLightbox.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="inline-flex items-center gap-2 px-4 py-2 bg-[#E8622A]/10 hover:bg-[#E8622A]/20 text-[#E8622A] font-bold text-xs rounded-xl transition-colors"
+                            >
+                              <ExternalLink className="w-4 h-4" /> Open Full Resolution
+                            </a>
                           </div>
                         </motion.div>
                       </motion.div>

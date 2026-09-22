@@ -103,7 +103,7 @@ export const submitPayment = async (
   console.log('Sending acknowledgment email to', recipientEmail);
   sendEmail(
     recipientEmail,
-    '⏳ Payment Verification Pending',
+    'Payment Verification Pending',
     `<h2>Hi ${user.firstName},</h2>
       <p>We have received your manual payment submission of <b>₹${data.amount}</b> for ${data.type}.</p>
       <p>Our team will verify your transaction (<b>${data.utrNumber}</b>) shortly.</p>
@@ -125,7 +125,37 @@ export const getMyPayments = async (userId: string) => {
 export const getAllPayments = async (status?: string) => {
   return prisma.manualPayment.findMany({
     where: status ? { status: status as any } : undefined,
-    include: { user: { select: { id: true, firstName: true, lastName: true, email: true, phone: true } } },
+    include: {
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          phone: true,
+          avatar: true,
+          state: true,
+          district: true,
+          gender: true,
+          dateOfBirth: true,
+          panNumber: true,
+          role: true,
+          isVerified: true,
+          createdAt: true,
+          memberships: {
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+            select: {
+              id: true,
+              plan: true,
+              status: true,
+              startDate: true,
+              endDate: true,
+            },
+          },
+        },
+      },
+    },
     orderBy: { createdAt: 'desc' },
   });
 };
@@ -222,7 +252,7 @@ export const rejectPayment = async (id: string, adminNote: string) => {
   try {
     await sendEmail(
       user.email,
-      '❌ Issue with your SRN Payment',
+      'Issue with your SRN Payment',
       `<h2>Hi ${user.firstName},</h2>
        <p>We encountered an issue while verifying your recent payment of <b>₹${payment.amount}</b>.</p>
        <p><b>Reason:</b> ${adminNote}</p>

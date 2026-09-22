@@ -121,7 +121,8 @@ export const getMe = catchAsync(async (req: Request, res: Response) => {
   const user = { 
     ...req.user, 
     profilePicture: req.user.avatar,
-    isMember: !!membership
+    isMember: !!membership,
+    membershipPlan: membership?.plan || null
   };
   delete user.password;
   delete user.avatar;
