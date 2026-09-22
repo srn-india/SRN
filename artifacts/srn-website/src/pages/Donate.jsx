@@ -162,27 +162,32 @@ export default function Donate() {
     e.preventDefault();
     if (!validateDonorDetails()) return;
 
-    if (!user || (!user.profilePicture && !user.avatar)) {
-      setIsModalOpen(true);
-      return;
-    }
-
     setLoading(true);
     try {
       const detailedPurpose = `[RAZORPAY] Campaign: ${formData.campaign} | Donor: ${formData.firstName} ${formData.lastName} | PAN: ${formData.panNumber.toUpperCase() || 'N/A'} | City: ${formData.city}, ${formData.state} | Address: ${formData.address}`;
       
+      const token = localStorage.getItem("accessToken");
+
       const orderRes = await fetch(`${API_BASE}/api/payments/order`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
+          ...(token ? { "Authorization": `Bearer ${token}` } : {})
         },
         credentials: "include",
         body: JSON.stringify({ 
           amount: amount || 5100, 
           currency: "INR", 
           type: "DONATION", 
-          purpose: detailedPurpose 
+          purpose: detailedPurpose,
+          email: formData.email,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: formData.phone,
+          panNumber: formData.panNumber ? formData.panNumber.toUpperCase().trim() : undefined,
+          state: formData.state,
+          city: formData.city,
+          address: formData.address,
         })
       });
       const orderData = await orderRes.json();
@@ -190,7 +195,7 @@ export default function Donate() {
 
       const keyRes = await fetch(`${API_BASE}/api/payments/key`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          ...(token ? { "Authorization": `Bearer ${token}` } : {})
         },
         credentials: 'include'
       });
@@ -217,13 +222,14 @@ export default function Donate() {
               method: "POST",
               headers: { 
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
+                ...(token ? { "Authorization": `Bearer ${token}` } : {})
               },
               credentials: "include",
               body: JSON.stringify({
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature
+                razorpay_signature: response.razorpay_signature,
+                purpose: detailedPurpose,
               })
             });
 
@@ -286,13 +292,17 @@ export default function Donate() {
 
     setQrSubmitting(true);
     try {
+      const token = localStorage.getItem("accessToken");
+
       let screenshotUrl = "";
       if (screenshotFile) {
         const uploadForm = new FormData();
         uploadForm.append("file", screenshotFile);
         const uploadRes = await fetch(`${API_BASE}/api/manual-payments/upload-screenshot`, {
           method: "POST",
-          headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
+          },
           credentials: "include",
           body: uploadForm,
         });
@@ -308,7 +318,7 @@ export default function Donate() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
         },
         credentials: "include",
         body: JSON.stringify({
@@ -317,7 +327,13 @@ export default function Donate() {
           utrNumber: utrNumber.trim(),
           screenshot: screenshotUrl,
           purpose: detailedPurpose,
-          email: formData.email,
+          email: formData.email ? formData.email.trim().toLowerCase() : undefined,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: formData.phone,
+          panNumber: formData.panNumber ? formData.panNumber.toUpperCase().trim() : undefined,
+          state: formData.state,
+          district: formData.city,
         }),
       });
       if (!res.ok) throw new Error((await res.json()).message);

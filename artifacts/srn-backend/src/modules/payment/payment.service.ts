@@ -179,13 +179,19 @@ export const createOrder = async (userId: string, amount: number, type: PaymentT
   });
 };
 
-export const verifyPayment = async (paymentData: { razorpay_order_id: string, razorpay_payment_id: string, razorpay_signature: string, purpose?: string }, userId: string) => {
+export const verifyPayment = async (paymentData: { razorpay_order_id: string, razorpay_payment_id: string, razorpay_signature: string, purpose?: string }, userId?: string) => {
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature, purpose } = paymentData;
   
   const payment = await prisma.payment.findUnique({ where: { razorpayOrderId: razorpay_order_id } });
-  if (!payment || payment.userId !== userId) {
+  if (!payment) {
     throw new Error('Payment record not found');
   }
+
+  if (userId && payment.userId !== userId) {
+    throw new Error('Payment record not found');
+  }
+
+  const effectiveUserId = payment.userId;
 
   const body = razorpay_order_id + "|" + razorpay_payment_id;
   const expectedSignature = crypto
@@ -211,10 +217,10 @@ export const verifyPayment = async (paymentData: { razorpay_order_id: string, ra
 
     // 2. Decouple logic depending on type
     if (payment.type === 'MEMBERSHIP') {
-      const membership = await membershipService.subscribeUser(userId, 'PREMIUM', 36, tx);
+      const membership = await membershipService.subscribeUser(effectiveUserId, 'PREMIUM', 36, tx);
       membershipId = membership.id;
     } else if (payment.type === 'DONATION') {
-      const userObj = await tx.user.findUnique({ where: { id: userId } });
+      const userObj = await tx.user.findUnique({ where: { id: effectiveUserId } });
       await tx.donation.create({
         data: {
           paymentId: payment.id,
@@ -229,7 +235,7 @@ export const verifyPayment = async (paymentData: { razorpay_order_id: string, ra
   });
 
   // 3. Notify Admin (after transaction commits to avoid rolling back on email failure)
-  const user = await prisma.user.findUnique({ where: { id: userId } });
+  const user = await prisma.user.findUnique({ where: { id: effectiveUserId } });
   
   const paymentDetails = {
     id: result.id,

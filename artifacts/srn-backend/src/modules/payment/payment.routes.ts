@@ -1,10 +1,8 @@
 import { Router } from 'express';
 import * as paymentController from './payment.controller';
-import { protect } from '../../middleware/auth';
+import { optionalAuth } from '../../middleware/auth';
 
 const router = Router();
-
-router.use(protect);
 
 /**
  * @swagger
@@ -40,7 +38,7 @@ router.get('/key', paymentController.getRazorpayKey);
  *       201:
  *         description: Order created successfully
  */
-router.post('/order', protect, paymentController.createOrder);
+router.post('/order', optionalAuth, paymentController.createOrder);
 
 /**
  * @swagger
@@ -65,6 +63,6 @@ router.post('/order', protect, paymentController.createOrder);
  *       200:
  *         description: Payment verified successfully
  */
-router.post('/verify', protect, paymentController.verifyPayment);
+router.post('/verify', optionalAuth, paymentController.verifyPayment);
 
 export default router;
