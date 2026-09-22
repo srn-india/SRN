@@ -1,13 +1,25 @@
 import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { isGmailOAuthConfigured, sendGmailViaAPI } from './gmail.service';
 
 /**
  * Email Service utility for sending transactional emails.
  * Supports:
- * 1. High-speed Google Gmail REST API via OAuth2 (using GMAIL_TOKEN_B64 or token.pickle)
- * 2. Pooled SMTP (via EMAIL_HOST, EMAIL_USER, etc.)
- * 3. Mock logger in development if neither is configured.
+ * 1. Resend HTTPS REST API via port 443 (Recommended on Render / Cloud hosting)
+ * 2. High-speed Google Gmail REST API via OAuth2
+ * 3. Pooled SMTP (via EMAIL_HOST, EMAIL_USER, etc.)
+ * 4. Mock logger in development if none is configured.
  */
+
+let resendClient: Resend | null = null;
+export const getResendClient = (): Resend | null => {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return null;
+  if (!resendClient) {
+    resendClient = new Resend(apiKey);
+  }
+  return resendClient;
+};
 
 let pooledTransporter: nodemailer.Transporter | null = null;
 const getTransporter = () => {
@@ -308,7 +320,35 @@ export const sendEmail = async (to: string, subject: string, htmlContent: string
   try {
     const brandedHtml = wrapWithSRNBranding(htmlContent, preheader);
 
-    // 1. Prioritize Gmail API via OAuth2 (fastest ~150-250ms, no SMTP handshake)
+    // 1. Prioritize Resend HTTPS REST API (Bypasses Render free tier SMTP port 587/465 blocks)
+    const resend = getResendClient();
+    if (resend) {
+      const fromEmail = process.env.RESEND_FROM_EMAIL || 'Sashakt Rashtra Nirman <onboarding@resend.dev>';
+      console.info(`[EmailService] Dispatching email via Resend API to: ${to} (from: ${fromEmail})...`);
+
+      const resendAttachments = attachments?.map((att) => ({
+        filename: att.filename,
+        content: Buffer.isBuffer(att.content) ? att.content : Buffer.from(att.content),
+      }));
+
+      const { data, error } = await resend.emails.send({
+        from: fromEmail,
+        to: [to],
+        subject,
+        html: brandedHtml,
+        attachments: resendAttachments,
+      });
+
+      if (error) {
+        console.error('[EmailService] Resend API error:', error);
+        throw new Error(`Resend API error: ${error.message}`);
+      }
+
+      console.log('[EmailService] Message sent via Resend API. ID: %s', data?.id);
+      return { messageId: data?.id, id: data?.id, resend: true };
+    }
+
+    // 2. Prioritize Gmail API via OAuth2 (fastest ~150-250ms, no SMTP handshake)
     if (isGmailOAuthConfigured()) {
       try {
         return await sendGmailViaAPI({
@@ -322,33 +362,32 @@ export const sendEmail = async (to: string, subject: string, htmlContent: string
       }
     }
 
-    // 2. Mock mode for local dev if neither Gmail OAuth nor SMTP host is configured
-    if (!process.env.EMAIL_HOST) {
-      console.log('---------------------------------------');
-      console.log(`[Dev Email Mock] Sent to: ${to}`);
-      console.log(`Subject: ${subject}`);
-      console.log(`Content length: ${brandedHtml.length} characters`);
-      console.log('---------------------------------------');
-      return { messageId: 'mock_id' };
-    }
-
-    // 3. Pooled SMTP
-    if (!isGmailOAuthConfigured()) {
+    // 3. Fallback to Pooled SMTP
+    if (process.env.EMAIL_HOST) {
       console.info(`[EmailService] Sending via SMTP (${process.env.EMAIL_HOST})...`);
-    }
-    const mailOptions = {
-      from: `"Sashakt Rashtra Nirman" <${process.env.EMAIL_FROM || 'no-reply@srn.org'}>`,
-      to,
-      subject,
-      html: brandedHtml,
-      attachments,
-    };
+      const mailOptions = {
+        from: `"Sashakt Rashtra Nirman" <${process.env.EMAIL_FROM || 'no-reply@srn.org'}>`,
+        to,
+        subject,
+        html: brandedHtml,
+        attachments,
+      };
 
-    const info = await getTransporter().sendMail(mailOptions);
-    console.log('Message sent via SMTP: %s', info.messageId);
-    return info;
+      const info = await getTransporter().sendMail(mailOptions);
+      console.log('Message sent via SMTP: %s', info.messageId);
+      return info;
+    }
+
+    // 4. Mock mode for local dev if neither Resend, Gmail OAuth, nor SMTP host is configured
+    console.log('---------------------------------------');
+    console.log(`[Dev Email Mock] Sent to: ${to}`);
+    console.log(`Subject: ${subject}`);
+    console.log(`Content length: ${brandedHtml.length} characters`);
+    console.log('---------------------------------------');
+    return { messageId: 'mock_id' };
   } catch (error: any) {
     console.error('Email Send Error:', error);
     throw new Error(error?.message || 'Failed to send email');
   }
 };
+
