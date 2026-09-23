@@ -95,8 +95,8 @@ const bearersData = {
       {
         nameEn: "Advocate Kripa Shankar",
         nameHi: "अधिवक्ता कृपा शंकर",
-        descEn: "Delhi",
-        descHi: "दिल्ली",
+        descEn: "Uttar Pradesh",
+        descHi: "उत्तर प्रदेश",
         image: "/national_bearers/adhivakta-kripa-shankar.jpeg"
       },
       {
@@ -116,8 +116,8 @@ const bearersData = {
       {
         nameEn: "Shri Vikash Shankar",
         nameHi: "श्री विकाश शंकर",
-        descEn: "Uttarakhand",
-        descHi: "उत्तराखंड",
+        descEn: "Delhi",
+        descHi: "दिल्ली",
         image: "/national_bearers/vikas-shankar.jpeg"
       },
       {
