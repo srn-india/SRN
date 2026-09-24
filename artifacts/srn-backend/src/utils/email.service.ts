@@ -28,7 +28,7 @@ export const getEmailDiagnostics = () => {
   return {
     hasResendApiKey: !!resendKey,
     resendApiKeyPrefix: resendKey ? resendKey.substring(0, 7) + '...' : null,
-    resendFromEmail: (process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev').replace(/^["']|["']$/g, '').trim(),
+    resendFromEmail: (process.env.RESEND_FROM_EMAIL || 'no-reply@srnindia.org').replace(/^["']|["']$/g, '').trim(),
     hasEmailHost: !!process.env.EMAIL_HOST,
     emailHost: process.env.EMAIL_HOST || null,
   };
@@ -329,6 +329,51 @@ export const notifyUserOfOTP = async (email: string, otpCode: string) => {
   );
 };
 
+export const sendRashtraMitraWelcomeEmail = async (email: string, firstName?: string) => {
+  const name = firstName || 'Friend';
+  const preheader = 'Welcome to Sashakt Rashtra Nirman as a Rashtra Mitra!';
+  const content = `
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div style="display: inline-block; padding: 6px 16px; background-color: #ECFDF5; border: 1px solid #10B981; border-radius: 9999px; color: #065F46; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">
+        🤝 Rashtra Mitra · Active Membership Confirmed
+      </div>
+      <h2 style="color: #2C1810; margin-top: 14px; margin-bottom: 6px; font-size: 24px; font-weight: 800;">
+        Welcome to the SRN Family, ${name}!
+      </h2>
+      <p style="color: #7A5C45; font-size: 14px; margin: 0;">
+        Your Rashtra Mitra membership has been successfully registered.
+      </p>
+    </div>
+
+    <p style="color: #4B5563; font-size: 14px; line-height: 1.7; margin-bottom: 16px;">
+      Thank you for standing with <strong>Sashakt Rashtra Nirman (SRN)</strong>. As a Rashtra Mitra (Supporter Member), you are directly connected to our grassroots civic movement across the nation.
+    </p>
+
+    <div style="background-color: #FDF5EC; border-left: 4px solid #10B981; padding: 18px 20px; border-radius: 0 8px 8px 0; margin: 24px 0;">
+      <h4 style="margin: 0 0 10px 0; color: #2C1810; font-size: 14px; font-weight: 800;">
+        🌟 Your Membership Highlights:
+      </h4>
+      <ul style="margin: 0; padding-left: 18px; color: #4B5563; font-size: 13px; line-height: 1.8;">
+        <li><strong>Role:</strong> Rashtra Mitra (Supporter Member)</li>
+        <li><strong>Validity:</strong> 3 Years</li>
+        <li><strong>Platform Access:</strong> Citizen journalism (Janmant), community drives, and social updates.</li>
+      </ul>
+    </div>
+
+    <center>
+      <a href="${process.env.FRONTEND_URL || 'https://srnindia.org'}/dashboard" class="btn">Go to Member Dashboard</a>
+    </center>
+  `;
+
+  return sendEmail(
+    email,
+    '🤝 Welcome to Sashakt Rashtra Nirman (Rashtra Mitra)',
+    content,
+    preheader
+  );
+};
+
+
 export const sendEmail = async (to: string, subject: string, htmlContent: string, preheader?: string, attachments?: any[]) => {
   try {
     const brandedHtml = wrapWithSRNBranding(htmlContent, preheader);
@@ -336,7 +381,7 @@ export const sendEmail = async (to: string, subject: string, htmlContent: string
     // 1. Prioritize Resend HTTPS REST API (Bypasses Render free tier SMTP port 587/465 blocks)
     const resend = getResendClient();
     if (resend) {
-      let fromEmail = process.env.RESEND_FROM_EMAIL || 'Sashakt Rashtra Nirman <onboarding@resend.dev>';
+      let fromEmail = process.env.RESEND_FROM_EMAIL || 'Sashakt Rashtra Nirman <no-reply@srnindia.org>';
       fromEmail = fromEmail.replace(/^["']|["']$/g, '').trim();
       console.info(`[EmailService] Dispatching email via Resend API to: ${to} (from: ${fromEmail})...`);
 
@@ -345,21 +390,29 @@ export const sendEmail = async (to: string, subject: string, htmlContent: string
         content: Buffer.isBuffer(att.content) ? att.content : Buffer.from(att.content),
       }));
 
-      const { data, error } = await resend.emails.send({
-        from: fromEmail,
-        to: [to],
-        subject,
-        html: brandedHtml,
-        attachments: resendAttachments,
-      });
+      try {
+        const { data, error } = await resend.emails.send({
+          from: fromEmail,
+          to: [to],
+          subject,
+          html: brandedHtml,
+          attachments: resendAttachments,
+        });
 
-      if (error) {
-        console.error('[EmailService] Resend API error:', error);
-        throw new Error(`Resend API error: ${error.message}`);
+        if (error) {
+          console.error('[EmailService] Resend API error:', error);
+          throw new Error(`Resend API error: ${error.message}`);
+        }
+
+        console.log('[EmailService] Message sent via Resend API. ID: %s', data?.id);
+        return { messageId: data?.id, id: data?.id, resend: true };
+      } catch (resendErr: any) {
+        console.warn(`[EmailService] Resend dispatch failed (${resendErr.message}). Attempting fallback providers...`);
+        // If neither Gmail OAuth nor SMTP is configured, rethrow so the error is reported
+        if (!isGmailOAuthConfigured() && !process.env.EMAIL_HOST) {
+          throw resendErr;
+        }
       }
-
-      console.log('[EmailService] Message sent via Resend API. ID: %s', data?.id);
-      return { messageId: data?.id, id: data?.id, resend: true };
     }
 
     // 2. Prioritize Gmail API via OAuth2 (fastest ~150-250ms, no SMTP handshake)

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, useAnimation } from "framer-motion";
-import { LogOut, User, Activity, Bell, CreditCard, ArrowLeft, Heart, Calendar, MessageSquare, ChevronRight, Settings, Star, TrendingUp, ShieldCheck, Lock, Download } from "lucide-react";
+import { LogOut, User, Activity, Bell, CreditCard, ArrowLeft, Heart, Calendar, MessageSquare, ChevronRight, Settings, Star, TrendingUp, ShieldCheck, Lock, Download, FileText } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const containerVariants = {
@@ -302,15 +302,42 @@ export default function Dashboard() {
                     Active Member
                   </div>
                   <a 
-                    href={`https://cgmlrhewmemptyklkbrq.supabase.co/storage/v1/object/public/id-cards/${membership.id}.png?download=SRN_Membership_Card.png`}
-                    download="SRN_Membership_Card.png"
+                    href={`https://cgmlrhewmemptyklkbrq.supabase.co/storage/v1/object/public/id-cards/${membership.id}.png?download=SRN_ID_Card_${user?.firstName || 'Member'}.png&t=${Date.now()}`}
+                    download={`SRN_ID_Card_${user?.firstName || 'Member'}.png`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center w-full px-5 py-3.5 bg-[#E8622A] hover:bg-[#D4551E] text-white rounded-[1.25rem] font-bold gap-2 transition-colors shadow-sm"
+                    className="flex items-center justify-center w-full px-5 py-3.5 bg-[#E8622A] hover:bg-[#D4551E] text-white rounded-[1.25rem] font-bold gap-2 transition-colors shadow-sm cursor-pointer"
                   >
                     <Download className="w-4 h-4" />
                     Download ID Card
                   </a>
+                  <button 
+                    onClick={async () => {
+                      try {
+                        const token = localStorage.getItem('token');
+                        const res = await fetch(`${API_BASE}/api/memberships/me/receipt`, {
+                          credentials: "include",
+                          headers: token ? { Authorization: `Bearer ${token}` } : {}
+                        });
+                        if (!res.ok) throw new Error("Receipt not found");
+                        const blob = await res.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `SRN_80G_Receipt_${user?.firstName || 'Member'}.pdf`;
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        window.URL.revokeObjectURL(url);
+                      } catch (e) {
+                        alert("Could not download receipt. Please contact support.");
+                      }
+                    }}
+                    className="flex items-center justify-center w-full px-5 py-3 bg-amber-50 hover:bg-amber-100/80 text-[#C2410C] border border-[#E8622A]/20 rounded-[1.25rem] text-sm font-bold gap-2 transition-colors shadow-sm cursor-pointer"
+                  >
+                    <FileText className="w-4 h-4 text-[#E8622A]" />
+                    Download 80G Receipt
+                  </button>
                 </div>
               ) : (
                 <div className="mt-4 flex items-center justify-center w-full px-5 py-3.5 bg-white/40 border border-[#E8D5B8]/50 rounded-[1.25rem] text-[#E8622A]/40 font-bold cursor-not-allowed select-none gap-2">

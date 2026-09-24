@@ -75,7 +75,8 @@ export const generateAndUploadIdCard = async (membershipId: string, txClient?: a
     const idX = image.width * 0.38;
     const idY = image.height * 0.79;
 
-    ctx.fillText(membership.user.firstName + ' ' + membership.user.lastName, valueX, nameY);
+    const fullName = [membership.user.firstName, membership.user.lastName].filter(Boolean).join(' ').trim() || 'Member';
+    ctx.fillText(fullName, valueX, nameY);
     
     const phone = membership.user.phone || 'N/A';
     const displayPhone = phone !== 'N/A' && phone.length >= 6

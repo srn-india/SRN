@@ -45,6 +45,7 @@ router.get('/me', membershipController.getMyMembership);
  *               format: binary
  */
 router.get('/me/id-card', membershipController.generateIdCard);
+router.get('/me/receipt', membershipController.downloadReceipt);
 
 
 /**
@@ -78,6 +79,9 @@ router.patch('/:id/cancel', membershipController.cancelMyMembership);
  *       200:
  *         description: List of all memberships
  */
+router.get('/export/excel', restrictTo('ADMIN'), membershipController.exportMembershipsExcel);
 router.get('/', restrictTo('ADMIN'), membershipController.getAllMemberships);
+router.delete('/:id', restrictTo('ADMIN'), membershipController.deleteMembership);
+router.post('/admin/:id/send-idcard', restrictTo('ADMIN'), membershipController.resendIdCard);
 
 export default router;

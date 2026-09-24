@@ -6,7 +6,7 @@ import {
   Mail, Phone, Lock, QrCode, CreditCard, Upload, X, Clock, 
   IndianRupee, Award, Sparkles, Check, Users, FileText, ChevronRight,
   BadgeCheck, Compass, BookOpen, Layers, Camera, Calendar,
-  ChevronDown, Search, KeyRound, Send, RefreshCw, AlertCircle
+  ChevronDown, Search, KeyRound, Send, RefreshCw, AlertCircle, AlertTriangle
 } from "lucide-react";
 import QRCode from "react-qr-code";
 import imageCompression from "browser-image-compression";
@@ -618,21 +618,12 @@ export default function BecomeMember() {
       if (!formData.state) newErrors.state = true;
       if (!formData.city) newErrors.city = true;
       
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!formData.email || !emailRegex.test(formData.email.trim())) {
-        newErrors.email = true;
-        setOtpMessage({
-          type: "error",
-          text: en ? "Please provide a valid email address." : "कृपया एक वैध ईमेल पता दर्ज करें।"
-        });
-      } else if (!isEmailVerified) {
-        newErrors.email = true;
-        setOtpMessage({
-          type: "error",
-          text: en 
-            ? "Please verify your email address via OTP before proceeding." 
-            : "कृपया आगे बढ़ने से पहले ईमेल पर प्राप्त OTP सत्यापित करें।"
-        });
+      // Email is optional (OTP verification temporarily disabled)
+      if (formData.email && formData.email.trim()) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email.trim())) {
+          newErrors.email = true;
+        }
       }
 
       if (formData.govIdNumber && formData.govIdNumber.trim()) {
@@ -1000,8 +991,8 @@ export default function BecomeMember() {
             </h1>
             <p className="text-[#7A5C45] text-xs sm:text-sm md:text-base max-w-2xl mx-auto font-medium leading-relaxed">
               {en 
-                ? "Choose your role in nation-building. Lead grassroots change as a Rashtra Nirman Karta or join as a Rashtra Mitra to support our causes." 
-                : "राष्ट्र निर्माण में अपनी भूमिका चुनें। राष्ट्र निर्माणकर्ता (सक्रिय सदस्य) के रूप में नेतृत्व करें अथवा राष्ट्र मित्र बनकर अभियानों से जुड़ें।"}
+                ? "Join as an active Rashtra Nirman Karta to lead grassroots governance, take committee responsibilities, and exercise executive voting rights." 
+                : "राष्ट्र निर्माणकर्ता (सक्रिय सदस्य) के रूप में जुड़ें। समिति दायित्व, निर्णयों में सहभागिता और कार्यकारी अधिकारों के साथ राष्ट्र निर्माण का नेतृत्व करें।"}
             </p>
           </motion.div>
         </div>
@@ -1105,40 +1096,34 @@ export default function BecomeMember() {
                       <div className="text-center sm:text-left mb-5">
                         <div className="inline-flex items-center gap-2 px-3 py-1 bg-orange-100/90 rounded-full text-[#E8622A] text-xs font-bold mb-2">
                           <Compass className="w-3.5 h-3.5" />
-                          {en ? "Step 1 of 3 · Select Your Category" : "कदम 1 · अपनी सदस्यता श्रेणी चुनें"}
+                          {en ? "Step 1 of 3 · Active Leadership Category" : "कदम 1 · सक्रिय नेतृत्व श्रेणी"}
                         </div>
                         <h2 className="text-2xl sm:text-3xl font-bold text-[#2C1810] font-serif mb-1">
-                          {en ? "Choose Your Membership Tier" : "अपनी सदस्यता श्रेणी चुनें"}
+                          {en ? "Rashtra Nirman Karta Membership" : "राष्ट्र निर्माणकर्ता (सक्रिय सदस्यता)"}
                         </h2>
                         <p className="text-[#7A5C45] text-xs sm:text-sm font-medium">
                           {en 
-                            ? "Compare privileges below and select how you would like to contribute to the SRN movement." 
-                            : "नीचे दोनों श्रेणियों के अधिकारों की तुलना करें और चुनें कि आप संगठन में किस रूप में जुड़ना चाहते हैं।"}
+                            ? "For dedicated members committed to grassroots governance, committee leadership, and executive voting rights." 
+                            : "जमीनी सांगठनिक कार्यों, समिति नेतृत्व, निर्णयों में सहभागिता और कार्यकारी अधिकारों हेतु सक्रिय सदस्यता।"}
                         </p>
                       </div>
 
-                      {/* Tier Cards Grid */}
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6 items-stretch">
+                      {/* Tier Card (Centered Single Active Tier) */}
+                      <div className="max-w-2xl mx-auto w-full">
                         
                         {/* ── ACTIVE / RASHTRA NIRMAN KARTA CARD ── */}
                         <div 
                           onClick={() => setMembershipTier("active")}
-                          className={`relative rounded-3xl p-5 sm:p-6 lg:p-7 transition-all duration-200 cursor-pointer flex flex-col justify-between border-2 ${
-                            membershipTier === "active"
-                              ? "bg-gradient-to-b from-orange-50/90 via-white to-orange-50/40 border-[#E8622A] shadow-xl shadow-orange-900/10 ring-2 ring-[#E8622A]/20 scale-[1.01]"
-                              : "bg-white/80 border-gray-200/90 hover:border-orange-200 hover:shadow-md"
-                          }`}
+                          className="relative rounded-3xl p-5 sm:p-6 lg:p-7 transition-all duration-200 cursor-pointer flex flex-col justify-between border-2 bg-gradient-to-b from-orange-50/90 via-white to-orange-50/40 border-[#E8622A] shadow-xl shadow-orange-900/10 ring-2 ring-[#E8622A]/20 scale-[1.01]"
                         >
                           {/* Recommended Ribbon */}
                           <div className="flex items-center justify-between gap-2 mb-3.5">
                             <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-[#E8622A] to-[#C04A18] text-white text-[10px] sm:text-xs font-bold rounded-full uppercase tracking-wider shadow-xs">
                               <Sparkles className="w-3 h-3" />
-                              {en ? "Recommended · Leadership Tier" : "सर्वश्रेष्ठ · नेतृत्व स्तर"}
+                              {en ? "Active Leadership Tier" : "सक्रिय नेतृत्व स्तर"}
                             </span>
-                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                              membershipTier === "active" ? "border-[#E8622A] bg-[#E8622A] text-white" : "border-gray-300"
-                            }`}>
-                              {membershipTier === "active" && <Check className="w-3 h-3 stroke-[3]" />}
+                            <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center border-[#E8622A] bg-[#E8622A] text-white">
+                              <Check className="w-3 h-3 stroke-[3]" />
                             </div>
                           </div>
 
@@ -1168,7 +1153,7 @@ export default function BecomeMember() {
                               <div className="flex items-start gap-2.5">
                                 <CheckCircle2 className="w-4 h-4 text-[#E8622A] shrink-0 mt-0.5" />
                                 <div className="space-y-0.5">
-                                  <strong className="text-[#2C1810] block text-xs sm:text-[13px] font-bold leading-snug">{en ? "Post Participation" : "पद एवं दायित्व सहभागिता"}</strong>
+                                   <strong className="text-[#2C1810] block text-xs sm:text-[13px] font-bold leading-snug">{en ? "Post Participation" : "पद एवं दायित्व सहभागिता"}</strong>
                                   <span className="text-gray-500 text-[11px] leading-snug block">{en ? "Eligible to apply for and hold organizational posts & committees" : "संगठन के विभिन्न पदों और दायित्वों के लिए पूर्ण पात्रता"}</span>
                                 </div>
                               </div>
@@ -1224,131 +1209,129 @@ export default function BecomeMember() {
                           </div>
 
                           <div className="mt-5 pt-3.5 border-t border-orange-100/90 flex items-center justify-between">
-                            <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl transition-all ${
-                              membershipTier === "active" 
-                                ? "bg-[#E8622A] text-white shadow-xs" 
-                                : "text-[#E8622A] bg-orange-100/70 hover:bg-orange-100"
-                            }`}>
-                              {membershipTier === "active" ? (en ? "✓ Selected Tier" : "✓ चयनित श्रेणी") : (en ? "Select Rashtra Nirman Karta" : "राष्ट्र निर्माणकर्ता चुनें")}
+                            <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-[#E8622A] text-white shadow-xs">
+                              {en ? "✓ Selected Tier" : "✓ चयनित श्रेणी"}
                             </span>
                             <span className="text-[11px] text-gray-400 font-medium">{en ? "Requires Verification" : "सत्यापन आवश्यक"}</span>
                           </div>
                         </div>
 
-                        {/* ── NORMAL / RASHTRA MITRA CARD ── */}
-                        <div 
-                          onClick={() => setMembershipTier("normal")}
-                          className={`relative rounded-3xl p-5 sm:p-6 lg:p-7 transition-all duration-200 cursor-pointer flex flex-col justify-between border-2 ${
-                            membershipTier === "normal"
-                              ? "bg-gradient-to-b from-amber-50/70 via-white to-amber-50/30 border-[#D4880C] shadow-xl shadow-amber-900/10 ring-2 ring-[#D4880C]/20 scale-[1.01]"
-                              : "bg-white/80 border-gray-200/90 hover:border-amber-200 hover:shadow-md"
-                          }`}
-                        >
-                          {/* Supporter Badge */}
-                          <div className="flex items-center justify-between gap-2 mb-3.5">
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100/80 text-amber-800 text-[10px] sm:text-xs font-bold rounded-full uppercase tracking-wider">
-                              <Users className="w-3 h-3 text-amber-700" />
-                              {en ? "Free · Supporter Tier" : "निःशुल्क · सामान्य समर्थक"}
-                            </span>
-                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                              membershipTier === "normal" ? "border-[#D4880C] bg-[#D4880C] text-white" : "border-gray-300"
-                            }`}>
-                              {membershipTier === "normal" && <Check className="w-3 h-3 stroke-[3]" />}
+                        {/* ── NORMAL / RASHTRA MITRA CARD (TEMPORARILY HIDDEN) ── */}
+                        {false && (
+                          <div 
+                            onClick={() => setMembershipTier("normal")}
+                            className={`relative rounded-3xl p-5 sm:p-6 lg:p-7 transition-all duration-200 cursor-pointer flex flex-col justify-between border-2 ${
+                              membershipTier === "normal"
+                                ? "bg-gradient-to-b from-amber-50/70 via-white to-amber-50/30 border-[#D4880C] shadow-xl shadow-amber-900/10 ring-2 ring-[#D4880C]/20 scale-[1.01]"
+                                : "bg-white/80 border-gray-200/90 hover:border-amber-200 hover:shadow-md"
+                            }`}
+                          >
+                            {/* Supporter Badge */}
+                            <div className="flex items-center justify-between gap-2 mb-3.5">
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100/80 text-amber-800 text-[10px] sm:text-xs font-bold rounded-full uppercase tracking-wider">
+                                <Users className="w-3 h-3 text-amber-700" />
+                                {en ? "Free · Supporter Tier" : "निःशुल्क · सामान्य समर्थक"}
+                              </span>
+                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                                membershipTier === "normal" ? "border-[#D4880C] bg-[#D4880C] text-white" : "border-gray-300"
+                              }`}>
+                                {membershipTier === "normal" && <Check className="w-3 h-3 stroke-[3]" />}
+                              </div>
                             </div>
-                          </div>
 
-                          <div>
-                            <div className="flex items-baseline justify-between mb-1.5">
-                              <div>
-                                <h3 className="text-xl sm:text-2xl font-bold font-serif text-[#2C1810]">
-                                  {en ? "Rashtra Mitra" : "राष्ट्र मित्र"}
-                                </h3>
-                                <span className="text-[11px] font-semibold text-emerald-700 block mt-0.5">
-                                  {en ? "General Supporter Tier" : "सामान्य समर्थक सदस्यता"}
+                            <div>
+                              <div className="flex items-baseline justify-between mb-1.5">
+                                <div>
+                                  <h3 className="text-xl sm:text-2xl font-bold font-serif text-[#2C1810]">
+                                    {en ? "Rashtra Mitra" : "राष्ट्र मित्र"}
+                                  </h3>
+                                  <span className="text-[11px] font-semibold text-emerald-700 block mt-0.5">
+                                    {en ? "General Supporter Tier" : "सामान्य समर्थक सदस्यता"}
+                                  </span>
+                                </div>
+                                <span className="text-lg sm:text-xl font-extrabold text-emerald-700 font-serif shrink-0 ml-2">
+                                  ₹0 <span className="text-xs font-semibold text-emerald-600">({en ? "Free" : "निःशुल्क"})</span>
                                 </span>
                               </div>
-                              <span className="text-lg sm:text-xl font-extrabold text-emerald-700 font-serif shrink-0 ml-2">
-                                ₹0 <span className="text-xs font-semibold text-emerald-600">({en ? "Free" : "निःशुल्क"})</span>
+
+                              <p className="text-xs text-[#7A5C45] mb-4 leading-relaxed min-h-[34px]">
+                                {en 
+                                  ? "We only collect basic information. Free community registration to stay connected with nation-building social causes." 
+                                  : "केवल सामान्य सूचना पंजीकरण। बिना किसी शुल्क के संगठन से जुड़ें और सामाजिक अभियानों की जानकारी प्राप्त करें।"}
+                              </p>
+
+                              {/* Benefits Checklist */}
+                              <div className="space-y-2.5 pt-3.5 border-t border-amber-100/90 text-xs">
+                                <div className="flex items-start gap-2.5">
+                                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                                  <div className="space-y-0.5">
+                                    <strong className="text-[#2C1810] block text-xs sm:text-[13px] font-bold leading-snug">{en ? "100% Free Registration" : "100% मुफ्त पंजीकरण"}</strong>
+                                    <span className="text-gray-500 text-[11px] leading-snug block">{en ? "No fee — simply enter your details to join" : "कोई शुल्क नहीं — बस अपनी जानकारी देकर जुड़ें"}</span>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-start gap-2.5">
+                                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                                  <div className="space-y-0.5">
+                                    <strong className="text-[#2C1810] block text-xs sm:text-[13px] font-bold leading-snug">{en ? "Member Dashboard Access" : "सदस्य डैशबोर्ड पहुंच"}</strong>
+                                    <span className="text-gray-500 text-[11px] leading-snug block">{en ? "Access your online member account and track initiatives" : "ऑनलाइन सदस्य पोर्टल तक पहुंच और गतिविधियों की जानकारी"}</span>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-start gap-2.5">
+                                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                                  <div className="space-y-0.5">
+                                    <strong className="text-[#2C1810] block text-xs sm:text-[13px] font-bold leading-snug">{en ? "Monthly Newsletter & Circulars" : "मासिक बुलेटिन व नियमित सूचनाएं"}</strong>
+                                    <span className="text-gray-500 text-[11px] leading-snug block">{en ? "Monthly digest and priority circulars directly on Email & WhatsApp" : "व्हाट्सएप व ईमेल पर संगठन के कार्यों की नियमित जानकारी"}</span>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-start gap-2.5">
+                                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                                  <div className="space-y-0.5">
+                                    <strong className="text-[#2C1810] block text-xs sm:text-[13px] font-bold leading-snug">{en ? "Volunteer in Local Drives" : "स्थानीय सेवा अभियानों में भागीदारी"}</strong>
+                                    <span className="text-gray-500 text-[11px] leading-snug block">{en ? "Invitations to participate in tree plantation, blood donation & youth camps" : "रक्तदान, वृक्षारोपण व आपदा राहत अभियानों में सहभागिता"}</span>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-start gap-2.5">
+                                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                                  <div className="space-y-0.5">
+                                    <strong className="text-[#2C1810] block text-xs sm:text-[13px] font-bold leading-snug">{en ? "Janmant Reader Access" : "जनमत पत्रिका व लेख पढ़ने की सुविधा"}</strong>
+                                    <span className="text-gray-500 text-[11px] leading-snug block">{en ? "Free access to read citizen articles, complaints, and public discussions" : "नागरिक पत्रकारिता व जनसमस्याओं के लेख पढ़ने की पूर्ण सुविधा"}</span>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-start gap-2.5">
+                                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                                  <div className="space-y-0.5">
+                                    <strong className="text-[#2C1810] block text-xs sm:text-[13px] font-bold leading-snug">{en ? "Upgrade Anytime" : "कभी भी सक्रिय सदस्यता में अपग्रेड"}</strong>
+                                    <span className="text-gray-500 text-[11px] leading-snug block">{en ? "Option to upgrade to Rashtra Nirman Karta with official ID Card anytime" : "जब चाहें तब ID कार्ड व नेतृत्व के लिए राष्ट्र निर्माणकर्ता में अपग्रेड करें"}</span>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-start gap-2.5">
+                                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                                  <div className="space-y-0.5">
+                                    <strong className="text-[#2C1810] block text-xs sm:text-[13px] font-bold leading-snug">{en ? "Dedicated Community Support" : "सदस्य सहायता व संपर्क"}</strong>
+                                    <span className="text-gray-500 text-[11px] leading-snug block">{en ? "Direct assistance from the SRN helpdesk for guidance and queries" : "किसी भी जानकारी अथवा मार्गदर्शन हेतु राष्ट्रीय हेल्पडेस्क से सहायता"}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="mt-5 pt-3.5 border-t border-amber-100/90 flex items-center justify-between">
+                              <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl transition-all ${
+                                membershipTier === "normal" 
+                                  ? "bg-[#D4880C] text-white shadow-xs" 
+                                  : "text-[#D4880C] bg-amber-100/70 hover:bg-amber-100"
+                              }`}>
+                                {membershipTier === "normal" ? (en ? "✓ Selected Tier" : "✓ चयनित श्रेणी") : (en ? "Select Rashtra Mitra" : "राष्ट्र मित्र चुनें")}
                               </span>
-                            </div>
-
-                            <p className="text-xs text-[#7A5C45] mb-4 leading-relaxed min-h-[34px]">
-                              {en 
-                                ? "We only collect basic information. Free community registration to stay connected with nation-building social causes." 
-                                : "केवल सामान्य सूचना पंजीकरण। बिना किसी शुल्क के संगठन से जुड़ें और सामाजिक अभियानों की जानकारी प्राप्त करें।"}
-                            </p>
-
-                            {/* Benefits Checklist */}
-                            <div className="space-y-2.5 pt-3.5 border-t border-amber-100/90 text-xs">
-                              <div className="flex items-start gap-2.5">
-                                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                                <div className="space-y-0.5">
-                                  <strong className="text-[#2C1810] block text-xs sm:text-[13px] font-bold leading-snug">{en ? "100% Free Registration" : "100% मुफ्त पंजीकरण"}</strong>
-                                  <span className="text-gray-500 text-[11px] leading-snug block">{en ? "No fee — simply enter your details to join" : "कोई शुल्क नहीं — बस अपनी जानकारी देकर जुड़ें"}</span>
-                                </div>
-                              </div>
-
-                              <div className="flex items-start gap-2.5">
-                                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                                <div className="space-y-0.5">
-                                  <strong className="text-[#2C1810] block text-xs sm:text-[13px] font-bold leading-snug">{en ? "Member Dashboard Access" : "सदस्य डैशबोर्ड पहुंच"}</strong>
-                                  <span className="text-gray-500 text-[11px] leading-snug block">{en ? "Access your online member account and track initiatives" : "ऑनलाइन सदस्य पोर्टल तक पहुंच और गतिविधियों की जानकारी"}</span>
-                                </div>
-                              </div>
-
-                              <div className="flex items-start gap-2.5">
-                                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                                <div className="space-y-0.5">
-                                  <strong className="text-[#2C1810] block text-xs sm:text-[13px] font-bold leading-snug">{en ? "Monthly Newsletter & Circulars" : "मासिक बुलेटिन व नियमित सूचनाएं"}</strong>
-                                  <span className="text-gray-500 text-[11px] leading-snug block">{en ? "Monthly digest and priority circulars directly on Email & WhatsApp" : "व्हाट्सएप व ईमेल पर संगठन के कार्यों की नियमित जानकारी"}</span>
-                                </div>
-                              </div>
-
-                              <div className="flex items-start gap-2.5">
-                                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                                <div className="space-y-0.5">
-                                  <strong className="text-[#2C1810] block text-xs sm:text-[13px] font-bold leading-snug">{en ? "Volunteer in Local Drives" : "स्थानीय सेवा अभियानों में भागीदारी"}</strong>
-                                  <span className="text-gray-500 text-[11px] leading-snug block">{en ? "Invitations to participate in tree plantation, blood donation & youth camps" : "रक्तदान, वृक्षारोपण व आपदा राहत अभियानों में सहभागिता"}</span>
-                                </div>
-                              </div>
-
-                              <div className="flex items-start gap-2.5">
-                                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                                <div className="space-y-0.5">
-                                  <strong className="text-[#2C1810] block text-xs sm:text-[13px] font-bold leading-snug">{en ? "Janmant Reader Access" : "जनमत पत्रिका व लेख पढ़ने की सुविधा"}</strong>
-                                  <span className="text-gray-500 text-[11px] leading-snug block">{en ? "Free access to read citizen articles, complaints, and public discussions" : "नागरिक पत्रकारिता व जनसमस्याओं के लेख पढ़ने की पूर्ण सुविधा"}</span>
-                                </div>
-                              </div>
-
-                              <div className="flex items-start gap-2.5">
-                                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                                <div className="space-y-0.5">
-                                  <strong className="text-[#2C1810] block text-xs sm:text-[13px] font-bold leading-snug">{en ? "Upgrade Anytime" : "कभी भी सक्रिय सदस्यता में अपग्रेड"}</strong>
-                                  <span className="text-gray-500 text-[11px] leading-snug block">{en ? "Option to upgrade to Rashtra Nirman Karta with official ID Card anytime" : "जब चाहें तब ID कार्ड व नेतृत्व के लिए राष्ट्र निर्माणकर्ता में अपग्रेड करें"}</span>
-                                </div>
-                              </div>
-
-                              <div className="flex items-start gap-2.5">
-                                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                                <div className="space-y-0.5">
-                                  <strong className="text-[#2C1810] block text-xs sm:text-[13px] font-bold leading-snug">{en ? "Dedicated Community Support" : "सदस्य सहायता व संपर्क"}</strong>
-                                  <span className="text-gray-500 text-[11px] leading-snug block">{en ? "Direct assistance from the SRN helpdesk for guidance and queries" : "किसी भी जानकारी अथवा मार्गदर्शन हेतु राष्ट्रीय हेल्पडेस्क से सहायता"}</span>
-                                </div>
-                              </div>
+                              <span className="text-[11px] text-emerald-600 font-semibold">{en ? "Instant 1-Click Activation" : "तुरंत 1-क्लिक सक्रियण"}</span>
                             </div>
                           </div>
-
-                          <div className="mt-5 pt-3.5 border-t border-amber-100/90 flex items-center justify-between">
-                            <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl transition-all ${
-                              membershipTier === "normal" 
-                                ? "bg-[#D4880C] text-white shadow-xs" 
-                                : "text-[#D4880C] bg-amber-100/70 hover:bg-amber-100"
-                            }`}>
-                              {membershipTier === "normal" ? (en ? "✓ Selected Tier" : "✓ चयनित श्रेणी") : (en ? "Select Rashtra Mitra" : "राष्ट्र मित्र चुनें")}
-                            </span>
-                            <span className="text-[11px] text-emerald-600 font-semibold">{en ? "Instant 1-Click Activation" : "तुरंत 1-क्लिक सक्रियण"}</span>
-                          </div>
-                        </div>
+                        )}
 
                       </div>
                     </div>
@@ -1480,190 +1463,39 @@ export default function BecomeMember() {
                               </label>
                               <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className={getInputClass("phone")} placeholder="+91 98765 43210" />
                             </div>
-                            {/* Email Address with integrated OTP verification */}
-                            <div className="sm:col-span-2 space-y-3 p-4 sm:p-5 rounded-2xl bg-white/90 border border-[#E8D5B8]/80 shadow-xs transition-all">
-                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                <label className="text-xs sm:text-sm font-bold text-[#2C1810] flex items-center gap-2">
-                                  <Mail className="w-4 h-4 text-[#E8622A]" />
-                                  <span>{en ? "Email Address (Gmail / Official)" : "ईमेल पता (Gmail / आधिकारिक)"} *</span>
-                                </label>
-                                {isEmailVerified ? (
-                                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 shadow-xs">
-                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                                    {en ? "Verified via OTP" : "OTP द्वारा सत्यापित"}
+                            {/* Email Address (Optional - OTP temporarily disabled) */}
+                            <div className="sm:col-span-2">
+                              <label className={labelClass}>
+                                <span className="flex items-center justify-between w-full">
+                                  <span className="flex items-center gap-2">
+                                    <Mail className="w-3.5 h-3.5 text-[#E8622A]" /> 
+                                    {en ? "Email Address" : "ईमेल पता"}
+                                    <span className="text-xs font-normal text-gray-500">
+                                      ({en ? "Optional" : "वैकल्पिक"})
+                                    </span>
                                   </span>
-                                ) : (
-                                  <span className="text-[11px] font-semibold text-[#E8622A] bg-orange-50 px-2.5 py-0.5 rounded-full border border-orange-200">
-                                    {en ? "OTP Verification Required" : "OTP सत्यापन आवश्यक है"}
-                                  </span>
-                                )}
+                                </span>
+                              </label>
+                              <div className="relative mt-1">
+                                <input 
+                                  type="email" 
+                                  name="email" 
+                                  value={formData.email} 
+                                  onChange={handleChange} 
+                                  className={getInputClass("email")} 
+                                  placeholder={en ? "yourname@gmail.com (Optional)" : "yourname@gmail.com (वैकल्पिक)"} 
+                                />
                               </div>
-
-                              <div className="flex flex-col sm:flex-row gap-2.5">
-                                <div className="relative flex-1">
-                                  <input 
-                                    type="email" 
-                                    name="email" 
-                                    value={formData.email} 
-                                    disabled={isEmailVerified}
-                                    onChange={handleEmailChange} 
-                                    className={`w-full px-4 py-3 sm:py-3.5 rounded-xl text-sm sm:text-base transition-all ${
-                                      isEmailVerified 
-                                        ? "bg-emerald-50/60 border-2 border-emerald-400 text-emerald-900 font-semibold" 
-                                        : errors.email
-                                          ? "border-2 border-red-500 ring-2 ring-red-500/20 bg-red-50/50"
-                                          : getInputClass("email")
-                                    }`}
-                                    placeholder="yourname@gmail.com" 
-                                  />
-                                </div>
-
-                                {!isEmailVerified ? (
-                                  <button
-                                    type="button"
-                                    onClick={handleSendOtp}
-                                    disabled={otpSending || otpTimer > 0 || !formData.email}
-                                    className={`px-5 py-3 sm:py-3.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer shrink-0 ${
-                                      otpTimer > 0 
-                                        ? "bg-gray-100 text-gray-500 border border-gray-200 cursor-not-allowed" 
-                                        : !formData.email 
-                                          ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                                          : "bg-[#E8622A] hover:bg-[#C04A18] text-white active:scale-95"
-                                    }`}
-                                  >
-                                    {otpSending ? (
-                                      <>
-                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        <span>{en ? "Sending Code..." : "कोड भेज रहे हैं..."}</span>
-                                      </>
-                                    ) : otpTimer > 0 ? (
-                                      <>
-                                        <Clock className="w-4 h-4 text-[#E8622A]" />
-                                        <span>{en ? `Resend in ${otpTimer}s` : `${otpTimer}s में पुनः भेजें`}</span>
-                                      </>
-                                    ) : otpSent ? (
-                                      <>
-                                        <RefreshCw className="w-4 h-4" />
-                                        <span>{en ? "Resend OTP" : "पुनः OTP भेजें"}</span>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <Send className="w-4 h-4" />
-                                        <span>{en ? "Send Verification Code" : "सत्यापन कोड भेजें"}</span>
-                                      </>
-                                    )}
-                                  </button>
-                                ) : (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setIsEmailVerified(false);
-                                      setOtpSent(false);
-                                      setOtpInput("");
-                                      setOtpMessage({ type: "", text: "" });
-                                    }}
-                                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-[#E8622A] hover:bg-orange-50 border border-orange-200 transition-colors cursor-pointer shrink-0"
-                                  >
-                                    {en ? "Change Email" : "ईमेल बदलें"}
-                                  </button>
-                                )}
-                              </div>
-
-                              {/* OTP Verification Box */}
-                              <AnimatePresence>
-                                {otpSent && !isEmailVerified && (
-                                  <motion.div 
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: "auto" }}
-                                    exit={{ opacity: 0, height: 0 }}
-                                    className="pt-3 border-t border-dashed border-[#E8D5B8] space-y-3"
-                                  >
-                                    {/* Tier Email Notification Pill */}
-                                    <div className="flex items-center gap-2 p-2.5 rounded-xl bg-orange-50/80 border border-orange-200/80 text-xs text-[#2C1810]">
-                                      {membershipTier === "active" ? (
-                                        <>
-                                          <Award className="w-4 h-4 text-[#E8622A] shrink-0" />
-                                          <span className="font-semibold">
-                                            {en 
-                                              ? "Sent Rashtra Nirman Karta (Active Member) verification email with official role guidance." 
-                                              : "राष्ट्र निर्माण कर्ता (सक्रिय सदस्य) विशेष सत्यापन मेल प्रेषित किया गया है।"}
-                                          </span>
-                                        </>
-                                      ) : (
-                                        <>
-                                          <Users className="w-4 h-4 text-emerald-600 shrink-0" />
-                                          <span className="font-semibold">
-                                            {en 
-                                              ? "Sent Rashtra Mitra (Supporter Member) verification email with community welfare details." 
-                                              : "राष्ट्र मित्र (सामान्य समर्थक सदस्य) विशेष सत्यापन मेल प्रेषित किया गया है।"}
-                                          </span>
-                                        </>
-                                      )}
-                                    </div>
-
-                                    <div className="flex flex-col sm:flex-row items-center gap-3">
-                                      <div className="relative w-full sm:w-64">
-                                        <input
-                                          type="text"
-                                          maxLength={6}
-                                          value={otpInput}
-                                          onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ""))}
-                                          placeholder="123456"
-                                          className="w-full text-center tracking-[0.4em] font-mono text-lg font-black py-2.5 px-4 rounded-xl border-2 border-[#E8622A] bg-white focus:outline-none focus:ring-4 focus:ring-[#E8622A]/20"
-                                        />
-                                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-mono">
-                                          6-DIGIT
-                                        </span>
-                                      </div>
-
-                                      <button
-                                        type="button"
-                                        onClick={handleVerifyOtp}
-                                        disabled={otpVerifying || otpInput.length !== 6}
-                                        className={`w-full sm:w-auto px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                                          otpInput.length === 6 && !otpVerifying
-                                            ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md active:scale-95"
-                                            : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                                        }`}
-                                      >
-                                        {otpVerifying ? (
-                                          <>
-                                            <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                            <span>{en ? "Verifying..." : "सत्यापित कर रहे हैं..."}</span>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <KeyRound className="w-4 h-4" />
-                                            <span>{en ? "Verify OTP" : "OTP सत्यापित करें"}</span>
-                                          </>
-                                        )}
-                                      </button>
-                                    </div>
-
-                                    <p className="text-[11px] text-[#7A5C45] flex items-center gap-1.5">
-                                      <Clock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                                      {en 
-                                        ? "Check your Gmail inbox (including Updates or Spam tab) for the 6-digit code. Valid for 10 minutes." 
-                                        : "कृपया 6-अंकों के कोड हेतु अपना Gmail इनबॉक्स (एवं स्पैम फ़ोल्डर) जांचें। कोड 10 मिनट के लिए मान्य है।"}
-                                    </p>
-                                  </motion.div>
-                                )}
-                              </AnimatePresence>
-
-                              {/* Alert / Feedback message */}
-                              {otpMessage.text && (
-                                <div className={`p-3 rounded-xl text-xs font-semibold flex items-center gap-2 ${
-                                  otpMessage.type === "success" 
-                                    ? "bg-emerald-50 text-emerald-800 border border-emerald-200" 
-                                    : "bg-red-50 text-red-700 border border-red-200"
-                                }`}>
-                                  {otpMessage.type === "success" ? (
-                                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                                  ) : (
-                                    <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
-                                  )}
-                                  <span>{otpMessage.text}</span>
-                                </div>
+                              {errors.email ? (
+                                <p className="text-xs text-red-500 mt-1">
+                                  {en ? "Please enter a valid email address or leave empty." : "कृपया वैध ईमेल पता दर्ज करें या खाली छोड़ें।"}
+                                </p>
+                              ) : (
+                                <p className="text-[11px] text-gray-500 mt-1">
+                                  {en 
+                                    ? "Optional: If provided, digital receipt & official updates will be sent to this email." 
+                                    : "वैकल्पिक: यदि आप ईमेल दर्ज करते हैं, तो डिजिटल रसीद व महत्वपूर्ण सूचनाएं इस पर भेजी जाएंगी।"}
+                                </p>
                               )}
                             </div>
                             <div>
@@ -2116,6 +1948,34 @@ export default function BecomeMember() {
                                     </button>
                                   )}
                                   <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleScreenshotChange} />
+                                </div>
+
+                                {/* Cautious Payment Notice / सख्त सावधानी सूचना */}
+                                <div className="p-4 bg-amber-50/90 border border-amber-300/80 rounded-2xl flex items-start gap-3.5 text-left shadow-xs">
+                                  <div className="w-8 h-8 rounded-xl bg-amber-100/90 border border-amber-300/60 flex items-center justify-center shrink-0 mt-0.5 text-amber-800">
+                                    <AlertTriangle className="w-4 h-4" />
+                                  </div>
+                                  <div className="flex-1 text-xs text-amber-950 leading-relaxed">
+                                    <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                                      <span className="uppercase tracking-wider text-[10px] font-extrabold text-amber-900 bg-amber-200/80 px-2 py-0.5 rounded">
+                                        {en ? "Important Advisory" : "सख्त चेतावनी व निर्देश"}
+                                      </span>
+                                      <span className="font-bold text-amber-900 text-xs sm:text-sm">
+                                        {en ? "Share Genuine & Valid Payment Information Only" : "केवल वैध एवं वास्तविक भुगतान विवरण ही साझा करें"}
+                                      </span>
+                                    </div>
+                                    <p className="text-[11px] sm:text-xs text-amber-900/90 leading-normal">
+                                      {en ? (
+                                        <>
+                                          Please verify and submit the exact <strong>12-digit UTR / UPI Reference Number</strong> and an unedited payment receipt. Every transaction is audited against official SRN bank account records before issuing your official ID Card. <strong>Submitting fraudulent, mismatched, or duplicate transaction details will result in immediate disqualification and permanent blacklisting of your account.</strong>
+                                        </>
+                                      ) : (
+                                        <>
+                                          कृपया अपने UPI / बैंक ऐप से प्राप्त सही <strong>12-अंकीय UTR / Ref संख्या</strong> और मूल रसीद का स्क्रीनशॉट ही साझा करें। ID कार्ड जारी करने से पहले प्रत्येक लेन-देन का बैंक खाते से मिलान किया जाता है। <strong>गलत, फर्जी या किसी अन्य के भुगतान का विवरण दर्ज करने पर आवेदन तत्काल रद्द कर दिया जाएगा तथा खाता हमेशा के लिए प्रतिबंधित कर दिया जाएगा।</strong>
+                                        </>
+                                      )}
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
                             )}

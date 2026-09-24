@@ -6,8 +6,8 @@ import {
   ArrowLeft, LogOut, UserCircle, Calendar, MessageSquare, 
   ShieldCheck, CheckCircle2, XCircle, Plus, Trash2, ShieldAlert,
   Settings, Sliders, Bell, LayoutDashboard, Key, TrendingUp, Download, MapPin,
-  BookOpen, AlertCircle, Briefcase, FileText, X, Eye, GraduationCap, Heart, CalendarDays, User, Users, RotateCw, QrCode, Send, Pencil,
-  Phone, Mail, Copy, Check, ExternalLink, Camera, Sparkles, UserCheck, Shield
+  BookOpen, AlertCircle, Briefcase, FileText, X, Eye, GraduationCap, Heart, CalendarDays, User, Users, RotateCw, RotateCcw, QrCode, Send, Pencil,
+  Phone, Mail, Copy, Check, ExternalLink, Camera, Sparkles, UserCheck, Shield, Loader2
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -51,6 +51,7 @@ export default function AdminDashboard() {
   const [paymentTypeFilter, setPaymentTypeFilter] = useState("ALL");
   const [imageLightbox, setImageLightbox] = useState(null);
   const [copiedField, setCopiedField] = useState("");
+  const [sendingIdCardId, setSendingIdCardId] = useState(null);
 
   const copyToClipboard = (text, fieldId) => {
     if (!text) return;
@@ -284,6 +285,27 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleDeleteMembership = async (id, memberName = 'this member') => {
+    if (!window.confirm(`Are you sure you want to permanently delete the membership record for ${memberName}?`)) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/memberships/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
+        credentials: 'include'
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setMemberships(prev => prev.filter(m => m.id !== id));
+        alert('✅ Membership record deleted successfully.');
+        fetchAnalytics();
+      } else {
+        alert('Failed to delete membership: ' + (data.message || 'Unknown error'));
+      }
+    } catch (err) {
+      alert('Error deleting membership: ' + err.message);
+    }
+  };
+
   const handleUpdateUserName = async (e) => {
     e.preventDefault();
     if (!renamingUser || !editFirstName.trim()) {
@@ -361,6 +383,35 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleResetCollections = async () => {
+    if (!window.confirm("Are you sure you want to reset all collected amounts and payment records to ₹0? This will clear test payments and zero out the collections overview.")) return;
+    setLoadingAnalytics(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/analytics/reset`, {
+        method: "POST",
+        headers: { 
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          "Content-Type": "application/json"
+        },
+        credentials: "include"
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert("✅ Collections data reset to ₹0 successfully.");
+        await fetchAnalytics();
+        if (activeTab === "manual-payments") {
+          fetchManualPayments();
+        }
+      } else {
+        alert("Reset failed: " + (data.message || "Unknown error"));
+      }
+    } catch (err) {
+      alert("Error: " + err.message);
+    } finally {
+      setLoadingAnalytics(false);
+    }
+  };
+
   const fetchManualPayments = async (status) => {
     const s = status || mpFilter;
     setManualLoading(true);
@@ -431,18 +482,75 @@ export default function AdminDashboard() {
     } catch (err) { alert("Error: " + err.message); }
   };
 
-  const sendMemberIdCard = async (userId) => {
-    if (!window.confirm("Generate and send ID card to this user?")) return;
+  const handleDeleteManualPayment = async (id, memberName = 'this entry') => {
+    if (!window.confirm(`Are you sure you want to remove the submission record and details for ${memberName}? This will delete the entry from this list.`)) return;
     try {
-      const res = await fetch(`${API_BASE}/api/manual-payments/admin/${userId}/send-idcard`, {
-        method: "POST",
+      const res = await fetch(`${API_BASE}/api/manual-payments/admin/${id}`, {
+        method: "DELETE",
         headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
         credentials: "include",
       });
-      if (res.ok) alert("🪪 ID card email sent successfully!");
-      else alert("Failed: " + (await res.json()).message);
-    } catch (err) { alert("Error: " + err.message); }
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setManualPayments(prev => prev.filter(p => p.id !== id));
+        alert("✅ Manual payment record removed successfully.");
+      } else {
+        alert("Failed to delete record: " + (data.message || "Unknown error"));
+      }
+    } catch (err) {
+      alert("Error: " + err.message);
+    }
   };
+
+  const handleCleanupApprovedPayments = async () => {
+    if (!window.confirm("Remove all APPROVED manual payment records from the dashboard? This cleans up processed submissions while keeping member profiles and memberships intact.")) return;
+    try {
+      setManualLoading(true);
+      const res = await fetch(`${API_BASE}/api/manual-payments/admin/cleanup?status=APPROVED`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert(`✅ Cleaned up ${data.data?.count || 0} approved payment record(s).`);
+        fetchManualPayments(mpFilter);
+      } else {
+        alert("Cleanup failed: " + (data.message || "Unknown error"));
+      }
+    } catch (err) {
+      alert("Error: " + err.message);
+    } finally {
+      setManualLoading(false);
+    }
+  };
+
+  const handleSendMemberIdCard = async (identifier, memberName = 'Member') => {
+    if (!window.confirm(`Generate and dispatch official ID card & receipt email to ${memberName}? (You can resend this multiple times if the user did not receive it).`)) return;
+    setSendingIdCardId(identifier);
+    try {
+      const res = await fetch(`${API_BASE}/api/memberships/admin/${identifier}/send-idcard`, {
+        method: "POST",
+        headers: { 
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          "Content-Type": "application/json"
+        },
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert(`✅ Official ID card and receipt email sent successfully to ${data.data?.sentTo || memberName}!`);
+      } else {
+        alert("Failed to send ID card: " + (data.message || "Unknown error"));
+      }
+    } catch (err) {
+      alert("Error sending ID card: " + err.message);
+    } finally {
+      setSendingIdCardId(null);
+    }
+  };
+
+  const sendMemberIdCard = (userId, memberName = 'Member') => handleSendMemberIdCard(userId, memberName);
 
   const handleDownloadMemberIdCard = async (payment) => {
     let memId = payment.membershipId;
@@ -465,7 +573,7 @@ export default function AdminDashboard() {
     }
 
     const downloadFileName = `SRN_ID_Card_${payment.user?.firstName || 'Member'}.png`;
-    const cardUrl = `https://cgmlrhewmemptyklkbrq.supabase.co/storage/v1/object/public/id-cards/${memId}.png?download=${downloadFileName}`;
+    const cardUrl = `https://cgmlrhewmemptyklkbrq.supabase.co/storage/v1/object/public/id-cards/${memId}.png?download=${downloadFileName}&t=${Date.now()}`;
     
     // Trigger download in new tab / download attribute
     const link = document.createElement('a');
@@ -479,11 +587,41 @@ export default function AdminDashboard() {
   };
 
   const handleExportMemberships = async () => {
-    let dataToExport = memberships;
-
-    // Fetch full list across all pages if possible
+    // 1. Try Native Binary .xlsx from Backend (Multi-sheet, auto-column-width, native Excel)
     try {
-      const res = await fetch(`${API_BASE}/api/memberships?page=1&limit=5000`, { credentials: 'include' });
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch(`${API_BASE}/api/memberships/export/excel`, {
+        headers: { 
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        credentials: 'include'
+      });
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `SRN_Memberships_Master_Register_${new Date().toISOString().slice(0, 10)}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        return;
+      }
+    } catch (err) {
+      console.warn("Backend excel export failed, falling back to client-side formatted export:", err);
+    }
+
+    // 2. High-Fidelity Client-side CSV Fallback (with UTF-8 BOM, comprehensive columns, and clean headers)
+    let dataToExport = memberships;
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch(`${API_BASE}/api/memberships?page=1&limit=5000`, { 
+        headers: { 
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        credentials: 'include' 
+      });
       if (res.ok) {
         const json = await res.json();
         if (json.data && json.data.memberships && json.data.memberships.length > 0) {
@@ -499,61 +637,123 @@ export default function AdminDashboard() {
       return;
     }
 
-    const activeCount = dataToExport.filter(m => m.status === 'ACTIVE').length;
-    const totalCount = dataToExport.length;
-
-    // Build comprehensive CSV headers as requested
     const headers = [
-      "Full Name",
+      "S.No.",
+      "Membership ID",
+      "Member Name",
+      "Membership Tier",
+      "Status",
+      "Fee (INR)",
       "Phone Number",
       "Email Address",
       "Gender",
+      "Date of Birth",
+      "Govt ID Type",
+      "Govt ID Number",
+      "PAN Card Number",
       "State",
       "District / City",
       "Occupation",
-      "Plan",
+      "Plan Code",
       "Start Date",
       "End Date",
-      "Status",
-      "Fee (INR)"
+      "Registration Date"
     ];
 
     const escapeCsv = (val) => {
-      if (val === null || val === undefined) return '""';
+      if (val === null || val === undefined || val === '') return '""';
       const str = String(val).replace(/"/g, '""');
       return `"${str}"`;
     };
 
-    const rows = dataToExport.map(m => [
-      escapeCsv(m.user ? `${m.user.firstName || ''} ${m.user.lastName || ''}`.trim() : "Unknown User"),
-      escapeCsv(m.user?.phone || "N/A"),
-      escapeCsv(m.user?.email || "N/A"),
-      escapeCsv(m.user?.gender || "N/A"),
-      escapeCsv(m.user?.state || "N/A"),
-      escapeCsv(m.user?.district || "N/A"),
-      escapeCsv(m.user?.occupation || "N/A"),
-      escapeCsv(m.plan || "PREMIUM"),
-      escapeCsv(new Date(m.startDate).toLocaleDateString("en-IN")),
-      escapeCsv(new Date(m.endDate).toLocaleDateString("en-IN")),
-      escapeCsv(m.status || "ACTIVE"),
-      escapeCsv("999")
-    ]);
-
-    // Append Summary Details at bottom
-    rows.push([]);
-    rows.push([escapeCsv("--- Summary Details ---"), '""', '""', '""', '""', '""', '""', '""', '""', '""', '""', '""']);
-    rows.push([escapeCsv("Total Registered Members"), escapeCsv(totalCount), '""', '""', '""', '""', '""', '""', '""', '""', '""', '""']);
-    rows.push([escapeCsv("Active Members"), escapeCsv(activeCount), '""', '""', '""', '""', '""', '""', '""', '""', '""', '""']);
-    rows.push([escapeCsv("Membership Revenue"), escapeCsv(analytics?.membershipRevenue || 0), '""', '""', '""', '""', '""', '""', '""', '""', '""', '""']);
-    rows.push([escapeCsv("Donation Revenue"), escapeCsv(analytics?.donationRevenue || 0), '""', '""', '""', '""', '""', '""', '""', '""', '""', '""']);
-    rows.push([escapeCsv("Total Revenue"), escapeCsv(analytics?.totalRevenue || 0), '""', '""', '""', '""', '""', '""', '""', '""', '""', '""']);
+    const rows = dataToExport.map((m, idx) => {
+      const isMitra = m.plan === 'BASIC';
+      const tierName = isMitra ? 'Rashtra Mitra (Supporter Tier)' : 'Rashtra Nirman Karta (Active Leadership)';
+      const fee = isMitra ? 0 : 101;
+      return [
+        idx + 1,
+        escapeCsv(m.id || "N/A"),
+        escapeCsv(m.user ? `${m.user.firstName || ''} ${m.user.lastName || ''}`.trim() : "Unknown User"),
+        escapeCsv(tierName),
+        escapeCsv(m.status || "ACTIVE"),
+        escapeCsv(fee),
+        escapeCsv(m.user?.phone || "N/A"),
+        escapeCsv(m.user?.email || "N/A"),
+        escapeCsv(m.user?.gender || "N/A"),
+        escapeCsv(m.user?.dateOfBirth ? new Date(m.user.dateOfBirth).toLocaleDateString("en-IN") : "N/A"),
+        escapeCsv(m.user?.govIdType || "N/A"),
+        escapeCsv(m.user?.govIdNumber || "N/A"),
+        escapeCsv(m.user?.panNumber || "N/A"),
+        escapeCsv(m.user?.state || "N/A"),
+        escapeCsv(m.user?.district || "N/A"),
+        escapeCsv(m.user?.occupation || "N/A"),
+        escapeCsv(m.plan || "PREMIUM"),
+        escapeCsv(m.startDate ? new Date(m.startDate).toLocaleDateString("en-IN") : "N/A"),
+        escapeCsv(m.endDate ? new Date(m.endDate).toLocaleDateString("en-IN") : "N/A"),
+        escapeCsv(m.createdAt ? new Date(m.createdAt).toLocaleDateString("en-IN") : "N/A")
+      ];
+    });
 
     const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute("href", url);
-    downloadAnchor.setAttribute("download", `srn_memberships_report_${new Date().toISOString().slice(0,10)}.csv`);
+    downloadAnchor.setAttribute("download", `SRN_Memberships_Master_Register_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportManualPayments = () => {
+    if (!manualPayments || manualPayments.length === 0) {
+      alert("No manual payment records to export.");
+      return;
+    }
+
+    const headers = [
+      "S.No.",
+      "Transaction ID",
+      "Contributor Name",
+      "Email Address",
+      "Phone Number",
+      "Amount (INR)",
+      "Payment Type",
+      "12-Digit UTR / Ref No",
+      "Verification Status",
+      "Submission Date",
+      "Screenshot URL",
+      "Rejection Note"
+    ];
+
+    const escapeCsv = (val) => {
+      if (val === null || val === undefined || val === '') return '""';
+      const str = String(val).replace(/"/g, '""');
+      return `"${str}"`;
+    };
+
+    const rows = manualPayments.map((p, idx) => [
+      idx + 1,
+      escapeCsv(p.id),
+      escapeCsv(p.user ? `${p.user.firstName || ''} ${p.user.lastName || ''}`.trim() : (p.email || 'N/A')),
+      escapeCsv(p.user?.email || p.email || 'N/A'),
+      escapeCsv(p.user?.phone || 'N/A'),
+      escapeCsv(p.amount),
+      escapeCsv(p.type),
+      escapeCsv(p.utrNumber || 'N/A'),
+      escapeCsv(p.status),
+      escapeCsv(p.createdAt ? new Date(p.createdAt).toLocaleDateString("en-IN") : 'N/A'),
+      escapeCsv(p.screenshot || 'N/A'),
+      escapeCsv(p.rejectionReason || 'N/A')
+    ]);
+
+    const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", url);
+    downloadAnchor.setAttribute("download", `SRN_Manual_Payments_Report_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -892,13 +1092,24 @@ export default function AdminDashboard() {
                         </h3>
                         <p className="text-xs text-[#7A5C45] mt-0.5">Verified collections from memberships and donations across UPI, QR, Bank Transfer & Online.</p>
                       </div>
-                      <button
-                        onClick={fetchAnalytics}
-                        className="text-xs font-bold text-[#E8622A] hover:text-[#C04A18] flex items-center gap-1.5 px-3 py-1.5 bg-orange-50 rounded-xl cursor-pointer transition-colors border border-orange-100"
-                        title="Refresh Collections"
-                      >
-                        <RotateCw className="w-3.5 h-3.5" /> Refresh
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={handleResetCollections}
+                          disabled={loadingAnalytics}
+                          className="text-xs font-bold text-rose-600 hover:text-rose-700 flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 rounded-xl cursor-pointer transition-colors border border-rose-200 shadow-2xs"
+                          title="Reset All Collections to ₹0"
+                        >
+                          <RotateCcw className="w-3.5 h-3.5" /> Reset Collections
+                        </button>
+                        <button
+                          onClick={fetchAnalytics}
+                          disabled={loadingAnalytics}
+                          className="text-xs font-bold text-[#E8622A] hover:text-[#C04A18] flex items-center gap-1.5 px-3 py-1.5 bg-orange-50 hover:bg-orange-100 rounded-xl cursor-pointer transition-colors border border-orange-100 shadow-2xs"
+                          title="Refresh Collections"
+                        >
+                          <RotateCw className={`w-3.5 h-3.5 ${loadingAnalytics ? "animate-spin" : ""}`} /> Refresh
+                        </button>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -1431,20 +1642,60 @@ export default function AdminDashboard() {
                                   </span>
                                 </td>
                                 <td className="px-6 py-4 text-right">
-                                  {m.user && (
+                                  <div className="flex items-center justify-end gap-2 flex-wrap">
+                                    {m.status === "ACTIVE" && (
+                                      <>
+                                        <button
+                                          onClick={() => handleSendMemberIdCard(m.id || m.userId, m.user ? `${m.user.firstName || ''} ${m.user.lastName || ''}`.trim() : 'Member')}
+                                          disabled={sendingIdCardId === (m.id || m.userId)}
+                                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100/80 border border-indigo-200 text-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
+                                          title="Send official ID card and receipt to member email (can be sent multiple times)"
+                                        >
+                                          {sendingIdCardId === (m.id || m.userId) ? (
+                                            <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-600" />
+                                          ) : (
+                                            <Send className="w-3.5 h-3.5" />
+                                          )}
+                                          <span>{sendingIdCardId === (m.id || m.userId) ? "Sending..." : "Send ID Card"}</span>
+                                        </button>
+
+                                        <a
+                                          href={`https://cgmlrhewmemptyklkbrq.supabase.co/storage/v1/object/public/id-cards/${m.id}.png?download=SRN_ID_Card_${m.user?.firstName || 'Member'}.png&t=${Date.now()}`}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-50 hover:bg-orange-100/80 border border-orange-200 text-[#E8622A] rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
+                                          title="Download ID Card PNG directly"
+                                        >
+                                          <Download className="w-3.5 h-3.5" />
+                                          <span>Download</span>
+                                        </a>
+                                      </>
+                                    )}
+
+                                    {m.user && (
+                                      <button
+                                        onClick={() => {
+                                          setRenamingUser({ id: m.userId || m.user.id, firstName: m.user.firstName || '', lastName: m.user.lastName || '', email: m.user.email });
+                                          setEditFirstName(m.user.firstName || '');
+                                          setEditLastName(m.user.lastName || '');
+                                          setRenameError('');
+                                          setRenameModalOpen(true);
+                                        }}
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 hover:border-orange-300 hover:bg-orange-50/50 text-[#7A5C45] hover:text-[#E8622A] rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
+                                        title="Rename Member"
+                                      >
+                                        <Pencil className="w-3.5 h-3.5" /> Rename
+                                      </button>
+                                    )}
+
                                     <button
-                                      onClick={() => {
-                                        setRenamingUser({ id: m.userId || m.user.id, firstName: m.user.firstName || '', lastName: m.user.lastName || '', email: m.user.email });
-                                        setEditFirstName(m.user.firstName || '');
-                                        setEditLastName(m.user.lastName || '');
-                                        setRenameError('');
-                                        setRenameModalOpen(true);
-                                      }}
-                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 hover:border-orange-300 hover:bg-orange-50/50 text-[#7A5C45] hover:text-[#E8622A] rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
+                                      onClick={() => handleDeleteMembership(m.id, m.user ? `${m.user.firstName || ''} ${m.user.lastName || ''}`.trim() : 'this member')}
+                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-red-200 hover:border-red-400 hover:bg-red-50 text-red-600 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
+                                      title="Permanently Delete Membership Record"
                                     >
-                                      <Pencil className="w-3.5 h-3.5" /> Rename
+                                      <Trash2 className="w-3.5 h-3.5 text-red-500" /> Delete
                                     </button>
-                                  )}
+                                  </div>
                                 </td>
                               </tr>
                             ))}
@@ -1499,9 +1750,27 @@ export default function AdminDashboard() {
                       </h2>
                       <p className="text-sm text-[#7A5C45] mt-1">Review and verify UPI and Bank Transfer payment submissions from members and donors.</p>
                     </div>
-                    <button onClick={() => fetchManualPayments()} className="flex items-center gap-2 px-4 py-2 bg-[#E8622A]/10 hover:bg-[#E8622A]/20 text-[#E8622A] rounded-xl font-semibold text-sm transition-colors">
-                      <RotateCw className="w-4 h-4" /> Refresh
-                    </button>
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <button 
+                        onClick={handleCleanupApprovedPayments} 
+                        disabled={manualLoading}
+                        className="flex items-center gap-2 px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl font-semibold text-sm transition-all shadow-xs cursor-pointer"
+                        title="Remove all approved & processed payment records from the dashboard"
+                      >
+                        <Trash2 className="w-4 h-4 text-rose-500" /> Clear Approved Records
+                      </button>
+                      <button 
+                        onClick={handleExportManualPayments} 
+                        disabled={manualLoading || manualPayments.length === 0}
+                        className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold text-sm transition-all shadow-sm disabled:opacity-50 cursor-pointer"
+                        title="Export Manual Payments Report (.csv)"
+                      >
+                        <Download className="w-4 h-4" /> Export Excel / CSV
+                      </button>
+                      <button onClick={() => fetchManualPayments()} className="flex items-center gap-2 px-4 py-2 bg-[#E8622A]/10 hover:bg-[#E8622A]/20 text-[#E8622A] rounded-xl font-semibold text-sm transition-colors cursor-pointer">
+                        <RotateCw className="w-4 h-4" /> Refresh
+                      </button>
+                    </div>
                   </div>
 
                   {/* Filter Tabs */}
@@ -1586,9 +1855,19 @@ export default function AdminDashboard() {
                                 })()}
                               </div>
 
-                              <div className="flex items-baseline gap-2">
-                                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Amount:</span>
-                                <h3 className="text-3xl font-extrabold font-serif text-[#2C1810]">₹{p.amount}</h3>
+                              <div className="flex items-center gap-3">
+                                <div className="flex items-baseline gap-2">
+                                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Amount:</span>
+                                  <h3 className="text-3xl font-extrabold font-serif text-[#2C1810]">₹{p.amount}</h3>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteManualPayment(p.id, `${p.user?.firstName || ''} ${p.user?.lastName || ''}`.trim() || p.utrNumber)}
+                                  className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer border border-transparent hover:border-rose-100"
+                                  title="Remove this payment record and submission details"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
                               </div>
                             </div>
 
@@ -1881,22 +2160,22 @@ export default function AdminDashboard() {
                             </div>
 
                             {/* Action Buttons */}
-                            {(p.status === "PENDING" || (p.status === "APPROVED" && p.type === "MEMBERSHIP")) && (
-                              <div className="mt-6 pt-6 border-t border-gray-100 flex flex-wrap gap-3 relative z-10">
+                            <div className="mt-6 pt-6 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3 relative z-10">
+                              <div className="flex flex-wrap items-center gap-3">
                                 {p.status === "PENDING" && (
                                   <>
                                     <button onClick={() => approveManualPayment(p.id, p.type)}
-                                      className="flex-1 sm:flex-none flex justify-center items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 cursor-pointer">
+                                      className="flex-1 sm:flex-none flex justify-center items-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 cursor-pointer">
                                       <CheckCircle2 className="w-5 h-5" /> Approve Payment
                                     </button>
                                     <button onClick={() => setRejectModal(p)}
-                                      className="flex-1 sm:flex-none flex justify-center items-center gap-2 px-6 py-3 bg-white border-2 border-red-100 hover:border-red-500 hover:bg-red-50 text-red-500 rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5 shadow-sm cursor-pointer">
+                                      className="flex-1 sm:flex-none flex justify-center items-center gap-2 px-6 py-2.5 bg-white border-2 border-red-100 hover:border-red-500 hover:bg-red-50 text-red-500 rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5 shadow-sm cursor-pointer">
                                       <XCircle className="w-5 h-5" /> Reject
                                     </button>
                                   </>
                                 )}
                                 {p.status === "APPROVED" && p.type === "MEMBERSHIP" && (
-                                  <div className="flex flex-wrap items-center gap-3">
+                                  <>
                                     <button 
                                       onClick={() => handleDownloadMemberIdCard(p)}
                                       className="flex-1 sm:flex-none flex justify-center items-center gap-2 px-5 py-2.5 bg-[#E8622A] hover:bg-[#D4551E] text-white rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 cursor-pointer"
@@ -1905,16 +2184,33 @@ export default function AdminDashboard() {
                                       <Download className="w-4 h-4" /> Download ID Card
                                     </button>
                                     <button 
-                                      onClick={() => sendMemberIdCard(p.userId)}
-                                      className="flex-1 sm:flex-none flex justify-center items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 cursor-pointer"
-                                      title="Send ID Card & Receipt to User Email"
+                                      onClick={() => handleSendMemberIdCard(p.userId, p.user?.firstName || 'Member')}
+                                      disabled={sendingIdCardId === p.userId}
+                                      className="flex-1 sm:flex-none flex justify-center items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 cursor-pointer"
+                                      title="Send ID Card & Receipt to User Email (Can be sent multiple times)"
                                     >
-                                      <Send className="w-4 h-4" /> Send Digital ID Card
+                                      {sendingIdCardId === p.userId ? (
+                                        <>
+                                          <Loader2 className="w-4 h-4 animate-spin text-white" /> Sending...
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Send className="w-4 h-4" /> Send Digital ID Card
+                                        </>
+                                      )}
                                     </button>
-                                  </div>
+                                  </>
                                 )}
                               </div>
-                            )}
+
+                              <button 
+                                onClick={() => handleDeleteManualPayment(p.id, `${p.user?.firstName || ''} ${p.user?.lastName || ''}`.trim() || p.utrNumber)}
+                                className="flex items-center gap-1.5 px-4 py-2.5 bg-white text-rose-600 hover:text-white hover:bg-rose-600 border border-rose-200 rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer ml-auto"
+                                title="Permanently remove this submission record and user details from dashboard"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" /> Remove Details
+                              </button>
+                            </div>
                           </div>
                         ))
                       )}

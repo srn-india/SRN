@@ -43,3 +43,9 @@ export const updateUserName = catchAsync(async (req: Request, res: Response) => 
   const user = await adminService.updateUserName(id as string, firstName, lastName);
   sendSuccess(res, user, 'User name updated successfully');
 });
+
+export const resetCollections = catchAsync(async (req: Request, res: Response) => {
+  const result = await adminService.resetCollections();
+  sendSuccess(res, result, 'Platform collections data has been reset to zero successfully');
+});
+

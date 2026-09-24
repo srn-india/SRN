@@ -3,35 +3,60 @@ import { generateAndUploadIdCard } from './idcard.service';
 import { MembershipPlan } from '@prisma/client';
 import { setCache, getCache, delCache } from '../../lib/cache';
 import { sendRashtraNirmanKartaOtpEmail, sendRashtraMitraOtpEmail } from '../../utils/email.service';
+import * as XLSX from 'xlsx';
 
 export const subscribeUser = async (userId: string, plan: MembershipPlan, durationInMonths: number, txClient?: any) => {
   const client = txClient || prisma;
 
-  // Prevent duplicate active memberships
-  const existingMembership = await client.membership.findFirst({
-    where: { userId, status: 'ACTIVE' }
+  // Check if user already has an active membership with the same plan
+  const existingActive = await client.membership.findFirst({
+    where: { userId, status: 'ACTIVE', plan }
   });
 
-  if (existingMembership) {
-    return existingMembership;
+  if (existingActive) {
+    return existingActive;
   }
 
   const startDate = new Date();
   const endDate = new Date();
   endDate.setMonth(endDate.getMonth() + durationInMonths);
 
-  // 1. Create membership record
-  const membership = await client.membership.create({
-    data: {
-      userId,
-      plan,
-      startDate,
-      endDate,
-      status: 'ACTIVE',
-    },
+  // Check for any prior membership (cancelled, expired, or different tier) to update and avoid duplicate rows
+  const priorMembership = await client.membership.findFirst({
+    where: { userId },
+    orderBy: { createdAt: 'desc' }
   });
 
-  // 3. Generate and upload the ID card only for Active (PREMIUM / LIFETIME) members
+  let membership;
+  if (priorMembership) {
+    // Delete any older duplicate rows if they exist
+    await client.membership.deleteMany({
+      where: { userId, id: { not: priorMembership.id } }
+    });
+    // Reuse and reactivate the membership record
+    membership = await client.membership.update({
+      where: { id: priorMembership.id },
+      data: {
+        plan,
+        startDate,
+        endDate,
+        status: 'ACTIVE',
+      }
+    });
+  } else {
+    // Create new membership record
+    membership = await client.membership.create({
+      data: {
+        userId,
+        plan,
+        startDate,
+        endDate,
+        status: 'ACTIVE',
+      },
+    });
+  }
+
+  // Generate and upload the ID card only for Active (PREMIUM / LIFETIME) members
   if (plan === 'PREMIUM' || plan === 'LIFETIME') {
     await generateAndUploadIdCard(membership.id, client).catch(console.error);
   }
@@ -80,6 +105,10 @@ export const getAllMemberships = async (page: number = 1, limit: number = 10) =>
             email: true,
             phone: true,
             gender: true,
+            dateOfBirth: true,
+            govIdType: true,
+            govIdNumber: true,
+            panNumber: true,
             state: true,
             district: true,
             postApplications: {
@@ -117,6 +146,128 @@ export const getAllMemberships = async (page: number = 1, limit: number = 10) =>
       totalPages: Math.ceil(total / limit),
     },
   };
+};
+
+export const exportMembershipsToExcel = async (): Promise<Buffer> => {
+  const memberships = await prisma.membership.findMany({
+    include: {
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          phone: true,
+          gender: true,
+          dateOfBirth: true,
+          govIdType: true,
+          govIdNumber: true,
+          panNumber: true,
+          state: true,
+          district: true,
+          postApplications: {
+            select: { currentOccupation: true, appliedPosition: true },
+            take: 1,
+            orderBy: { createdAt: 'desc' },
+          },
+        },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  const memberRows = memberships.map((m, index) => {
+    const occupation = m.user?.postApplications?.[0]?.currentOccupation 
+      || m.user?.postApplications?.[0]?.appliedPosition 
+      || 'N/A';
+    const isRashtraMitra = m.plan === 'BASIC';
+    const tierName = isRashtraMitra ? 'Rashtra Mitra (Supporter Tier)' : 'Rashtra Nirman Karta (Active Leadership)';
+    const fee = isRashtraMitra ? 0 : 101;
+
+    return {
+      'S.No.': index + 1,
+      'Membership ID': m.id,
+      'Member Name': `${m.user?.firstName || ''} ${m.user?.lastName || ''}`.trim() || 'N/A',
+      'Membership Tier': tierName,
+      'Status': m.status,
+      'Fee Paid (INR)': fee,
+      'Phone Number': m.user?.phone || 'N/A',
+      'Email Address': m.user?.email || 'N/A',
+      'Gender': m.user?.gender || 'N/A',
+      'Date of Birth': m.user?.dateOfBirth ? m.user.dateOfBirth.toISOString().slice(0, 10) : 'N/A',
+      'Govt ID Type': m.user?.govIdType || 'N/A',
+      'Govt ID Number': m.user?.govIdNumber || 'N/A',
+      'PAN Card Number': m.user?.panNumber || 'N/A',
+      'State': m.user?.state || 'N/A',
+      'District / City': m.user?.district || 'N/A',
+      'Occupation': occupation,
+      'Plan Code': m.plan,
+      'Start Date': m.startDate ? new Date(m.startDate).toISOString().slice(0, 10) : 'N/A',
+      'End Date / Expiry': m.endDate ? new Date(m.endDate).toISOString().slice(0, 10) : 'N/A',
+      'Registration Date': m.createdAt ? new Date(m.createdAt).toISOString().slice(0, 10) : 'N/A',
+    };
+  });
+
+  // Calculate Metrics for Summary Sheet
+  const totalCount = memberships.length;
+  const activeCount = memberships.filter(m => m.status === 'ACTIVE').length;
+  const cancelledCount = memberships.filter(m => m.status === 'CANCELLED').length;
+  const expiredCount = memberships.filter(m => m.status === 'EXPIRED').length;
+  const activeLeadershipCount = memberships.filter(m => m.plan !== 'BASIC').length;
+  const supporterCount = memberships.filter(m => m.plan === 'BASIC').length;
+  const totalRevenue = activeLeadershipCount * 101;
+
+  const summaryRows = [
+    { 'Metric': 'Organization Name', 'Value': 'Sashakt Rashtra Nirman (SRN) Trust' },
+    { 'Metric': 'Report Title', 'Value': 'Official Membership & Leadership Master Register' },
+    { 'Metric': 'Report Generated On', 'Value': new Date().toLocaleString('en-IN') },
+    { 'Metric': 'Total Registered Members', 'Value': totalCount },
+    { 'Metric': 'Active Members', 'Value': activeCount },
+    { 'Metric': 'Cancelled Members', 'Value': cancelledCount },
+    { 'Metric': 'Expired Members', 'Value': expiredCount },
+    { 'Metric': 'Rashtra Nirman Karta (Active Leadership)', 'Value': activeLeadershipCount },
+    { 'Metric': 'Rashtra Mitra (Supporter Tier)', 'Value': supporterCount },
+    { 'Metric': 'Total Membership Fee Generated (INR)', 'Value': `₹${totalRevenue.toLocaleString('en-IN')}` },
+    { 'Metric': 'Tax Status', 'Value': 'Section 80G & 12A Compliant' }
+  ];
+
+  const workbook = XLSX.utils.book_new();
+
+  // 1. Members Register Sheet
+  const wsMembers = XLSX.utils.json_to_sheet(memberRows);
+  wsMembers['!cols'] = [
+    { wch: 6 },  // S.No.
+    { wch: 38 }, // Membership ID
+    { wch: 24 }, // Member Name
+    { wch: 38 }, // Membership Tier
+    { wch: 14 }, // Status
+    { wch: 16 }, // Fee Paid
+    { wch: 16 }, // Phone Number
+    { wch: 28 }, // Email Address
+    { wch: 10 }, // Gender
+    { wch: 14 }, // Date of Birth
+    { wch: 16 }, // Govt ID Type
+    { wch: 20 }, // Govt ID Number
+    { wch: 18 }, // PAN Card Number
+    { wch: 18 }, // State
+    { wch: 18 }, // District
+    { wch: 22 }, // Occupation
+    { wch: 12 }, // Plan Code
+    { wch: 14 }, // Start Date
+    { wch: 16 }, // End Date
+    { wch: 16 }, // Reg Date
+  ];
+  XLSX.utils.book_append_sheet(workbook, wsMembers, 'Members Register');
+
+  // 2. Summary & Analytics Sheet
+  const wsSummary = XLSX.utils.json_to_sheet(summaryRows);
+  wsSummary['!cols'] = [
+    { wch: 42 }, // Metric
+    { wch: 36 }  // Value
+  ];
+  XLSX.utils.book_append_sheet(workbook, wsSummary, 'Summary & Metrics');
+
+  return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
 };
 
 // ── In-memory fallback map for OTPs with TTL ─────────────────────────────────
@@ -230,3 +381,13 @@ export const verifyMembershipOtp = async ({
     message: 'Email address verified successfully!',
   };
 };
+
+export const deleteMembershipById = async (id: string) => {
+  const membership = await prisma.membership.findUnique({ where: { id } });
+  if (!membership) {
+    throw new Error('Membership record not found');
+  }
+  await prisma.membership.delete({ where: { id } });
+  return { success: true, id };
+};
+

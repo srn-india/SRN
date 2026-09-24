@@ -137,6 +137,9 @@ async function notifyUserOfPayment(payment: any) {
   try {
     const pdfBuffer = await generateReceiptPdf({
       userName: payment.userName || 'Supporter',
+      userPan: payment.userPan,
+      userPhone: payment.userPhone,
+      userEmail: payment.userEmail,
       amount: Number(payment.amount),
       paymentId: payment.razorpayPaymentId || payment.id,
       type: isDonation ? 'DONATION' : 'MEMBERSHIP',
@@ -150,6 +153,23 @@ async function notifyUserOfPayment(payment: any) {
     });
   } catch (err) {
     console.error('Failed to generate PDF receipt:', err);
+  }
+
+  // Attach ID card image if membership ID is available
+  if (!isDonation && payment.membershipId && process.env.SUPABASE_URL) {
+    try {
+      const cardUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/id-cards/${payment.membershipId}.png`;
+      const cardRes = await fetch(cardUrl);
+      if (cardRes.ok) {
+        attachments.push({
+          filename: `SRN_ID_Card_${firstName}.png`,
+          content: Buffer.from(await cardRes.arrayBuffer()),
+          contentType: 'image/png'
+        });
+      }
+    } catch (err) {
+      console.error('Failed to attach ID card image to membership email:', err);
+    }
   }
 
   try {
@@ -241,7 +261,9 @@ export const verifyPayment = async (paymentData: { razorpay_order_id: string, ra
     id: result.id,
     userId: result.userId,
     userName: user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : undefined,
-    userEmail: user?.email,
+    userEmail: user?.email || undefined,
+    userPan: (user as any)?.govIdNumber || (user as any)?.panNumber || undefined,
+    userPhone: user?.phone || undefined,
     amount: result.amount,
     currency: 'INR',
     type: result.type,

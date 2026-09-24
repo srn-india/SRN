@@ -111,5 +111,6 @@ router.patch('/users/:id/name', adminController.updateUserName);
  *         description: Analytics data
  */
 router.get('/analytics', adminController.getAnalytics);
+router.post('/analytics/reset', adminController.resetCollections);
 
 export default router;

@@ -17,6 +17,16 @@ export const registerUser = async (data: any) => {
     throw new Error('Email already in use');
   }
 
+  const cleanPhone = data.phone ? String(data.phone).trim() : null;
+  if (cleanPhone) {
+    const existingPhone = await prisma.user.findFirst({
+      where: { phone: cleanPhone },
+    });
+    if (existingPhone) {
+      throw new Error('This phone number is already registered with another account');
+    }
+  }
+
   const hashedPassword = await bcrypt.hash(data.password, 10);
 
   const otpCode = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
@@ -170,6 +180,7 @@ export const forgotPassword = async (email: string) => {
     <a href="${resetUrl}">${resetUrl}</a>
   `;
 
+  if (!user.email) throw new Error('User has no registered email');
   await sendEmail(user.email, 'Password Reset Request', message);
   return { message: 'Password reset link sent to email' };
 };
@@ -194,6 +205,7 @@ export const sendVerificationEmail = async (userId: string) => {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new Error('User not found');
   if (user.isVerified) throw new Error('User is already verified');
+  if (!user.email) throw new Error('User has no registered email');
 
   const verificationToken = crypto.randomBytes(32).toString('hex');
   const hashedToken = crypto.createHash('sha256').update(verificationToken).digest('hex');
@@ -237,7 +249,7 @@ export const setup2FA = async (userId: string) => {
     data: { twoFactorSecret: secret }
   });
 
-  const otpauthUrl = authenticator.keyuri(user.email, 'SRN Admin', secret);
+  const otpauthUrl = authenticator.keyuri(user.email || 'admin@srn-india.org', 'SRN Admin', secret);
   const qrCodeUrl = await QRCode.toDataURL(otpauthUrl);
 
   return { secret, qrCodeUrl };

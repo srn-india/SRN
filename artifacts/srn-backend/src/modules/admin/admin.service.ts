@@ -175,3 +175,23 @@ export const getAnalytics = async () => {
   };
 };
 
+/**
+ * Resets platform collections data (clears recorded payments and donations)
+ */
+export const resetCollections = async () => {
+  const [paymentsDeleted, manualDeleted, donationRecordsDeleted, donationsDeleted] = await Promise.all([
+    prisma.payment.deleteMany(),
+    prisma.manualPayment.deleteMany(),
+    prisma.donationRecord.deleteMany(),
+    prisma.donation.deleteMany(),
+  ]);
+
+  return {
+    paymentsDeleted: paymentsDeleted.count,
+    manualDeleted: manualDeleted.count,
+    donationRecordsDeleted: donationRecordsDeleted.count,
+    donationsDeleted: donationsDeleted.count,
+  };
+};
+
+

@@ -171,9 +171,16 @@ export default function App() {
               <Route path="/about" element={<Layout onPhoneClick={() => setShowPhonePopup(true)}><Placeholder title="About Us" /></Layout>} />
               <Route path="/events" element={<Layout onPhoneClick={() => setShowPhonePopup(true)}><Events /></Layout>} />
               <Route path="/forums" element={<Layout onPhoneClick={() => setShowPhonePopup(true)}><Forums /></Layout>} />
-              <Route path="/become-member" element={
-                <Layout onPhoneClick={() => setShowPhonePopup(true)}><BecomeMember /></Layout>
-              } />
+              <Route 
+                path="/become-member" 
+                element={
+                  <ProtectedRoute>
+                    <Layout onPhoneClick={() => setShowPhonePopup(true)}>
+                      <BecomeMember />
+                    </Layout>
+                  </ProtectedRoute>
+                } 
+              />
               <Route path="/donate" element={
                 <Layout onPhoneClick={() => setShowPhonePopup(true)}><Donate /></Layout>
               } />
