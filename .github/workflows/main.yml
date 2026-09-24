@@ -55,10 +55,10 @@ jobs:
       - name: Generate Prisma Client
         run: npx prisma generate
 
-      - name: Run Migrations
-        run: npx prisma migrate deploy
+      - name: Push Database Schema
+        run: npx prisma db push --accept-data-loss
         env:
-          DATABASE_URL: postgresql://user:password@localhost:5432/srn_db_test
+          DATABASE_URL: postgresql://user:password@127.0.0.1:5432/srn_db_test
 
       - name: Build Backend
         run: npm run build

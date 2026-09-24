@@ -1,3 +1,6 @@
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "public";
+
 -- CreateEnum
 CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN');
 
@@ -25,17 +28,29 @@ CREATE TYPE "ArticleStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
 -- CreateEnum
 CREATE TYPE "ApplicationStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
 
+-- CreateEnum
+CREATE TYPE "ManualPaymentStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
+
+-- CreateEnum
+CREATE TYPE "DonationPaymentMethod" AS ENUM ('UPI', 'BANK_TRANSFER', 'RAZORPAY');
+
+-- CreateEnum
+CREATE TYPE "DonationStatus" AS ENUM ('PENDING', 'VERIFIED', 'REJECTED');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
+    "email" TEXT,
     "phone" TEXT,
     "state" TEXT,
     "district" TEXT,
     "gender" TEXT,
     "dateOfBirth" TIMESTAMP(3),
+    "govIdType" TEXT,
+    "govIdNumber" TEXT,
+    "panNumber" TEXT,
     "password" TEXT,
     "avatar" TEXT,
     "twoFactorSecret" TEXT,
@@ -239,6 +254,24 @@ CREATE TABLE "Donation" (
 );
 
 -- CreateTable
+CREATE TABLE "ManualPayment" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "amount" DOUBLE PRECISION NOT NULL,
+    "type" "PaymentType" NOT NULL,
+    "utrNumber" TEXT NOT NULL,
+    "screenshot" TEXT,
+    "purpose" TEXT,
+    "status" "ManualPaymentStatus" NOT NULL DEFAULT 'PENDING',
+    "adminNote" TEXT,
+    "membershipId" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ManualPayment_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "RefreshToken" (
     "id" TEXT NOT NULL,
     "token" TEXT NOT NULL,
@@ -249,8 +282,50 @@ CREATE TABLE "RefreshToken" (
     CONSTRAINT "RefreshToken_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "DonationRecord" (
+    "id" TEXT NOT NULL,
+    "receiptNumber" TEXT NOT NULL,
+    "amount" DOUBLE PRECISION NOT NULL,
+    "currency" TEXT NOT NULL DEFAULT 'INR',
+    "campaign" TEXT NOT NULL,
+    "donorFirstName" TEXT NOT NULL,
+    "donorLastName" TEXT NOT NULL,
+    "donorEmail" TEXT NOT NULL,
+    "donorPhone" TEXT NOT NULL,
+    "donorPan" TEXT,
+    "donorAddress" TEXT,
+    "donorState" TEXT NOT NULL,
+    "donorCity" TEXT NOT NULL,
+    "paymentMethod" "DonationPaymentMethod" NOT NULL,
+    "status" "DonationStatus" NOT NULL DEFAULT 'PENDING',
+    "utrNumber" TEXT,
+    "screenshotUrl" TEXT,
+    "razorpayOrderId" TEXT,
+    "razorpayPaymentId" TEXT,
+    "userId" TEXT,
+    "is80GEligible" BOOLEAN NOT NULL DEFAULT true,
+    "receiptPdfUrl" TEXT,
+    "adminNotes" TEXT,
+    "verifiedAt" TIMESTAMP(3),
+    "verifiedBy" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "DonationRecord_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_phone_key" ON "User"("phone");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_govIdNumber_key" ON "User"("govIdNumber");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_panNumber_key" ON "User"("panNumber");
 
 -- CreateIndex
 CREATE INDEX "Membership_userId_idx" ON "Membership"("userId");
@@ -307,10 +382,34 @@ CREATE INDEX "PostApplication_userId_idx" ON "PostApplication"("userId");
 CREATE UNIQUE INDEX "Donation_paymentId_key" ON "Donation"("paymentId");
 
 -- CreateIndex
+CREATE INDEX "ManualPayment_userId_idx" ON "ManualPayment"("userId");
+
+-- CreateIndex
+CREATE INDEX "ManualPayment_status_idx" ON "ManualPayment"("status");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "RefreshToken_token_key" ON "RefreshToken"("token");
 
 -- CreateIndex
 CREATE INDEX "RefreshToken_userId_idx" ON "RefreshToken"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "DonationRecord_receiptNumber_key" ON "DonationRecord"("receiptNumber");
+
+-- CreateIndex
+CREATE INDEX "DonationRecord_userId_idx" ON "DonationRecord"("userId");
+
+-- CreateIndex
+CREATE INDEX "DonationRecord_status_idx" ON "DonationRecord"("status");
+
+-- CreateIndex
+CREATE INDEX "DonationRecord_donorEmail_idx" ON "DonationRecord"("donorEmail");
+
+-- CreateIndex
+CREATE INDEX "DonationRecord_utrNumber_idx" ON "DonationRecord"("utrNumber");
+
+-- CreateIndex
+CREATE INDEX "DonationRecord_createdAt_idx" ON "DonationRecord"("createdAt");
 
 -- AddForeignKey
 ALTER TABLE "Membership" ADD CONSTRAINT "Membership_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -352,4 +451,11 @@ ALTER TABLE "PostApplication" ADD CONSTRAINT "PostApplication_userId_fkey" FOREI
 ALTER TABLE "Donation" ADD CONSTRAINT "Donation_paymentId_fkey" FOREIGN KEY ("paymentId") REFERENCES "Payment"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "ManualPayment" ADD CONSTRAINT "ManualPayment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "RefreshToken" ADD CONSTRAINT "RefreshToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "DonationRecord" ADD CONSTRAINT "DonationRecord_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
