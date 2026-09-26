@@ -152,6 +152,13 @@ const bearersData = {
     titleHi: "मोर्चा",
     members: [
       {
+        nameEn: "Dr. Manoj Gorkela",
+        nameHi: "डॉ. मनोज गोर्केला",
+        descEn: "Special counsel for Government of M.P, Chhattisgarh, Uttarakhand & Chandigarh at Supreme Court of India\n**President, Rashtriya Adhivakta Manch**",
+        descHi: "भारत के सर्वोच्च न्यायालय में म.प्र., छत्तीसगढ़, उत्तराखंड एवं चंडीगढ़ सरकार के विशेष अधिवक्ता\n**अध्यक्ष, राष्ट्रीय अधिवक्ता मंच**",
+        image: "/national_bearers/manoj-gorkela.jpg"
+      },
+      {
         nameEn: "Prof. (Dr.) Anjana Yadav",
         nameHi: "प्रो. (डॉ.) अंजना यादव",
         descEn: "Rajasthan\nEx-Pro Chancellor, Baba Mastnath University, Rohtak\n**President, Mahila Morcha**",
@@ -381,7 +388,7 @@ export default function NationalOfficeBearers() {
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-12 w-full justify-items-center justify-center max-w-4xl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 w-full justify-items-center justify-center max-w-5xl">
             {bearersData.morcha.members.map((member, i) => (
               <MemberCard key={i} member={member} lang={lang} />
             ))}
