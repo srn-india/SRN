@@ -11,6 +11,39 @@ async function deleteUser() {
   console.log('--- SRN Admin: DANGER - Delete User Account ---');
   console.log('WARNING: This will permanently delete the user and all their related data (memberships, payments, posts, etc.) from the remote database.');
   
+  const targetEmail = process.argv[2];
+
+  if (targetEmail && targetEmail.includes('@')) {
+    try {
+      const user = await prisma.user.findUnique({
+        where: { email: targetEmail.trim() }
+      });
+
+      if (!user) {
+        console.log(`❌ No user found with the email: ${targetEmail}`);
+        process.exit(1);
+      }
+
+      console.log(`\n⚠️  FOUND USER: ${user.firstName} ${user.lastName} (${targetEmail})`);
+      console.log('Deleting user and cascading all related records...');
+
+      await prisma.user.delete({
+        where: { id: user.id }
+      });
+
+      console.log(`✅ Successfully and permanently deleted user ${targetEmail} from the database.`);
+      process.exit(0);
+    } catch (error) {
+      console.error('❌ An error occurred while trying to delete the user:', error);
+      process.exit(1);
+    }
+  }
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
   rl.question('Enter the email address of the user you want to permanently delete: ', async (email) => {
     try {
       if (!email || !email.includes('@')) {

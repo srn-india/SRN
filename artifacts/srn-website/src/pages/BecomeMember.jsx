@@ -1034,48 +1034,7 @@ export default function BecomeMember() {
             </div>
           </motion.div>
         ) : (
-          <div className="bg-white/70 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white relative">
-            
-            {/* Stepper Header */}
-            <div className="bg-white/50 border-b border-[#E8D5B8]/50 py-4 px-6 sm:px-8 relative rounded-t-[2.5rem] overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#E8622A]/5 to-transparent" />
-              <div className="flex justify-between items-center relative z-10 max-w-2xl mx-auto">
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1.5 bg-[#E8D5B8]/30 rounded-full z-0" />
-                <motion.div 
-                  className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1.5 bg-gradient-to-r from-[#E8622A] to-[#C04A18] rounded-full z-0 shadow-sm origin-left" 
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: ((currentStep - 1) / (steps.length - 1)) }}
-                  transition={{ duration: 0.5, ease: "easeInOut" }}
-                />
-                
-                {steps.map((step) => {
-                  const Icon = step.icon;
-                  const isActive = step.id === currentStep;
-                  const isCompleted = step.id < currentStep;
-                  
-                  return (
-                    <div key={step.id} className="relative z-10 flex flex-col items-center">
-                      <motion.div 
-                        initial={false}
-                        animate={{ 
-                          scale: isActive ? 1.08 : 1,
-                          backgroundColor: isActive || isCompleted ? "#E8622A" : "#FFFFFF",
-                          color: isActive || isCompleted ? "#FFFFFF" : "#B89070",
-                          borderColor: isActive || isCompleted ? "#FFFFFF" : "#E8D5B8"
-                        }}
-                        className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center border-3 shadow-sm transition-colors duration-300 ${isActive ? 'shadow-orange-900/20 ring-2 ring-[#E8622A]/30' : ''}`}
-                      >
-                        {isCompleted ? <CheckCircle2 className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
-                      </motion.div>
-                      <span className={`mt-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider hidden sm:block transition-colors duration-300 ${isActive || isCompleted ? "text-[#E8622A]" : "text-[#B89070]"}`}>
-                        {en ? step.title : step.titleHi}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
+          <div className="bg-white/70 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white relative overflow-hidden">
             {/* Form Body */}
             <div className="p-5 sm:p-7 lg:p-8 bg-white/40">
               <AnimatePresence mode="wait">
