@@ -355,7 +355,8 @@ export default function BecomeMember() {
   const [qrSubmitted, setQrSubmitted] = useState(false);
   const fileInputRef = useRef(null);
 
-  const [currentStep, setCurrentStep] = useState(1);
+  // NOTE: Step 1 is temporarily hidden; defaulting directly to Step 2 (Rashtra Nirman Karta)
+  const [currentStep, setCurrentStep] = useState(2);
   const [errors, setErrors] = useState({});
 
   // Email OTP verification state
@@ -645,7 +646,7 @@ export default function BecomeMember() {
     setCurrentStep((prev) => Math.min(prev + 1, steps.length));
   };
 
-  const handlePrev = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
+  const handlePrev = () => setCurrentStep((prev) => Math.max(prev - 1, 2));
 
   // ── Normal Membership (Free / Info Collection Only) ───────────────────────────
   const handleNormalMemberSubmit = async () => {
@@ -1048,9 +1049,11 @@ export default function BecomeMember() {
                 >
                   
                   {/* ══════════════════════════════════════════════════════════════
-                      STEP 1: MEMBERSHIP TIER (RASHTRA NIRMAN KARTA VS RASHTRA MITRA)
+                      NOTE: THIS IS TEMPORARILY HIDDEN
+                      STEP 1: MEMBERSHIP TIER (DEFAULT: RASHTRA NIRMAN KARTA)
                      ══════════════════════════════════════════════════════════════ */}
-                  {currentStep === 1 && (
+                  {/* THIS IS TEMPORARILY HIDDEN */}
+                  {false && currentStep === 1 && (
                     <div className="space-y-5">
                       <div className="text-center sm:text-left mb-5">
                         <div className="inline-flex items-center gap-2 px-3 py-1 bg-orange-100/90 rounded-full text-[#E8622A] text-xs font-bold mb-2">
@@ -1304,7 +1307,7 @@ export default function BecomeMember() {
                       <div>
                         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-orange-100/90 rounded-full text-[#E8622A] text-xs font-bold mb-2.5">
                           <User className="w-4 h-4" />
-                          {en ? "Step 2 of 3 · Member Details & Role" : "कदम 2 · व्यक्तिगत विवरण एवं भूमिका"}
+                          {en ? "Step 1 of 2 · Member Details & Role" : "कदम 1 · व्यक्तिगत विवरण एवं भूमिका"}
                         </div>
                         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#2C1810] font-serif mb-1.5">
                           {en ? "Member Information & Organizational Role" : "सदस्य विवरण एवं सांगठनिक भूमिका"}
@@ -1781,7 +1784,7 @@ export default function BecomeMember() {
                             <div>
                               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-orange-100/90 rounded-full text-[#E8622A] text-xs font-bold mb-3">
                                 <Sparkles className="w-4 h-4" />
-                                {en ? "Step 3 of 3 · Rashtra Nirman Karta Onboarding" : "कदम 3 · राष्ट्र निर्माणकर्ता सत्यापन व अंशदान"}
+                                {en ? "Step 2 of 2 · Rashtra Nirman Karta Onboarding" : "कदम 2 · राष्ट्र निर्माणकर्ता सत्यापन व अंशदान"}
                               </div>
                               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#2C1810] font-serif mb-2">
                                 {en ? "Rashtra Nirman Karta Confirmation" : "राष्ट्र निर्माणकर्ता सदस्यता पुष्टिकरण"}
@@ -1950,7 +1953,7 @@ export default function BecomeMember() {
 
               {/* Form Navigation Controls */}
               <div className="mt-7 pt-5 border-t border-[#E8D5B8]/60 flex justify-between items-center">
-                {currentStep > 1 ? (
+                {currentStep > 2 ? (
                   <button
                     onClick={handlePrev}
                     className="px-5 sm:px-6 py-3 rounded-xl text-[#7A5C45] font-bold hover:bg-white transition-colors flex items-center gap-2 text-sm shadow-xs border border-transparent hover:border-[#E8D5B8]/60 cursor-pointer"
