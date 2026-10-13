@@ -133,6 +133,20 @@ const bearersData = {
         descEn: "Uttarakhand",
         descHi: "उत्तराखंड",
         image: "/national_bearers/rajesh-mehta.jpeg"
+      },
+      {
+        nameEn: "Ms Sonali Khatri",
+        nameHi: "सुश्री सोनाली खत्री",
+        descEn: "Delhi",
+        descHi: "दिल्ली",
+        image: "/national_bearers/sonali-khatri.jpeg"
+      },
+      {
+        nameEn: "Shri Shriniwas Vijay Mohta",
+        nameHi: "श्री श्रीनिवास विजय मोहता",
+        descEn: "Maharashtra",
+        descHi: "महाराष्ट्र",
+        image: "/national_bearers/shriniwas-vijay-mohta.jpeg"
       }
     ]
   },
@@ -183,7 +197,7 @@ const bearersData = {
   }
 };
 
-function MemberCard({ member, lang }) {
+function MemberCard({ member, lang, className = "" }) {
   const en = lang === "en";
   const name = en ? member.nameEn : member.nameHi;
   const desc = en ? member.descEn : member.descHi;
@@ -213,7 +227,7 @@ function MemberCard({ member, lang }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5 }}
-      className="flex flex-col items-center text-center w-full max-w-[230px] group"
+      className={`flex flex-col items-center text-center w-full max-w-[230px] group ${className}`}
     >
       {/* 3:4 Aspect Ratio Image/Placeholder */}
       <div className="w-full aspect-[3/4] rounded-2xl bg-white border border-[#E8D5B8] flex flex-col items-center justify-center relative overflow-hidden transition-all duration-300 group-hover:border-[#E8622A]/40 group-hover:shadow-md">
@@ -356,9 +370,14 @@ export default function NationalOfficeBearers() {
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 w-full justify-items-center justify-center max-w-[1500px]">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 w-full justify-items-center justify-center max-w-[1440px]">
             {bearersData.secretaries.members.map((member, i) => (
-              <MemberCard key={i} member={member} lang={lang} />
+              <MemberCard
+                key={i}
+                member={member}
+                lang={lang}
+                className={i === 6 ? "lg:col-start-3" : ""}
+              />
             ))}
           </div>
         </section>
