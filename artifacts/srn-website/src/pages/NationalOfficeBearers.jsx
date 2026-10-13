@@ -135,13 +135,6 @@ const bearersData = {
         image: "/national_bearers/rajesh-mehta.jpeg"
       },
       {
-        nameEn: "Ms Sonali Khatri",
-        nameHi: "सुश्री सोनाली खत्री",
-        descEn: "Delhi",
-        descHi: "दिल्ली",
-        image: "/national_bearers/sonali-khatri.jpeg"
-      },
-      {
         nameEn: "Shri Shriniwas Vijay Mohta",
         nameHi: "श्री श्रीनिवास विजय मोहता",
         descEn: "Maharashtra",
@@ -159,6 +152,13 @@ const bearersData = {
         descEn: "Andhra Pradesh",
         descHi: "आंध्र प्रदेश",
         image: "/national_bearers/krishnadu-dhananjaya.jpeg"
+      },
+      {
+        nameEn: "Dr. Sonali Khatri",
+        nameHi: "डॉ. सोनाली खत्री",
+        descEn: "Delhi",
+        descHi: "दिल्ली",
+        image: "/national_bearers/sonali-khatri.jpeg"
       }
     ]
   },
@@ -376,7 +376,7 @@ export default function NationalOfficeBearers() {
                 key={i}
                 member={member}
                 lang={lang}
-                className={i === 6 ? "lg:col-start-3" : ""}
+                className={i === 6 ? "lg:col-start-3 lg:col-span-2" : ""}
               />
             ))}
           </div>
@@ -391,7 +391,7 @@ export default function NationalOfficeBearers() {
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
-          <div className="grid grid-cols-1 gap-8 md:gap-12 w-full justify-items-center justify-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12 w-full justify-items-center justify-center max-w-xl">
             {bearersData.jointSecretaries.members.map((member, i) => (
               <MemberCard key={i} member={member} lang={lang} />
             ))}
