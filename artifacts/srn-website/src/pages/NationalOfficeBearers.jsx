@@ -64,7 +64,7 @@ const bearersData = {
     ]
   },
   generalSecretaries: {
-    titleHi: "राष्ट्रीय महासचिव",
+    titleHi: "राष्ट्रीय महामंत्री",
     members: [
       {
         nameEn: "Shri Kirti Shankar Awasthi",
@@ -90,7 +90,7 @@ const bearersData = {
     ]
   },
   secretaries: {
-    titleHi: "राष्ट्रीय सचिव",
+    titleHi: "राष्ट्रीय सचिव / मंत्री",
     members: [
       {
         nameEn: "Advocate Kripa Shankar",
@@ -140,6 +140,20 @@ const bearersData = {
         descEn: "Maharashtra",
         descHi: "महाराष्ट्र",
         image: "/national_bearers/shriniwas-vijay-mohta.jpeg"
+      },
+      {
+        nameEn: 'Shri Virendra Sharma "Veer"',
+        nameHi: 'श्री वीरेंद्र शर्मा "वीर"',
+        descEn: "Chandigarh",
+        descHi: "चंडीगढ़",
+        image: "/national_bearers/virendra-sharma.jpeg"
+      },
+      {
+        nameEn: "Shri Hemantrao Khanwilkar",
+        nameHi: 'श्री हेमंतराव खानवलकर',
+        descEn: "",
+        descHi: "",
+        image: "/national_bearers/hemantwar-khanwilkar.jpeg"
       }
     ]
   },
@@ -182,8 +196,8 @@ const bearersData = {
       {
         nameEn: "Shri Sudhir Saxena",
         nameHi: "श्री सुधीर सक्सेना",
-        descEn: "National Kickboxing player\nSilver medal for India at India Open International Kickboxing Cup 2026\n**President, Yuva Morcha**",
-        descHi: "राष्ट्रीय किकबॉक्सिंग खिलाड़ी\nइंडिया ओपन इंटरनेशनल किकबॉक्सिंग कप 2026 में भारत के लिए रजत पदक\n**अध्यक्ष, युवा मोर्चा**",
+        descEn: "International Kickboxing player\nSilver medal for India at India Open International Kickboxing Cup 2026\n**President, Yuva Morcha**",
+        descHi: "अंतर्राष्ट्रीय किकबॉक्सिंग खिलाड़ी\nइंडिया ओपन इंटरनेशनल किकबॉक्सिंग कप 2026 में भारत के लिए रजत पदक\n**अध्यक्ष, युवा मोर्चा**",
         image: "/national_bearers/sudhir-saxena.jpeg"
       },
       {
@@ -192,6 +206,13 @@ const bearersData = {
         descEn: "Former Judge\n**President, ST Morcha**",
         descHi: "पूर्व न्यायाधीश\n**अध्यक्ष, एसटी मोर्चा**",
         image: "/national_bearers/prakash-uikey.jpeg"
+      },
+      {
+        nameEn: "Dr. Ashok Adhana",
+        nameHi: "डॉ. अशोक अधाना",
+        descEn: "Working President, Rashtriya Sanyukt Kisan Morcha\n**President, Kisan Morcha**",
+        descHi: "**कार्यकारिणी अध्यक्ष, राष्ट्रीय संयुक्त किसान मोर्चा**",
+        image: "/national_bearers/ashok-adhana.jpeg"
       }
     ]
   }
@@ -227,10 +248,10 @@ function MemberCard({ member, lang, className = "" }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5 }}
-      className={`flex flex-col items-center text-center w-full max-w-[230px] group ${className}`}
+      className={`flex flex-col items-center text-center w-[210px] group ${className}`}
     >
-      {/* 3:4 Aspect Ratio Image/Placeholder */}
-      <div className="w-full aspect-[3/4] rounded-2xl bg-white border border-[#E8D5B8] flex flex-col items-center justify-center relative overflow-hidden transition-all duration-300 group-hover:border-[#E8622A]/40 group-hover:shadow-md">
+      {/* Exact uniform 3:4 Aspect Ratio Image/Placeholder */}
+      <div className="w-[210px] h-[280px] rounded-2xl bg-white border border-[#E8D5B8] flex flex-col items-center justify-center relative overflow-hidden transition-all duration-300 group-hover:border-[#E8622A]/40 group-hover:shadow-md shrink-0">
         {member.image && !imageError ? (
           <img
             src={member.image}
@@ -338,7 +359,7 @@ export default function NationalOfficeBearers() {
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 w-full justify-items-center justify-center max-w-[1440px]">
+          <div className="flex flex-wrap justify-center gap-4 md:gap-6 w-full max-w-[1380px]">
             {bearersData.vicePresidents.members.map((member, i) => (
               <MemberCard key={i} member={member} lang={lang} />
             ))}
@@ -354,7 +375,7 @@ export default function NationalOfficeBearers() {
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-12 w-full justify-items-center justify-center max-w-3xl">
+          <div className="flex flex-wrap justify-center gap-4 md:gap-6 w-full max-w-[1380px]">
             {bearersData.generalSecretaries.members.map((member, i) => (
               <MemberCard key={i} member={member} lang={lang} />
             ))}
@@ -370,14 +391,9 @@ export default function NationalOfficeBearers() {
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 w-full justify-items-center justify-center max-w-[1440px]">
+          <div className="flex flex-wrap justify-center gap-4 md:gap-6 w-full max-w-[1380px]">
             {bearersData.secretaries.members.map((member, i) => (
-              <MemberCard
-                key={i}
-                member={member}
-                lang={lang}
-                className={i === 6 ? "lg:col-start-3 lg:col-span-2" : ""}
-              />
+              <MemberCard key={i} member={member} lang={lang} />
             ))}
           </div>
         </section>
@@ -391,7 +407,7 @@ export default function NationalOfficeBearers() {
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12 w-full justify-items-center justify-center max-w-xl">
+          <div className="flex flex-wrap justify-center gap-4 md:gap-6 w-full max-w-[1380px]">
             {bearersData.jointSecretaries.members.map((member, i) => (
               <MemberCard key={i} member={member} lang={lang} />
             ))}
@@ -407,7 +423,7 @@ export default function NationalOfficeBearers() {
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 w-full justify-items-center justify-center max-w-5xl">
+          <div className="flex flex-wrap justify-center gap-4 md:gap-6 w-full max-w-[1380px]">
             {bearersData.morcha.members.map((member, i) => (
               <MemberCard key={i} member={member} lang={lang} />
             ))}
