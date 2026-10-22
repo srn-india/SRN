@@ -165,3 +165,61 @@ body {
   }
 }
 
+/* ── National Office Bearers Dynamic Multi-Screen 6-Column Layout ── */
+.national-bearers-container {
+  --bearer-gap: 12px;
+  --bearer-cols: 2;
+  --bearer-card-width: min(170px, calc((100% - (var(--bearer-cols) - 1) * var(--bearer-gap) - 1px) / var(--bearer-cols)));
+}
+
+@media (min-width: 640px) {
+  .national-bearers-container {
+    --bearer-gap: 14px;
+    --bearer-cols: 3;
+    --bearer-card-width: min(190px, calc((100% - (var(--bearer-cols) - 1) * var(--bearer-gap) - 1px) / var(--bearer-cols)));
+  }
+}
+
+@media (min-width: 768px) {
+  .national-bearers-container {
+    --bearer-gap: 16px;
+    --bearer-cols: 4;
+    --bearer-card-width: min(200px, calc((100% - (var(--bearer-cols) - 1) * var(--bearer-gap) - 1px) / var(--bearer-cols)));
+  }
+}
+
+/* On all desktop screens (>= 1024px), strictly enforce exactly 6 cards per row without wrapping */
+@media (min-width: 1024px) {
+  .national-bearers-container {
+    --bearer-gap: 12px;
+    --bearer-cols: 6;
+    --bearer-card-width: min(210px, calc((100% - 5 * var(--bearer-gap) - 1.5px) / 6));
+  }
+}
+
+@media (min-width: 1280px) {
+  .national-bearers-container {
+    --bearer-gap: 16px;
+    --bearer-cols: 6;
+    --bearer-card-width: min(210px, calc((100% - 5 * var(--bearer-gap) - 1.5px) / 6));
+  }
+}
+
+.bearer-card-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--bearer-gap);
+  width: 100%;
+  max-width: 1380px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.bearer-card-item {
+  width: var(--bearer-card-width);
+  max-width: 210px;
+  flex: 0 0 var(--bearer-card-width);
+  box-sizing: border-box;
+}
+

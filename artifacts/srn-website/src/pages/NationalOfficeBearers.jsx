@@ -151,8 +151,8 @@ const bearersData = {
       {
         nameEn: "Shri Hemantrao Khanwilkar",
         nameHi: 'श्री हेमंतराव खानवलकर',
-        descEn: "",
-        descHi: "",
+        descEn: "Madhya Pradesh",
+        descHi: "मध्य प्रदेश",
         image: "/national_bearers/hemantwar-khanwilkar.jpeg"
       }
     ]
@@ -248,10 +248,10 @@ function MemberCard({ member, lang, className = "" }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5 }}
-      className={`flex flex-col items-center text-center w-[210px] group ${className}`}
+      className={`bearer-card-item flex flex-col items-center text-center group ${className}`}
     >
       {/* Exact uniform 3:4 Aspect Ratio Image/Placeholder */}
-      <div className="w-[210px] h-[280px] rounded-2xl bg-white border border-[#E8D5B8] flex flex-col items-center justify-center relative overflow-hidden transition-all duration-300 group-hover:border-[#E8622A]/40 group-hover:shadow-md shrink-0">
+      <div className="w-full aspect-[3/4] rounded-2xl bg-white border border-[#E8D5B8] flex flex-col items-center justify-center relative overflow-hidden transition-all duration-300 group-hover:border-[#E8622A]/40 group-hover:shadow-md shrink-0">
         {member.image && !imageError ? (
           <img
             src={member.image}
@@ -271,11 +271,11 @@ function MemberCard({ member, lang, className = "" }) {
       </div>
 
       {/* Name and Designation */}
-      <h3 className="mt-4 text-base md:text-lg font-bold font-serif text-[#2C1810] leading-tight transition-colors duration-300 group-hover:text-[#E8622A]">
+      <h3 className="mt-3 text-sm md:text-base font-bold font-serif text-[#2C1810] leading-tight transition-colors duration-300 group-hover:text-[#E8622A] px-1">
         {name}
       </h3>
       {desc && (
-        <p className="mt-1 text-xs md:text-sm text-[#7A5C45] font-medium leading-normal">
+        <p className="mt-1 text-xs md:text-sm text-[#7A5C45] font-medium leading-normal px-1">
           {renderDesc(desc)}
         </p>
       )}
@@ -332,7 +332,7 @@ export default function NationalOfficeBearers() {
       </section>
 
       {/* ── Sections and grids ───────────────────────────────────────── */}
-      <div className="max-w-[1560px] mx-auto px-4 sm:px-6 py-16 relative z-10 space-y-14">
+      <div className="national-bearers-container max-w-[1560px] mx-auto px-4 sm:px-6 py-16 relative z-10 space-y-14">
         
         {/* 1. National President */}
         <section className="flex flex-col items-center">
@@ -343,7 +343,7 @@ export default function NationalOfficeBearers() {
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
-          <div className="flex justify-center w-full">
+          <div className="bearer-card-grid">
             {bearersData.president.members.map((member, i) => (
               <MemberCard key={i} member={member} lang={lang} />
             ))}
@@ -359,7 +359,7 @@ export default function NationalOfficeBearers() {
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
-          <div className="flex flex-wrap justify-center gap-4 md:gap-6 w-full max-w-[1380px]">
+          <div className="bearer-card-grid">
             {bearersData.vicePresidents.members.map((member, i) => (
               <MemberCard key={i} member={member} lang={lang} />
             ))}
@@ -375,7 +375,7 @@ export default function NationalOfficeBearers() {
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
-          <div className="flex flex-wrap justify-center gap-4 md:gap-6 w-full max-w-[1380px]">
+          <div className="bearer-card-grid">
             {bearersData.generalSecretaries.members.map((member, i) => (
               <MemberCard key={i} member={member} lang={lang} />
             ))}
@@ -391,7 +391,7 @@ export default function NationalOfficeBearers() {
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
-          <div className="flex flex-wrap justify-center gap-4 md:gap-6 w-full max-w-[1380px]">
+          <div className="bearer-card-grid">
             {bearersData.secretaries.members.map((member, i) => (
               <MemberCard key={i} member={member} lang={lang} />
             ))}
@@ -407,7 +407,7 @@ export default function NationalOfficeBearers() {
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
-          <div className="flex flex-wrap justify-center gap-4 md:gap-6 w-full max-w-[1380px]">
+          <div className="bearer-card-grid">
             {bearersData.jointSecretaries.members.map((member, i) => (
               <MemberCard key={i} member={member} lang={lang} />
             ))}
@@ -423,12 +423,13 @@ export default function NationalOfficeBearers() {
             </h2>
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8622A]" />
           </div>
-          <div className="flex flex-wrap justify-center gap-4 md:gap-6 w-full max-w-[1380px]">
+          <div className="bearer-card-grid">
             {bearersData.morcha.members.map((member, i) => (
               <MemberCard key={i} member={member} lang={lang} />
             ))}
           </div>
         </section>
+
 
       </div>
     </div>
