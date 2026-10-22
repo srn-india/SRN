@@ -10,6 +10,7 @@ import {
   Phone, Mail, Copy, Check, ExternalLink, Camera, Sparkles, UserCheck, Shield, Loader2
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "../components/ui/dialog";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -45,6 +46,10 @@ export default function AdminDashboard() {
   // Manual payments state
   const [manualPayments, setManualPayments] = useState([]);
   const [manualLoading, setManualLoading] = useState(false);
+  const [reviewPayment, setReviewPayment] = useState(null);
+  const [reviewDetails, setReviewDetails] = useState({ amount: '', utrNumber: '', purpose: '', adminNote: '' });
+  const [reviewBusy, setReviewBusy] = useState(false);
+  const [reviewError, setReviewError] = useState('');
   const [rejectModal, setRejectModal] = useState(null); // { id, userId }
   const [rejectReason, setRejectReason] = useState("");
   const [mpFilter, setMpFilter] = useState("PENDING");
@@ -450,20 +455,37 @@ export default function AdminDashboard() {
   }, [activeTab]);
 
   const approveManualPayment = async (id, type) => {
-    const msg = type === "MEMBERSHIP" 
-      ? "Approve this payment? This will grant membership access to the user." 
-      : "Approve this payment? This will verify the user's donation.";
-    if (!window.confirm(msg)) return;
+    if (!window.confirm(type === 'DONATION' ? 'Approve this donation and email the reviewed receipt?' : 'Approve this payment and grant membership access?')) return;
+    setReviewBusy(true);
+    setReviewError('');
     try {
+      const corrections = type === 'DONATION' ? { amount: Number(reviewDetails.amount), utrNumber: reviewDetails.utrNumber, purpose: reviewDetails.purpose } : {};
       const res = await fetch(`${API_BASE}/api/manual-payments/admin/${id}/approve`, {
-        method: "PATCH",
-        headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}`, "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ adminNote: "" })
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}`, 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ adminNote: reviewDetails.adminNote, corrections }),
       });
-      if (res.ok) { alert("✅ Payment approved! User notified via email."); fetchManualPayments(); }
-      else alert("Failed: " + (await res.json()).message);
-    } catch (err) { alert("Error: " + err.message); }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Approval failed');
+      alert(data.data?.emailSent ? 'Payment approved. Receipt emailed to the donor.' : data.data?.deliveryError || 'Payment approved. Email was not sent.');
+      setReviewPayment(null);
+      fetchManualPayments();
+    } catch (err) { setReviewError(err.message); }
+    finally { setReviewBusy(false); }
+  };
+
+  const resendDonationReceipt = async (id) => {
+    setReviewBusy(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/manual-payments/admin/${id}/receipt`, {
+        method: 'POST', credentials: 'include', headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Receipt email failed');
+      alert('Donation receipt emailed successfully.');
+    } catch (err) { alert(err.message); }
+    finally { setReviewBusy(false); }
   };
 
   const rejectManualPayment = async (id) => {
@@ -724,7 +746,7 @@ export default function AdminDashboard() {
       "Verification Status",
       "Submission Date",
       "Screenshot URL",
-      "Rejection Note"
+      "Admin Review / Corrections"
     ];
 
     const escapeCsv = (val) => {
@@ -745,7 +767,7 @@ export default function AdminDashboard() {
       escapeCsv(p.status),
       escapeCsv(p.createdAt ? new Date(p.createdAt).toLocaleDateString("en-IN") : 'N/A'),
       escapeCsv(p.screenshot || 'N/A'),
-      escapeCsv(p.rejectionReason || 'N/A')
+      escapeCsv(p.adminNote || 'N/A')
     ]);
 
     const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
@@ -957,7 +979,7 @@ export default function AdminDashboard() {
     { id: "complaints", label: "Manage Complaints", icon: AlertCircle },
     { id: "applications", label: "Post Applications", icon: Briefcase },
     { id: "memberships", label: "Manage Memberships", icon: Users },
-    { id: "manual-payments", label: "Manual Payments", icon: QrCode },
+    { id: "manual-payments", label: "Payment Reviews", icon: QrCode },
     { id: "settings", label: "Platform Settings", icon: Settings },
   ];
 
@@ -1746,9 +1768,9 @@ export default function AdminDashboard() {
                     <div>
                       <h2 className="text-2xl font-bold text-[#2C1810] font-serif flex items-center gap-3">
                         <div className="p-2 bg-[#E8622A]/10 rounded-xl"><QrCode className="w-6 h-6 text-[#E8622A]" /></div>
-                        Manual Payments (UPI & Bank Transfer)
+                        Payment Reviews (UPI, Bank & Online)
                       </h2>
-                      <p className="text-sm text-[#7A5C45] mt-1">Review and verify UPI and Bank Transfer payment submissions from members and donors.</p>
+                      <p className="text-sm text-[#7A5C45] mt-1">Review payments, correct donation discrepancies, and approve receipts before emailing donors.</p>
                     </div>
                     <div className="flex items-center gap-2.5 flex-wrap">
                       <button 
@@ -1838,7 +1860,10 @@ export default function AdminDashboard() {
                                 {(() => {
                                   let methodTag = "Manual";
                                   let cleanPurpose = p.purpose || "";
-                                  if (cleanPurpose.includes("[BANK TRANSFER]")) {
+                                  if (p.id.startsWith('razorpay:')) {
+                                    methodTag = 'Razorpay';
+                                    cleanPurpose = cleanPurpose.replace('[RAZORPAY]', '').trim();
+                                  } else if (cleanPurpose.includes("[BANK TRANSFER]")) {
                                     methodTag = "Bank Transfer";
                                     cleanPurpose = cleanPurpose.replace("[BANK TRANSFER]", "").trim();
                                   } else if (cleanPurpose.includes("[UPI]")) {
@@ -2164,15 +2189,18 @@ export default function AdminDashboard() {
                               <div className="flex flex-wrap items-center gap-3">
                                 {p.status === "PENDING" && (
                                   <>
-                                    <button onClick={() => approveManualPayment(p.id, p.type)}
+                                    <button onClick={() => { setReviewPayment(p); setReviewDetails({ amount: String(p.amount), utrNumber: p.utrNumber, purpose: p.purpose || '', adminNote: '' }); setReviewError(''); }}
                                       className="flex-1 sm:flex-none flex justify-center items-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 cursor-pointer">
-                                      <CheckCircle2 className="w-5 h-5" /> Approve Payment
+                                      <CheckCircle2 className="w-5 h-5" /> Review & Approve
                                     </button>
                                     <button onClick={() => setRejectModal(p)}
                                       className="flex-1 sm:flex-none flex justify-center items-center gap-2 px-6 py-2.5 bg-white border-2 border-red-100 hover:border-red-500 hover:bg-red-50 text-red-500 rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5 shadow-sm cursor-pointer">
                                       <XCircle className="w-5 h-5" /> Reject
                                     </button>
                                   </>
+                                )}
+                                {p.status === "APPROVED" && p.type === "DONATION" && (
+                                  <button type="button" disabled={reviewBusy} onClick={() => resendDonationReceipt(p.id)} className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-bold disabled:opacity-50">Resend Donation Receipt</button>
                                 )}
                                 {p.status === "APPROVED" && p.type === "MEMBERSHIP" && (
                                   <>
@@ -2215,6 +2243,38 @@ export default function AdminDashboard() {
                         ))
                       )}
                     </div>
+                  )}
+
+                  {reviewPayment && (
+                    <Dialog open onOpenChange={open => { if (!open && !reviewBusy) setReviewPayment(null); }}>
+                    <DialogContent className="max-h-[90vh] overflow-y-auto" onEscapeKeyDown={e => { if (reviewBusy) e.preventDefault(); }} onInteractOutside={e => { if (reviewBusy) e.preventDefault(); }}>
+                      <form onSubmit={e => { e.preventDefault(); approveManualPayment(reviewPayment.id, reviewPayment.type); }} className="bg-white rounded-2xl p-6 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto">
+                        <DialogTitle className="text-xl font-bold">Review {reviewPayment.type === 'DONATION' ? 'Donation' : 'Membership Payment'}</DialogTitle>
+                        <p className="text-sm text-gray-600">{reviewPayment.user?.firstName} {reviewPayment.user?.lastName} · {reviewPayment.user?.email || 'No email on file'}</p>
+                        <DialogDescription>Check the payment proof before approval. Donation corrections and your explanation will be emailed with the receipt.</DialogDescription>
+                        {reviewPayment.type === 'DONATION' && (<>
+                          <label className="block text-sm font-bold">Verified amount (₹)
+                            <input required type="number" min="0.01" step="0.01" disabled={reviewPayment.id.startsWith('razorpay:')} value={reviewDetails.amount} onChange={e => setReviewDetails({ ...reviewDetails, amount: e.target.value })} className="block w-full border rounded-lg p-2 mt-1" />
+                          </label>
+                          <label className="block text-sm font-bold">UTR / Transaction ID
+                            <input required maxLength={100} disabled={reviewPayment.id.startsWith('razorpay:')} value={reviewDetails.utrNumber} onChange={e => setReviewDetails({ ...reviewDetails, utrNumber: e.target.value })} className="block w-full border rounded-lg p-2 mt-1" />
+                          </label>
+                          {reviewPayment.id.startsWith('razorpay:') && <p className="text-xs text-gray-600">Online payment amount and transaction ID are fixed by the payment provider.</p>}
+                          <label className="block text-sm font-bold">Donation details / purpose
+                            <textarea maxLength={4000} value={reviewDetails.purpose} onChange={e => setReviewDetails({ ...reviewDetails, purpose: e.target.value })} rows={3} className="block w-full border rounded-lg p-2 mt-1" />
+                          </label>
+                        </>)}
+                        <label className="block text-sm font-bold">Admin note / reason for corrections
+                          <textarea maxLength={4000} value={reviewDetails.adminNote} onChange={e => setReviewDetails({ ...reviewDetails, adminNote: e.target.value })} rows={3} className="block w-full border rounded-lg p-2 mt-1" />
+                        </label>
+                        {reviewError && <p role="alert" className="text-red-700 text-sm">{reviewError}</p>}
+                        <div className="flex gap-3">
+                          <button type="submit" disabled={reviewBusy} className="flex-1 bg-emerald-600 text-white rounded-xl p-3 font-bold disabled:opacity-50">{reviewBusy ? 'Sending…' : 'Approve & Email Receipt'}</button>
+                          <button type="button" disabled={reviewBusy} onClick={() => setReviewPayment(null)} className="rounded-xl bg-gray-100 p-3">Cancel</button>
+                        </div>
+                      </form>
+                    </DialogContent>
+                    </Dialog>
                   )}
 
                   {/* Reject Modal */}

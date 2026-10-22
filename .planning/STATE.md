@@ -8,6 +8,7 @@
 ## Quick Tasks Completed
 | Task | Date | Status | Description |
 |------|------|--------|-------------|
+| `007-donation-admin-review` | 2026-10-22 | COMPLETE ✓ | Donations require admin approval before receipt generation; correction audit emailed to donors and receipt resend available |
 | `006-public-donation-route` | 2026-09-23 | COMPLETE ✓ | Public donation route, unblocking guest donations via Razorpay and Manual methods |
 | `005-public-membership-govid` | 2026-09-23 | COMPLETE ✓ | Public membership route, multi-document Government ID (Aadhaar, PAN, Voter ID, DL) with database sync |
 | `004-resend-email-integration` | 2026-09-23 | COMPLETE ✓ | Resend HTTPS REST API integration replacing SMTP (bypasses Render port blocks) |
@@ -34,3 +35,16 @@
 - Added backend route `POST /api/memberships/register-normal` and updated `getMe` to expose `membershipPlan`.
 - Enriched `getAllPayments` in `manual-payment.service.ts` to include full user profiles (avatar/ID photo, state, district, gender, DOB, role, verification status, and latest membership history).
 - Upgraded Admin Dashboard payment verification (`AdminDashboard.jsx`) with comprehensive user identity cards, ID photo preview with lightbox zoom, phone/email contact links, 1-click copy helpers, demographics, and formatted application purpose breakdown.
+
+
+## Donation Admin Review — 2026-10-22
+- New manual donations remain PENDING; no PDF receipt is generated on submission.
+- Verified online donations create a PENDING entry in Payment Reviews atomically with payment verification. Online payment amount/reference remain immutable; review entries are excluded from duplicate analytics totals.
+- Admins can correct manual donation amount, transaction reference, and purpose before approval. A reason is mandatory for changes; original and corrected values are stored in adminNote and included in the donor email. Receipt uses verified values.
+- Approval conditionally updates PENDING status to prevent duplicate issuance. Approved donation receipts can be resent; delivery errors are surfaced in the admin UI.
+- Donation copy in English and Hindi states that receipts follow admin approval. Admin review uses the existing accessible Dialog component; CSV includes the review/correction note.
+- Verification: backend and frontend production builds pass; 19 focused backend donation tests and all 16 frontend tests pass. Admin UI test verifies corrected details and explanation are submitted together. HTTP checks: frontend /donate 200, backend / 200, unauthenticated admin review endpoint 401.
+- Full backend suite: 7 suites blocked by existing Jest/ESM htmlparser2 dependency parse failure (auth, events, health, payment, posts, sanitize, user). The completed full-suite run passed 36 tests across 5 suites before the final additional donation cases were added. Local test Redis also reported connection errors. No live donation or donor email was sent during verification.
+- React Doctor: changed-file scan reported no issues, overall score 59/100. Existing frontend bundle-size warning remains.
+- Servers started: frontend http://localhost:8080; backend http://localhost:4000 (Redis connected). No database schema migration required. Existing auto-approved historical donations were not altered.
+- .planning/ROADMAP.md is absent; work follows the active Membership Tiers & Donation Backend phase recorded above.

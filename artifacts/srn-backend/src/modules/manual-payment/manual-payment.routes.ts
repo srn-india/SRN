@@ -15,6 +15,7 @@ router.post('/upload-screenshot', optionalAuth, upload.single('file'), ctrl.uplo
 router.get('/admin/all', protect, restrictTo('ADMIN'), ctrl.getAllPayments);
 router.delete('/admin/cleanup', protect, restrictTo('ADMIN'), ctrl.cleanupPayments);
 router.delete('/admin/:id', protect, restrictTo('ADMIN'), ctrl.deletePayment);
+router.post('/admin/:id/receipt', protect, restrictTo('ADMIN'), ctrl.resendDonationReceipt);
 router.patch('/admin/:id/approve', protect, restrictTo('ADMIN'), ctrl.approvePayment);
 router.patch('/admin/:id/reject', protect, restrictTo('ADMIN'), ctrl.rejectPayment);
 router.post('/admin/:userId/send-idcard', protect, restrictTo('ADMIN'), ctrl.sendIdCard);

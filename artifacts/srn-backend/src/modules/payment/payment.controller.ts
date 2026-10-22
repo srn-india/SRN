@@ -54,7 +54,7 @@ export const verifyPayment = catchAsync(async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user?.id;
     const result = await paymentService.verifyPayment(req.body, userId);
-    sendSuccess(res, result, 'Payment verified and membership/donation activated');
+    sendSuccess(res, result, result.type === 'DONATION' ? 'Payment received; receipt pending admin approval' : 'Payment verified and membership activated');
   } catch (error: any) {
     console.error("verifyPayment Error Details:", error);
     res.status(500).json({ status: 'error', message: error.message || 'Payment verification failed' });

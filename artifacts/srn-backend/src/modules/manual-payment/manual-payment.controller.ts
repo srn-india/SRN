@@ -26,7 +26,7 @@ export const submit = async (req: Request, res: Response) => {
       profilePicture 
     } = req.body;
 
-    if (!amount || !type || !utrNumber) {
+    if (typeof amount !== 'number' || !Number.isFinite(amount) || amount <= 0 || !['DONATION', 'MEMBERSHIP'].includes(type) || typeof utrNumber !== 'string' || !utrNumber.trim()) {
       return res.status(400).json({ success: false, message: 'amount, type and utrNumber are required' });
     }
 
@@ -233,8 +233,8 @@ export const getAllPayments = async (req: Request, res: Response) => {
 export const approvePayment = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { adminNote } = req.body;
-    const result = await service.approvePayment(id as string, adminNote as string);
+    const { adminNote, corrections } = req.body;
+    const result = await service.approvePayment(id as string, adminNote, corrections);
     res.json({ success: true, message: 'Payment approved', data: result });
   } catch (err: any) {
     res.status(400).json({ success: false, message: err.message });
@@ -297,3 +297,12 @@ export const cleanupPayments = async (req: Request, res: Response) => {
   }
 };
 
+
+export const resendDonationReceipt = async (req: Request, res: Response) => {
+  try {
+    await service.sendDonationReceipt(req.params.id as string);
+    res.json({ success: true, message: 'Donation receipt email sent' });
+  } catch (err: any) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};

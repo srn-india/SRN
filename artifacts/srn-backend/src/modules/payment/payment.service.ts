@@ -72,6 +72,7 @@ async function notifyAdminOfPayment(payment: {
       `New Payment Received — ₹${payment.amount} (${payment.type})`,
       `
         <p>A new ${payment.type} payment has been recorded.</p>
+        ${payment.type === 'DONATION' ? `<p>Admin approval is required before a receipt can be generated. <a href="${process.env.FRONTEND_URL}/admin-dashboard">Review in Payment Reviews</a></p>` : ''}
         <ul>
           <li><b>Amount:</b> ₹${payment.amount}</li>
           <li><b>Status:</b> ${payment.status}</li>
@@ -223,10 +224,12 @@ export const verifyPayment = async (paymentData: { razorpay_order_id: string, ra
     throw new Error('Invalid payment signature');
   }
   
+  if (payment.status === 'SUCCESS') return { ...payment, reviewStatus: payment.type === 'DONATION' ? 'ADMIN_REVIEW' : undefined };
+
   const result = await prisma.$transaction(async (tx: any) => {
     // 1. Update payment status and store payment ID
     const updatedPayment = await tx.payment.update({
-      where: { id: payment.id },
+      where: { id: payment.id, status: 'PENDING' },
       data: { 
         status: 'SUCCESS',
         razorpayPaymentId: razorpay_payment_id,
@@ -241,6 +244,17 @@ export const verifyPayment = async (paymentData: { razorpay_order_id: string, ra
       membershipId = membership.id;
     } else if (payment.type === 'DONATION') {
       const userObj = await tx.user.findUnique({ where: { id: effectiveUserId } });
+      await tx.manualPayment.create({
+        data: {
+          id: `razorpay:${payment.id}`,
+          userId: effectiveUserId,
+          amount: Number(payment.amount),
+          type: 'DONATION',
+          utrNumber: razorpay_payment_id,
+          purpose: `[RAZORPAY] ${purpose || ''}`,
+          status: 'PENDING',
+        },
+      });
       await tx.donation.create({
         data: {
           paymentId: payment.id,
@@ -279,16 +293,23 @@ export const verifyPayment = async (paymentData: { razorpay_order_id: string, ra
   // tasks as soon as the response is sent, so SMTP connections launched in a detached async
   // closure never complete. Awaiting here ensures the emails are fully sent.
   try {
-    // Priority 1: Send the user their receipt and ID card first
+    // Donation receipts wait for admin approval; membership delivery remains immediate.
     if (user?.email) {
-      await notifyUserOfPayment(paymentDetails);
+      if (payment.type === 'DONATION') {
+        await sendEmail(user.email, 'SRN donation received — admin review pending',
+          `<p>We have received your online donation of ₹${result.amount}.</p><p>Our admin team will review the donation details. Your receipt will be generated and emailed after approval.</p>`);
+      } else {
+        await notifyUserOfPayment(paymentDetails);
+      }
     }
-    // Priority 2: Generate the Excel ledger and send admin notification
+  } catch (err) {
+    console.error('User payment notification failed:', err);
+  }
+  try {
     await notifyAdminOfPayment(paymentDetails);
   } catch (err) {
-    // Log but do NOT throw — a failed email should never break the payment response
-    console.error("Email notification jobs failed:", err);
+    console.error('Admin payment notification failed:', err);
   }
 
-  return result;
+  return { ...result, reviewStatus: payment.type === 'DONATION' ? 'ADMIN_REVIEW' : undefined };
 };

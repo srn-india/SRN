@@ -239,6 +239,7 @@ export default function Donate() {
             }
 
             setSubmitted(true);
+            alert(en ? 'Payment received. Your donation is pending admin approval. We will email your receipt after review.' : 'भुगतान प्राप्त हुआ। आपका दान व्यवस्थापक की मंज़ूरी की प्रतीक्षा में है। समीक्षा के बाद रसीद ईमेल की जाएगी।');
             setTimeout(() => {
               setSubmitted(false);
               setAmount(5100);
@@ -722,8 +723,8 @@ export default function Donate() {
                           <h3 className="text-lg font-bold text-[#5C1010] font-serif mb-1">{en ? "Donation Received!" : "दान प्राप्त हुआ!"}</h3>
                           <p className="text-[#7A5C45] text-xs leading-relaxed">
                             {en 
-                              ? "Thank you! Your payment details have been submitted. Our team will verify and dispatch your 80G tax receipt within 24 hours." 
-                              : "धन्यवाद! आपका भुगतान सबमिट हो गया है। हमारी टीम 24 घंटों में 80G रसीद ईमेल करेगी।"}
+                              ? "Thank you! Your payment details have been submitted. Our admin team will review your donation and email your receipt after approval."
+                              : "धन्यवाद! आपका भुगतान सबमिट हो गया है। हमारी व्यवस्थापक टीम समीक्षा और मंज़ूरी के बाद रसीद ईमेल करेगी।"}
                           </p>
                         </div>
                       ) : (
@@ -842,8 +843,8 @@ export default function Donate() {
                           <h3 className="text-lg font-bold text-[#5C1010] font-serif mb-1">{en ? "Transfer Received!" : "ट्रांसफर प्राप्त हुआ!"}</h3>
                           <p className="text-[#7A5C45] text-xs leading-relaxed">
                             {en 
-                              ? "Thank you! Your bank transfer donation has been submitted for verification. We will issue your 80G certificate within 24 hours." 
-                              : "धन्यवाद! आपका बैंक ट्रांसफर सबमिट हो गया है। 80G प्रमाणपत्र 24 घंटों में जारी किया जाएगा।"}
+                              ? "Thank you! Your bank transfer donation has been submitted for verification. Our admin team will email your receipt after approval."
+                              : "धन्यवाद! आपका बैंक ट्रांसफर सबमिट हो गया है। व्यवस्थापक की समीक्षा और मंज़ूरी के बाद रसीद ईमेल की जाएगी।"}
                           </p>
                         </div>
                       ) : (
@@ -1011,7 +1012,7 @@ export default function Donate() {
                 </div>
                 <div className="flex items-center gap-2.5 text-[#5C1010]">
                   <CheckCircle2 className="w-4 h-4 text-[#E8622A] shrink-0" />
-                  <span className="font-semibold">{en ? "Instant Digital 80G Certificate Dispatch" : "डिजिटल 80G प्रमाण पत्र सीधे ईमेल पर"}</span>
+                  <span className="font-semibold">{en ? "Receipt Emailed After Admin Approval" : "व्यवस्थापक की मंज़ूरी के बाद रसीद ईमेल पर"}</span>
                 </div>
               </div>
 

@@ -1,5 +1,6 @@
 import { prisma } from '../../lib/prisma';
 import { PaymentType } from '@prisma/client';
+import { z } from 'zod';
 import { generateReceiptPdf, ReceiptData } from '../../utils/receipt.service';
 import * as membershipService from '../membership/membership.service';
 import * as idcardService from '../membership/idcard.service';
@@ -19,8 +20,7 @@ export const submitPayment = async (
     email?: string;
   }
 ) => {
-  // Donations are automatically approved since they don't grant member privileges
-  const initialStatus = data.type === 'DONATION' ? 'APPROVED' : 'PENDING';
+  const initialStatus = 'PENDING';
 
   const payment = await prisma.manualPayment.create({
     data: {
@@ -30,20 +30,20 @@ export const submitPayment = async (
       utrNumber: data.utrNumber,
       screenshot: data.screenshot,
       purpose: data.purpose,
-      status: initialStatus as any, // Bypass TS check if needed, but 'APPROVED' is valid
+      status: initialStatus
     },
     include: { user: true },
   });
 
-  // Notify admin in background
+  // Await notifications so the hosting platform can finish delivery before responding.
   const user = payment.user;
   const userName = `${user.firstName} ${user.lastName}`.trim();
   const recipientEmail = data.email || user.email;
 
-  sendEmail(
+  await sendEmail(
     ADMIN_EMAIL,
     `🔔 New Manual Payment Submitted — ₹${data.amount} (${data.type})`,
-    `<h2>Manual Payment ${initialStatus === 'APPROVED' ? 'Received (Auto-Approved)' : 'Pending Verification'}</h2>
+    `<h2>Manual Payment Pending Verification</h2>
      <ul>
        <li><b>User:</b> ${userName} (${recipientEmail})</li>
        <li><b>Type:</b> ${data.type}</li>
@@ -55,59 +55,10 @@ export const submitPayment = async (
      <p><a href="${process.env.FRONTEND_URL}/admin-dashboard" class="btn">Review in Admin Dashboard</a></p>`
   ).catch(err => console.error('Admin notification email failed:', err));
 
-  // If DONATION, send the thank you email immediately in the background
-  if (data.type === 'DONATION') {
-    (async () => {
-      let attachments: any[] = [];
-      try {
-        const pdfBuffer = await generateReceiptPdf({
-          userName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Contributor',
-          userPan: (user as any).govIdNumber || (user as any).panNumber || undefined,
-          userPhone: user.phone || undefined,
-          userEmail: user.email || undefined,
-          amount: Number(data.amount),
-          paymentId: data.utrNumber,
-          type: 'DONATION',
-          date: new Date(),
-          method: data.purpose?.includes('[BANK TRANSFER]') ? 'Bank Transfer' : 'UPI (Manual)'
-        });
-        attachments.push({
-          filename: 'SRN_Donation_Receipt.pdf',
-          content: pdfBuffer,
-          contentType: 'application/pdf'
-        });
-      } catch (err) {
-        console.error('Failed to generate PDF receipt:', err);
-      }
-
-      if (recipientEmail) {
-        await sendEmail(
-          recipientEmail,
-          '✅ Your Donation has been received!',
-          `<h2>Dear ${user.firstName},</h2>
-           <p>We have successfully received your generous donation of <b>₹${data.amount}</b> via ${data.purpose?.includes('[BANK TRANSFER]') ? 'Bank Transfer' : 'UPI'}.</p>
-           <p>Your contribution directly empowers our youth-driven initiatives and helps us build a stronger India. We cannot do this without the support of dedicated individuals like you.</p>
-           <div style="background-color: #f3f4f6; padding: 16px; border-radius: 6px; margin: 24px 0;">
-             <h3 style="margin-top:0; color: #111;">Donation Receipt</h3>
-             <p style="margin:4px 0;"><b>Amount:</b> ₹${data.amount}</p>
-             <p style="margin:4px 0;"><b>Payment Method:</b> ${data.purpose?.includes('[BANK TRANSFER]') ? 'Bank Transfer' : 'UPI'}</p>
-             <p style="margin:4px 0;"><b>UTR / Transaction ID:</b> ${data.utrNumber}</p>
-             <p style="margin:4px 0;"><b>Date:</b> ${new Date().toLocaleDateString('en-IN')}</p>
-           </div>
-           <p>Please find the official PDF receipt attached to this email.</p>
-           <p>With deep gratitude,<br><b>The SRN Team</b></p>
-           <center><a href="${process.env.FRONTEND_URL}/dashboard" class="btn">Visit Dashboard</a></center>`,
-          undefined,
-          attachments
-        ).then(() => console.log('Donation thank you email sent successfully')).catch(err => console.error('Donation thank you email failed:', err));
-      }
-    })();
-  }
-  
   // Send an acknowledgment email for ALL manual payments immediately if email is available
   if (recipientEmail) {
     console.log('Sending acknowledgment email to', recipientEmail);
-    sendEmail(
+    await sendEmail(
       recipientEmail,
       'Payment Verification Pending',
       `<h2>Hi ${user.firstName},</h2>
@@ -169,82 +120,76 @@ export const getAllPayments = async (status?: string) => {
   });
 };
 
-// ── Admin: Approve a payment ─────────────────────────────────────────────────
-export const approvePayment = async (id: string, adminNote?: string) => {
-  const payment = await prisma.manualPayment.findUnique({
-    where: { id },
-    include: { user: true },
+const escapeHtml = (value: string) => value.replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]!));
+
+const correctionSchema = z.object({
+  amount: z.number().positive().max(99999999.99).refine(value => Math.abs(value * 100 - Math.round(value * 100)) < 0.00001, 'Use at most two decimal places').optional(),
+  utrNumber: z.string().trim().min(1).max(100).optional(),
+  purpose: z.string().trim().max(4000).optional(),
+}).strict();
+
+// Both online and manual donations use this review queue. Online payment facts remain immutable.
+export const sendDonationReceipt = async (id: string) => {
+  const payment = await prisma.manualPayment.findUnique({ where: { id }, include: { user: true } });
+  if (!payment || payment.type !== 'DONATION' || payment.status !== 'APPROVED') throw new Error('Donation must be approved before sending a receipt');
+  const user = payment.user;
+  if (!user.email) throw new Error('Donor email is required to send a receipt');
+  const method = payment.id.startsWith('razorpay:') ? 'RAZORPAY' : payment.purpose?.includes('[BANK TRANSFER]') ? 'Bank Transfer' : 'UPI (Manual)';
+  const pdfBuffer = await generateReceiptPdf({
+    userName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Supporter',
+    userPan: user.panNumber || (user.govIdType === 'PAN' ? user.govIdNumber : undefined) || undefined,
+    userPhone: user.phone || undefined,
+    userEmail: user.email,
+    amount: payment.amount,
+    paymentId: payment.utrNumber,
+    type: 'DONATION',
+    date: payment.createdAt,
+    method,
   });
+  await sendEmail(user.email, 'Your SRN donation has been approved',
+    `<h2>Thank you, ${escapeHtml(user.firstName || 'Supporter')}!</h2>
+     <p>Your donation has been reviewed and approved by our admin team.</p>
+     <p><b>Verified amount:</b> ₹${payment.amount}<br><b>Transaction ID:</b> ${escapeHtml(payment.utrNumber)}<br><b>Method:</b> ${method}</p>
+     <p><b>Donation details:</b> ${escapeHtml(payment.purpose || '')}</p>
+     ${payment.adminNote ? `<p><b>Admin review and corrections:</b></p><pre style="white-space:pre-wrap">${escapeHtml(payment.adminNote)}</pre>` : ''}
+     <p>Your approved donation receipt is attached.</p>`,
+    'Your donation has been approved. Please see the attached receipt.',
+    [{ filename: 'SRN_Donation_Receipt.pdf', content: pdfBuffer, contentType: 'application/pdf' }]);
+};
+
+// ── Admin: Approve a payment ─────────────────────────────────────────────────
+export const approvePayment = async (id: string, adminNote?: string, input: unknown = {}) => {
+  const corrections = correctionSchema.parse(input);
+  const note = z.string().trim().max(4000).parse(adminNote ?? '');
+  const payment = await prisma.manualPayment.findUnique({ where: { id }, include: { user: true } });
   if (!payment) throw new Error('Payment not found');
   if (payment.status !== 'PENDING') throw new Error('Payment is not pending');
-
+  const changes = Object.entries(corrections).filter(([key, value]) => value !== (payment[key as keyof typeof payment] ?? ''));
+  if (changes.length && payment.type !== 'DONATION') throw new Error('Corrections are only supported for donations');
+  if (changes.length && !note) throw new Error('An admin note explaining the corrections is required');
+  if (payment.id.startsWith('razorpay:') && changes.some(([key]) => key === 'amount' || key === 'utrNumber')) throw new Error('Online payment amount and transaction ID cannot be changed');
+  const reviewNote = [note, ...changes.map(([key, value]) => `${key}: ${payment[key as keyof typeof payment] ?? '(empty)'} → ${value}`)].filter(Boolean).join('\n');
   let membershipId: string | undefined;
-
-  // Grant membership if applicable
   if (payment.type === 'MEMBERSHIP') {
     const membership = await membershipService.subscribeUser(payment.userId, 'PREMIUM', 36);
     membershipId = membership.id;
   }
-
+  // Conditional update prevents concurrent approvals from issuing duplicate receipts.
   const updated = await prisma.manualPayment.update({
-    where: { id },
-    data: { status: 'APPROVED', adminNote, membershipId },
+    where: { id, status: 'PENDING' },
+    data: { ...corrections, status: 'APPROVED', adminNote: reviewNote, membershipId },
   });
-
-  // Notify user with ID card and receipt (unified email)
-  const user = payment.user;
-  const firstName = user.firstName || 'Member';
-
-  if (payment.type === 'MEMBERSHIP') {
-    try {
-      await sendIdCard(payment.userId);
-    } catch (err) {
-      console.error('Failed to send ID card and receipt on approval:', err);
-    }
-  } else {
-    // DONATION: Generate receipt PDF and send confirmation email
-    let attachments: any[] = [];
-    try {
-      const pdfBuffer = await generateReceiptPdf({
-        userName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || firstName,
-        userPan: (user as any).govIdNumber || (user as any).panNumber || undefined,
-        userPhone: user.phone || undefined,
-        userEmail: user.email || undefined,
-        amount: Number(payment.amount),
-        paymentId: payment.utrNumber,
-        type: 'DONATION',
-        date: payment.createdAt,
-        method: payment.purpose?.includes('[BANK TRANSFER]') ? 'Bank Transfer' : 'UPI (Manual)'
-      });
-      attachments.push({
-        filename: 'SRN_Donation_Receipt.pdf',
-        content: pdfBuffer,
-        contentType: 'application/pdf'
-      });
-    } catch (err) {
-      console.error('Failed to generate donation receipt PDF on approval:', err);
-    }
-
-    if (user.email) {
-      try {
-        await sendEmail(
-          user.email,
-          '✅ Your Donation has been verified!',
-          `<h2>Thank you for your generous donation, ${firstName}!</h2>
-           <p>Your donation of <b>₹${payment.amount}</b> via ${payment.purpose?.includes('[BANK TRANSFER]') ? 'Bank Transfer' : 'UPI'} has been successfully verified.</p>
-           <p>Your official tax-deductible receipt is attached to this email.</p>
-           ${adminNote ? `<p><b>Note:</b> ${adminNote}</p>` : ''}
-           <center><a href="${process.env.FRONTEND_URL}/dashboard" class="btn">Visit Dashboard</a></center>`,
-          'Your donation is verified',
-          attachments
-        );
-      } catch (err) {
-        console.error('Donation approval email dispatch failed:', err);
-      }
-    }
+  let emailSent = false;
+  let deliveryError: string | undefined;
+  try {
+    if (payment.type === 'MEMBERSHIP') await sendIdCard(payment.userId);
+    else await sendDonationReceipt(id);
+    emailSent = true;
+  } catch (err) {
+    console.error('Approval email dispatch failed:', err);
+    deliveryError = 'Payment approved, but receipt email failed. Please retry sending it.';
   }
-
-  return { ...updated, membershipId };
+  return { ...updated, membershipId, emailSent, deliveryError };
 };
 
 // ── Admin: Reject a payment ──────────────────────────────────────────────────
@@ -257,8 +202,8 @@ export const rejectPayment = async (id: string, adminNote: string) => {
   if (payment.status !== 'PENDING') throw new Error('Payment is not pending');
 
   const updated = await prisma.manualPayment.update({
-    where: { id },
-    data: { status: 'REJECTED', adminNote },
+    where: { id, status: 'PENDING' },
+    data: { status: 'REJECTED', adminNote: z.string().trim().min(1).max(4000).parse(adminNote) },
   });
 
   // Notify user if email exists
@@ -270,7 +215,7 @@ export const rejectPayment = async (id: string, adminNote: string) => {
         'Issue with your SRN Payment',
         `<h2>Hi ${user.firstName},</h2>
          <p>We encountered an issue while verifying your recent payment of <b>₹${payment.amount}</b>.</p>
-         <p><b>Reason:</b> ${adminNote}</p>
+         <p><b>Reason:</b> ${escapeHtml(adminNote)}</p>
          <p>If you believe this is an error, please reply to this email or re-submit your payment verification via the website.</p>
          <center><a href="${process.env.FRONTEND_URL}/donate" class="btn">Re-submit Payment</a></center>`
       );

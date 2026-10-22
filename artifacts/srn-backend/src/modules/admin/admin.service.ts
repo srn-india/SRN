@@ -137,7 +137,7 @@ export const getAnalytics = async () => {
     prisma.post.count(),
     prisma.event.count(),
     prisma.payment.count({ where: { status: 'SUCCESS' } }),
-    prisma.manualPayment.count({ where: { status: 'APPROVED' } }),
+    prisma.manualPayment.count({ where: { status: 'APPROVED', NOT: { id: { startsWith: 'razorpay:' } } } }),
     // Razorpay Online Payments
     prisma.payment.aggregate({
       where: { status: 'SUCCESS', type: 'MEMBERSHIP' },
@@ -153,7 +153,7 @@ export const getAnalytics = async () => {
       _sum: { amount: true },
     }),
     prisma.manualPayment.aggregate({
-      where: { status: 'APPROVED', type: 'DONATION' },
+      where: { status: 'APPROVED', type: 'DONATION', NOT: { id: { startsWith: 'razorpay:' } } },
       _sum: { amount: true },
     }),
   ]);
