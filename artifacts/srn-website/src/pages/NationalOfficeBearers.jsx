@@ -79,13 +79,6 @@ const bearersData = {
         descEn: "Bihar",
         descHi: "बिहार",
         image: "/national_bearers/alok-kumar.jpeg"
-      },
-      {
-        nameEn: "Shri B.K. Shukla",
-        nameHi: "श्री बी.के. शुक्ला",
-        descEn: "मुख्य महासचिव",
-        descHi: "मुख्य महासचिव",
-        image: "/national_bearers/b-k-shukla.jpeg"
       }
     ]
   },
