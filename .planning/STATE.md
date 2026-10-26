@@ -8,6 +8,7 @@
 ## Quick Tasks Completed
 | Task | Date | Status | Description |
 |------|------|--------|-------------|
+| `010-avatar-save-state` | 2026-10-26 | COMPLETE ✓ | Fixed stale file picker after saving, enabled actionable Save validation, and clarified ID-card copy |
 | `009-avatar-live-deployment` | 2026-10-26 | COMPLETE ✓ | Corrected stale Render repository/deployment and hardened avatar response handling with regression tests |
 | `008-admin-user-avatar` | 2026-10-26 | COMPLETE ✓ | Admin-only profile image uploads for any user, paginated Manage Users view, ID-card refresh and API/UI tests |
 | `007-donation-admin-review` | 2026-10-22 | COMPLETE ✓ | Donations require admin approval before receipt generation; correction audit emailed to donors and receipt resend available |
@@ -68,3 +69,10 @@
 - Avatar editor now checks response content type, handles HTML 404/413/502 and malformed JSON with actionable errors, and rejects success responses without an updated avatar. Existing image remains unchanged on failure.
 - Regression tests reproduced the exact browser parsing error before the fix. Verification: both builds pass; all 25 frontend tests and all 16 backend avatar tests pass. React Doctor reports no new issues. The pre-existing full-backend Jest/ESM limitation remains documented above.
 - No real user's image was uploaded or changed during diagnostics. Deployment credentials were used in memory only and excluded from files and commits.
+
+
+## Avatar Save Button State — 2026-10-26
+- Found that successful upload cleared the React file state without resetting the native file picker. The picker still displayed the saved filename, Save was disabled, and reselecting the same file did not trigger another change event.
+- Reset the native file input after successful save. Save is disabled only during upload; clicking without a valid selected file shows an actionable message and makes no API request. Existing file validation and admin-only access remain enforced.
+- Clarified the ID-card note: saving also updates the photo on an active member's ID card.
+- Regression tests reproduce the stale picker and inactive button before the fix and pass afterward, including selecting and saving the same photo again. Verification: frontend build and all 27 frontend tests pass; React Doctor reports no new findings. No backend code changed or real user image modified during testing.

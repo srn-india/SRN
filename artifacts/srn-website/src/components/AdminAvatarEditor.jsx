@@ -21,7 +21,9 @@ export default function AdminAvatarEditor({ target, onUpdated, onClose }) {
 
   const save = async event => {
     event.preventDefault();
-    if (!file || busy) return;
+    if (busy) return;
+    if (!file) { setMessage(''); setError('Choose a PNG or JPEG image before saving.'); return; }
+    const form = event.currentTarget;
     setBusy(true); setError(''); setMessage('');
     try {
       const body = new FormData();
@@ -42,6 +44,7 @@ export default function AdminAvatarEditor({ target, onUpdated, onClose }) {
       if (!result?.data?.avatar) throw new Error('The server returned an invalid upload response. Please try again shortly.');
       onUpdated(result.data);
       setFile(null);
+      form.elements.namedItem('avatar').value = '';
       setMessage(result.data.idCardWarning || 'Profile image updated successfully.');
     } catch (err) { setError(err.message); }
     finally { setBusy(false); }
@@ -55,7 +58,7 @@ export default function AdminAvatarEditor({ target, onUpdated, onClose }) {
         <form onSubmit={save} className="space-y-4">
           {(preview || target.avatar) && <img src={preview || target.avatar} alt="Selected user" className="w-32 h-32 rounded-xl object-cover mx-auto" />}
           <label className="block text-sm font-bold">New profile image
-            <input type="file" accept="image/png,image/jpeg" disabled={busy} className="block mt-2 w-full" onChange={event => {
+            <input type="file" name="avatar" accept="image/png,image/jpeg" disabled={busy} className="block mt-2 w-full" onChange={event => {
               const selected = event.target.files?.[0];
               setError(''); setMessage(''); setFile(null);
               if (!selected) return;
@@ -69,9 +72,9 @@ export default function AdminAvatarEditor({ target, onUpdated, onClose }) {
           </label>
           {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
           {message && <p role="status" className="text-sm text-emerald-800">{message}</p>}
-          <p className="text-xs text-gray-600">Active members’ ID cards are refreshed with the new photo.</p>
+          <p className="text-xs text-gray-600">For active members, saving also updates the photo on their ID card.</p>
           <div className="flex gap-3">
-            <button type="submit" disabled={!file || busy} className="bg-[#E8622A] text-white rounded-xl px-4 py-2 font-bold disabled:opacity-50">{busy ? 'Saving…' : 'Save Profile Image'}</button>
+            <button type="submit" disabled={busy} className="bg-[#E8622A] text-white rounded-xl px-4 py-2 font-bold disabled:opacity-50">{busy ? 'Saving…' : 'Save Profile Image'}</button>
             <button type="button" disabled={busy} onClick={onClose} className="border rounded-xl px-4 py-2">Close</button>
           </div>
         </form>

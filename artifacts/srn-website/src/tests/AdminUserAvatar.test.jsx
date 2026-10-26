@@ -19,6 +19,29 @@ const openEditor = async user => {
   return within(screen.getByRole('dialog'));
 };
 describe('Admin profile image management', () => {
+  it('explains a missing photo when Save is clicked instead of leaving the button inactive', async () => {
+    const user = userEvent.setup();
+    const modal = await openEditor(user);
+    const save = modal.getByRole('button', { name: 'Save Profile Image' });
+    expect(save).toBeEnabled();
+    await user.click(save);
+    expect(await modal.findByRole('alert')).toHaveTextContent('Choose a PNG or JPEG image before saving');
+    expect(fetch.mock.calls.some(([, options]) => options?.method === 'PATCH')).toBe(false);
+  });
+  it('clears the saved file selection so the same photo can be selected and saved again', async () => {
+    const user = userEvent.setup();
+    const modal = await openEditor(user);
+    const picker = modal.getByLabelText('New profile image');
+    const file = new File(['image'], 'photo.png', { type: 'image/png' });
+    await user.upload(picker, file);
+    await user.click(modal.getByRole('button', { name: 'Save Profile Image' }));
+    await modal.findByRole('status');
+    expect(picker).toHaveValue('');
+    await user.upload(picker, file);
+    await user.click(modal.getByRole('button', { name: 'Save Profile Image' }));
+    await waitFor(() => expect(fetch.mock.calls.filter(([, options]) => options?.method === 'PATCH')).toHaveLength(2));
+  });
+
   it.each([
     [404, 'The server does not support profile image updates yet'],
     [413, 'The server rejected the image size'],
@@ -46,7 +69,7 @@ describe('Admin profile image management', () => {
     const modal = await openEditor(user);
     await user.upload(modal.getByLabelText('New profile image'), new File(['pdf'], 'file.pdf', { type: 'application/pdf' }));
     expect(await modal.findByRole('alert')).toHaveTextContent('Choose a PNG or JPEG');
-    expect(modal.getByRole('button', { name: 'Save Profile Image' })).toBeDisabled();
+    expect(modal.getByRole('button', { name: 'Save Profile Image' })).toBeEnabled();
     expect(fetch.mock.calls.some(([, options]) => options?.method === 'PATCH')).toBe(false);
   });
 
