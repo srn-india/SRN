@@ -8,6 +8,7 @@
 ## Quick Tasks Completed
 | Task | Date | Status | Description |
 |------|------|--------|-------------|
+| `012-idcard-test-portability` | 2026-10-26 | COMPLETE ✓ | Removed macOS-only preview file export from the ID-card regression test; layout assertions retained |
 | `011-idcard-long-name` | 2026-10-26 | COMPLETE ✓ | Fit full member names before the portrait, preserving other field sizes; regenerated the reported card |
 | `010-avatar-save-state` | 2026-10-26 | COMPLETE ✓ | Fixed stale file picker after saving, enabled actionable Save validation, and clarified ID-card copy |
 | `009-avatar-live-deployment` | 2026-10-26 | COMPLETE ✓ | Corrected stale Render repository/deployment and hardened avatar response handling with regression tests |
@@ -85,3 +86,7 @@
 - Added real-canvas regression tests for the reported long name, a long unbroken name, and a short name. Tests assert measured name bounds, complete text, and unchanged other field fonts. Visually inspected the generated preview.
 - Backend build passes and 38 related backend tests pass (ID-card name, admin avatar, donation review, online donation review). No frontend code changed. Existing full-suite ESM limitation remains documented above.
 - Found exactly one matching user and active membership for the reported name, and regenerated that card in existing storage using the corrected renderer. No user profile or membership fields were changed; no email was sent. Other existing cards were not bulk-regenerated.
+
+## ID-card CI Portability — 2026-10-26
+- GitHub Actions reported 77 passing tests and one failure: the ID-card test tried writing a visual preview to macOS-only /private/tmp on Ubuntu. Removed the unused fs import and preview export; all rendering and layout assertions remain intact.
+- Local verification: all three ID-card cases and the backend build pass. No production code changed. Full Linux CI verification follows the push.

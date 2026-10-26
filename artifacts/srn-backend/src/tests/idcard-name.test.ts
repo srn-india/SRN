@@ -1,5 +1,4 @@
 import { CanvasRenderingContext2D, loadImage } from 'canvas';
-import fs from 'fs';
 import { prisma } from '../lib/prisma';
 import { supabase } from '../lib/supabase';
 import { generateAndUploadIdCard } from '../modules/membership/idcard.service';
@@ -40,5 +39,4 @@ test.each([
   expect(textDraws.find(draw => draw.text === '98******10')?.font).toContain('38px');
   expect(textDraws.find(draw => draw.text === '12****78')?.font).toContain('38px');
   if (firstName === 'Rahul') expect(name.font).toContain('38px');
-  if (firstName === 'K K CHAUDHARY') fs.writeFileSync('/private/tmp/srn-long-name-id-card.png', buffer);
 });
