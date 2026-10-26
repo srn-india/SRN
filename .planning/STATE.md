@@ -8,6 +8,7 @@
 ## Quick Tasks Completed
 | Task | Date | Status | Description |
 |------|------|--------|-------------|
+| `008-admin-user-avatar` | 2026-10-26 | COMPLETE ✓ | Admin-only profile image uploads for any user, paginated Manage Users view, ID-card refresh and API/UI tests |
 | `007-donation-admin-review` | 2026-10-22 | COMPLETE ✓ | Donations require admin approval before receipt generation; correction audit emailed to donors and receipt resend available |
 | `006-public-donation-route` | 2026-09-23 | COMPLETE ✓ | Public donation route, unblocking guest donations via Razorpay and Manual methods |
 | `005-public-membership-govid` | 2026-09-23 | COMPLETE ✓ | Public membership route, multi-document Government ID (Aadhaar, PAN, Voter ID, DL) with database sync |
@@ -48,3 +49,13 @@
 - React Doctor: changed-file scan reported no issues, overall score 59/100. Existing frontend bundle-size warning remains.
 - Servers started: frontend http://localhost:8080; backend http://localhost:4000 (Redis connected). No database schema migration required. Existing auto-approved historical donations were not altered.
 - .planning/ROADMAP.md is absent; work follows the active Membership Tiers & Donation Backend phase recorded above.
+
+
+## Admin User Profile Images — 2026-10-26
+- Added PATCH /api/admin/users/:id/avatar, behind the existing database-backed protect + ADMIN authorization middleware, before multipart parsing. Non-admins cannot update other users' photos or access the new user-management UI.
+- Reused avatar storage and the existing upload helper. Accepts PNG/JPEG up to 5 MB, checks file signatures and decodes the image, limits dimensions to 4096 × 4096, and re-encodes to PNG before saving. The original photo remains untouched on invalid input or upload failure.
+- Added Manage Users with pagination over the existing admin users API. Image editor is also reachable from membership/payment name editors. Updates refresh user lists, membership/payment photos, and the current admin's auth profile when applicable.
+- Active membership ID cards are regenerated after photo changes; ID-card generation failure is surfaced as a warning while preserving the saved photo.
+- Verification: both production builds pass. All 16 new backend avatar API tests pass, including unauthenticated/non-admin rejection, database-role authorization over token claims, invalid/corrupt/oversized images, ID-card refresh, and storage failure. All 21 frontend tests pass, including 5 new image-management tests. Full backend run: 56 tests pass across 6 suites; 7 existing suites (auth, events, health, payment, posts, sanitize, user) fail to load because of the existing htmlparser2 Jest/ESM parsing error.
+- React Doctor scan includes untracked new source/tests: no new diagnostics, project score 62/100. Existing bundle-size warning remains.
+- Running backend root and frontend respond successfully; the live unauthenticated avatar API returns 401. Read-only storage check confirms avatars bucket exists and is public. Automated tests mock persistence and storage; no real user's profile photo was changed.

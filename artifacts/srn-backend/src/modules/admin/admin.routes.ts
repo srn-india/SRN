@@ -2,6 +2,7 @@ import { Router } from 'express';
 import * as adminController from './admin.controller';
 import { protect } from '../../middleware/auth';
 import { restrictTo } from '../../middleware/role';
+import { upload } from '../../utils/upload';
 
 const router = Router();
 
@@ -97,6 +98,12 @@ router.delete('/users/:id', adminController.deleteUser);
  */
 router.patch('/users/:id/role', adminController.updateUserRole);
 router.patch('/users/:id/name', adminController.updateUserName);
+router.patch('/users/:id/avatar', (req, res, next) => {
+  upload.single('avatar')(req, res, error => {
+    if (error) return res.status(400).json({ success: false, message: error.message });
+    next();
+  });
+}, adminController.updateUserAvatar);
 
 /**
  * @swagger

@@ -49,3 +49,9 @@ export const resetCollections = catchAsync(async (req: Request, res: Response) =
   sendSuccess(res, result, 'Platform collections data has been reset to zero successfully');
 });
 
+
+export const updateUserAvatar = catchAsync(async (req: Request, res: Response) => {
+  if (!req.file) return sendError(res, 'A profile image is required', null, 400);
+  const user = await adminService.updateUserAvatar(req.params.id as string, req.file);
+  sendSuccess(res, user, 'User profile image updated successfully');
+});

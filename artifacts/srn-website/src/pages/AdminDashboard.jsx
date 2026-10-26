@@ -10,6 +10,7 @@ import {
   Phone, Mail, Copy, Check, ExternalLink, Camera, Sparkles, UserCheck, Shield, Loader2
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import AdminAvatarEditor from "../components/AdminAvatarEditor";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "../components/ui/dialog";
 
 const containerVariants = {
@@ -155,6 +156,38 @@ export default function AdminDashboard() {
 
   const [analytics, setAnalytics] = useState(null);
   const [loadingAnalytics, setLoadingAnalytics] = useState(true);
+
+  const [managedUsers, setManagedUsers] = useState([]);
+  const [usersPage, setUsersPage] = useState(1);
+  const [usersTotalPages, setUsersTotalPages] = useState(1);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [usersError, setUsersError] = useState('');
+  const [avatarUser, setAvatarUser] = useState(null);
+
+  const fetchManagedUsers = async (page = 1) => {
+    if (user?.role !== 'ADMIN') return;
+    setUsersLoading(true); setUsersError('');
+    try {
+      const response = await fetch(`${API_BASE}/api/admin/users?page=${page}&limit=10`, {
+        credentials: 'include', headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` },
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || 'Failed to load users');
+      setManagedUsers(result.data.users);
+      setUsersPage(result.data.pagination.page);
+      setUsersTotalPages(result.data.pagination.totalPages);
+    } catch (err) { setUsersError(err.message); }
+    finally { setUsersLoading(false); }
+  };
+
+  const handleAvatarUpdated = updated => {
+    setManagedUsers(prev => prev.map(item => item.id === updated.id ? { ...item, avatar: updated.avatar } : item));
+    setMemberships(prev => prev.map(item => (item.userId || item.user?.id) === updated.id ? { ...item, user: { ...item.user, avatar: updated.avatar } } : item));
+    setManualPayments(prev => prev.map(item => (item.userId || item.user?.id) === updated.id ? { ...item, user: { ...item.user, avatar: updated.avatar } } : item));
+    setAvatarUser(prev => ({ ...prev, avatar: updated.avatar }));
+    setRenamingUser(prev => prev?.id === updated.id ? { ...prev, avatar: updated.avatar } : prev);
+    if (updated.id === user?.id) checkAuth?.();
+  };
 
   // Rename user modal state
   const [renameModalOpen, setRenameModalOpen] = useState(false);
@@ -334,6 +367,7 @@ export default function AdminDashboard() {
         throw new Error(data.message || "Failed to update user name");
       }
 
+      setManagedUsers(prev => prev.map(item => item.id === renamingUser.id ? { ...item, firstName: editFirstName.trim(), lastName: editLastName.trim() } : item));
       // Update in memberships state
       setMemberships(prev => prev.map(m => {
         if ((m.userId && m.userId === renamingUser.id) || (m.user && m.user.id === renamingUser.id)) {
@@ -435,7 +469,9 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    if (activeTab === "profile") {
+    if (activeTab === "users") {
+      fetchManagedUsers();
+    } else if (activeTab === "profile") {
       fetchAnalytics();
     } else if (activeTab === "memberships") {
       fetchMemberships(membershipPage);
@@ -978,6 +1014,7 @@ export default function AdminDashboard() {
     { id: "articles", label: "Manage Articles", icon: BookOpen },
     { id: "complaints", label: "Manage Complaints", icon: AlertCircle },
     { id: "applications", label: "Post Applications", icon: Briefcase },
+    ...(user?.role === 'ADMIN' ? [{ id: 'users', label: 'Manage Users', icon: User }] : []),
     { id: "memberships", label: "Manage Memberships", icon: Users },
     { id: "manual-payments", label: "Payment Reviews", icon: QrCode },
     { id: "settings", label: "Platform Settings", icon: Settings },
@@ -1625,7 +1662,7 @@ export default function AdminDashboard() {
                                     {m.user && (
                                       <button
                                         onClick={() => {
-                                          setRenamingUser({ id: m.userId || m.user.id, firstName: m.user.firstName || '', lastName: m.user.lastName || '', email: m.user.email });
+                                          setRenamingUser({ id: m.userId || m.user.id, firstName: m.user.firstName || '', lastName: m.user.lastName || '', email: m.user.email, avatar: m.user.avatar });
                                           setEditFirstName(m.user.firstName || '');
                                           setEditLastName(m.user.lastName || '');
                                           setRenameError('');
@@ -1697,7 +1734,7 @@ export default function AdminDashboard() {
                                     {m.user && (
                                       <button
                                         onClick={() => {
-                                          setRenamingUser({ id: m.userId || m.user.id, firstName: m.user.firstName || '', lastName: m.user.lastName || '', email: m.user.email });
+                                          setRenamingUser({ id: m.userId || m.user.id, firstName: m.user.firstName || '', lastName: m.user.lastName || '', email: m.user.email, avatar: m.user.avatar });
                                           setEditFirstName(m.user.firstName || '');
                                           setEditLastName(m.user.lastName || '');
                                           setRenameError('');
@@ -1759,6 +1796,28 @@ export default function AdminDashboard() {
                     </div>
                   )}
                 </motion.div>
+              )}
+
+              {activeTab === 'users' && user?.role === 'ADMIN' && (
+                <section className="bg-white p-6 rounded-2xl space-y-4" aria-label="Manage Users">
+                  <h2 className="text-2xl font-bold">Manage Users</h2>
+                  <p className="text-sm text-gray-600">Update names and profile images for any registered user.</p>
+                  {usersError && <p role="alert" className="text-red-700">{usersError}</p>}
+                  {usersLoading ? <p role="status">Loading users…</p> : managedUsers.map(item => (
+                    <div key={item.id} className="flex flex-wrap items-center gap-4 border rounded-xl p-4">
+                      {item.avatar ? <img src={item.avatar} alt={`${item.firstName} ${item.lastName}`} className="w-14 h-14 rounded-full object-cover" /> : <User className="w-14 h-14 text-gray-400" aria-label="No profile image" />}
+                      <div className="flex-1 min-w-0"><p className="font-bold">{item.firstName} {item.lastName}</p><p className="text-sm break-all">{item.email || 'No email'} · {item.role}</p></div>
+                      <button type="button" onClick={() => { setRenamingUser(item); setEditFirstName(item.firstName || ''); setEditLastName(item.lastName || ''); setRenameError(''); setRenameModalOpen(true); }} className="border rounded-xl px-3 py-2 text-sm font-bold">Edit Name</button>
+                      <button type="button" onClick={() => setAvatarUser(item)} className="bg-[#E8622A] text-white rounded-xl px-3 py-2 text-sm font-bold">Update Profile Image</button>
+                    </div>
+                  ))}
+                  {!usersLoading && !usersError && managedUsers.length === 0 && <p>No users found.</p>}
+                  <div className="flex justify-between items-center gap-3">
+                    <button type="button" aria-label="Previous users" disabled={usersLoading || usersPage <= 1} onClick={() => fetchManagedUsers(usersPage - 1)} className="border rounded-xl px-4 py-2 disabled:opacity-50">Previous</button>
+                    <span>Page {usersPage} of {Math.max(1, usersTotalPages)}</span>
+                    <button type="button" aria-label="Next users" disabled={usersLoading || usersPage >= usersTotalPages} onClick={() => fetchManagedUsers(usersPage + 1)} className="border rounded-xl px-4 py-2 disabled:opacity-50">Next</button>
+                  </div>
+                </section>
               )}
 
               {/* MANUAL PAYMENTS TAB */}
@@ -1946,7 +2005,7 @@ export default function AdminDashboard() {
                                         {p.user && (
                                           <button
                                             onClick={() => {
-                                              setRenamingUser({ id: p.userId || p.user.id, firstName: p.user.firstName || '', lastName: p.user.lastName || '', email: p.user.email });
+                                              setRenamingUser({ id: p.userId || p.user.id, firstName: p.user.firstName || '', lastName: p.user.lastName || '', email: p.user.email, avatar: p.user.avatar });
                                               setEditFirstName(p.user.firstName || '');
                                               setEditLastName(p.user.lastName || '');
                                               setRenameError('');
@@ -2654,6 +2713,7 @@ export default function AdminDashboard() {
             </div>
           )}
         </AnimatePresence>
+        {avatarUser && user?.role === 'ADMIN' && <AdminAvatarEditor key={avatarUser.id} target={avatarUser} onUpdated={handleAvatarUpdated} onClose={() => setAvatarUser(null)} />}
         {/* RENAME USER MODAL */}
         <AnimatePresence>
           {renameModalOpen && renamingUser && (
@@ -2682,6 +2742,8 @@ export default function AdminDashboard() {
                     <p className="text-xs text-gray-500 font-medium">User Email</p>
                     <p className="text-sm font-bold text-[#2C1810] break-all">{renamingUser.email}</p>
                   </div>
+
+                  {user?.role === 'ADMIN' && <button type="button" onClick={() => { setRenameModalOpen(false); setAvatarUser(renamingUser); }} className="border rounded-xl px-4 py-2 text-sm font-bold">Update Profile Image</button>}
 
                   {renameError && (
                     <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs font-semibold rounded-xl">

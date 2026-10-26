@@ -1,5 +1,7 @@
 import { prisma } from '../../lib/prisma';
 import { Role } from '@prisma/client';
+import { createCanvas, loadImage } from 'canvas';
+import { uploadToSupabase } from '../../utils/upload';
 import * as idcardService from '../membership/idcard.service';
 
 /**
@@ -194,4 +196,31 @@ export const resetCollections = async () => {
   };
 };
 
-
+export const updateUserAvatar = async (userId: string, file: Express.Multer.File) => {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw Object.assign(new Error('User not found'), { statusCode: 404 });
+  const isPng = file.mimetype === 'image/png' && file.buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+  const isJpeg = file.mimetype === 'image/jpeg' && file.buffer.subarray(0, 3).equals(Buffer.from([255, 216, 255]));
+  if (!isPng && !isJpeg) throw Object.assign(new Error('Please upload a PNG or JPEG image'), { statusCode: 400 });
+  let image;
+  try { image = await loadImage(file.buffer); }
+  catch { throw Object.assign(new Error('The image could not be decoded'), { statusCode: 400 }); }
+  if (image.width > 4096 || image.height > 4096) throw Object.assign(new Error('Image dimensions must not exceed 4096 × 4096 pixels'), { statusCode: 400 });
+  // Re-encode decoded pixels so only raster image content reaches avatar storage.
+  const canvas = createCanvas(image.width, image.height);
+  canvas.getContext('2d').drawImage(image, 0, 0);
+  const avatar = await uploadToSupabase({ ...file, originalname: 'avatar.png', mimetype: 'image/png', buffer: canvas.toBuffer('image/png') }, 'avatars');
+  const updatedUser = await prisma.user.update({ where: { id: userId }, data: { avatar }, select: { id: true, firstName: true, lastName: true, email: true, avatar: true } });
+  let idCardWarning: string | undefined;
+  const membership = await prisma.membership.findFirst({ where: { userId, status: 'ACTIVE' }, orderBy: { createdAt: 'desc' } });
+  if (membership) {
+    try {
+      const card = await idcardService.generateAndUploadIdCard(membership.id);
+      if (!card) throw new Error('ID card generation failed');
+    } catch (error) {
+      console.error('Failed to refresh ID card after profile image update:', error);
+      idCardWarning = 'Profile image saved, but the ID card could not be refreshed. Regenerate the ID card from Manage Memberships.';
+    }
+  }
+  return { ...updatedUser, idCardWarning };
+};
