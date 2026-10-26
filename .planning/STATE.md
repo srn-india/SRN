@@ -8,6 +8,7 @@
 ## Quick Tasks Completed
 | Task | Date | Status | Description |
 |------|------|--------|-------------|
+| `011-idcard-long-name` | 2026-10-26 | COMPLETE ✓ | Fit full member names before the portrait, preserving other field sizes; regenerated the reported card |
 | `010-avatar-save-state` | 2026-10-26 | COMPLETE ✓ | Fixed stale file picker after saving, enabled actionable Save validation, and clarified ID-card copy |
 | `009-avatar-live-deployment` | 2026-10-26 | COMPLETE ✓ | Corrected stale Render repository/deployment and hardened avatar response handling with regression tests |
 | `008-admin-user-avatar` | 2026-10-26 | COMPLETE ✓ | Admin-only profile image uploads for any user, paginated Manage Users view, ID-card refresh and API/UI tests |
@@ -76,3 +77,11 @@
 - Reset the native file input after successful save. Save is disabled only during upload; clicking without a valid selected file shows an actionable message and makes no API request. Existing file validation and admin-only access remain enforced.
 - Clarified the ID-card note: saving also updates the photo on an active member's ID card.
 - Regression tests reproduce the stale picker and inactive button before the fix and pass afterward, including selecting and saving the same photo again. Verification: frontend build and all 27 frontend tests pass; React Doctor reports no new findings. No backend code changed or real user image modified during testing.
+
+
+## Long Names on ID Cards — 2026-10-26
+- Root cause: the name was drawn at a fixed 38px size without a width bound, then covered by the portrait. The reported full name extended into the portrait area.
+- Shared ID-card generator now measures the full name and proportionally reduces its font size only when required to fit before the portrait, with a 20px gap. The complete name is preserved; short names and phone/member-ID field sizes stay unchanged.
+- Added real-canvas regression tests for the reported long name, a long unbroken name, and a short name. Tests assert measured name bounds, complete text, and unchanged other field fonts. Visually inspected the generated preview.
+- Backend build passes and 38 related backend tests pass (ID-card name, admin avatar, donation review, online donation review). No frontend code changed. Existing full-suite ESM limitation remains documented above.
+- Found exactly one matching user and active membership for the reported name, and regenerated that card in existing storage using the corrected renderer. No user profile or membership fields were changed; no email was sent. Other existing cards were not bulk-regenerated.

@@ -75,8 +75,17 @@ export const generateAndUploadIdCard = async (membershipId: string, txClient?: a
     const idX = image.width * 0.38;
     const idY = image.height * 0.79;
 
+    const avatarRadius = image.width * 0.138;
+    const avatarX = image.width * 0.84;
+    const avatarY = image.height * 0.43;
+
     const fullName = [membership.user.firstName, membership.user.lastName].filter(Boolean).join(' ').trim() || 'Member';
-    ctx.fillText(fullName, valueX, nameY);
+    const nameMaxWidth = avatarX - avatarRadius - valueX - 20;
+    const nameFontSize = Math.min(38, 38 * nameMaxWidth / ctx.measureText(fullName).width);
+    ctx.save();
+    ctx.font = `bold ${nameFontSize}px "SRN-Bold", "DejaVu Sans", Arial, sans-serif`;
+    ctx.fillText(fullName, valueX, nameY, nameMaxWidth);
+    ctx.restore();
     
     const phone = membership.user.phone || 'N/A';
     const displayPhone = phone !== 'N/A' && phone.length >= 6
@@ -89,10 +98,6 @@ export const generateAndUploadIdCard = async (membershipId: string, txClient?: a
       ? rawDisplayId.slice(0, 2) + '*'.repeat(rawDisplayId.length - 4) + rawDisplayId.slice(-2)
       : rawDisplayId;
     ctx.fillText(displayId, idX, idY);
-
-    const avatarRadius = image.width * 0.138;
-    const avatarX = image.width * 0.84;
-    const avatarY = image.height * 0.43;
 
     try {
       let avatarImage = null;
