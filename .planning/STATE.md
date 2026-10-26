@@ -8,6 +8,7 @@
 ## Quick Tasks Completed
 | Task | Date | Status | Description |
 |------|------|--------|-------------|
+| `009-avatar-live-deployment` | 2026-10-26 | COMPLETE ✓ | Corrected stale Render repository/deployment and hardened avatar response handling with regression tests |
 | `008-admin-user-avatar` | 2026-10-26 | COMPLETE ✓ | Admin-only profile image uploads for any user, paginated Manage Users view, ID-card refresh and API/UI tests |
 | `007-donation-admin-review` | 2026-10-22 | COMPLETE ✓ | Donations require admin approval before receipt generation; correction audit emailed to donors and receipt resend available |
 | `006-public-donation-route` | 2026-09-23 | COMPLETE ✓ | Public donation route, unblocking guest donations via Razorpay and Manual methods |
@@ -59,3 +60,11 @@
 - Verification: both production builds pass. All 16 new backend avatar API tests pass, including unauthenticated/non-admin rejection, database-role authorization over token claims, invalid/corrupt/oversized images, ID-card refresh, and storage failure. All 21 frontend tests pass, including 5 new image-management tests. Full backend run: 56 tests pass across 6 suites; 7 existing suites (auth, events, health, payment, posts, sanitize, user) fail to load because of the existing htmlparser2 Jest/ESM parsing error.
 - React Doctor scan includes untracked new source/tests: no new diagnostics, project score 62/100. Existing bundle-size warning remains.
 - Running backend root and frontend respond successfully; the live unauthenticated avatar API returns 401. Read-only storage check confirms avatars bucket exists and is public. Automated tests mock persistence and storage; no real user's profile photo was changed.
+
+
+## Live Avatar Upload Failure — 2026-10-26
+- Production diagnosis: srnindia.org had the new avatar editor, but Render srn-backend still referenced https://github.com/Lonewolf-lab/SRN and was serving commit 4932941 from 2026-09-24. That backend predates PATCH /api/admin/users/:id/avatar. The frontend blindly parsed non-JSON error responses, surfacing Safari's generic “The string did not match the expected pattern.” message.
+- Corrected the existing Render service repository to https://github.com/srn-india/SRN, retaining main, Docker settings, environment variables and database. Deployed tested commit 35e76c6278bee39caf475bd2523286d005f86ad4 via deploy dep-dbfobed9el5s73fvo1vg. Render reports the service live; startup logs confirm server binding and Redis connection. No Prisma schema, backend dependencies, or Dockerfile changes were needed.
+- Avatar editor now checks response content type, handles HTML 404/413/502 and malformed JSON with actionable errors, and rejects success responses without an updated avatar. Existing image remains unchanged on failure.
+- Regression tests reproduced the exact browser parsing error before the fix. Verification: both builds pass; all 25 frontend tests and all 16 backend avatar tests pass. React Doctor reports no new issues. The pre-existing full-backend Jest/ESM limitation remains documented above.
+- No real user's image was uploaded or changed during diagnostics. Deployment credentials were used in memory only and excluded from files and commits.

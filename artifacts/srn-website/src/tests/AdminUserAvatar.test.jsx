@@ -9,7 +9,7 @@ const donor = { id: 'target', firstName: 'Test', lastName: 'Donor', email: 'dono
 beforeEach(() => {
   auth.user.role = 'ADMIN';
   vi.stubGlobal('localStorage', { getItem: () => 'test-token' });
-  vi.stubGlobal('fetch', vi.fn(async (url, options) => ({ ok: true, json: async () => ({ data: options?.method === 'PATCH' ? { ...donor, avatar: 'https://example.com/new.png' } : String(url).includes('/admin/users') ? { users: [donor], pagination: { page: 1, totalPages: 2 } } : {} }) })));
+  vi.stubGlobal('fetch', vi.fn(async (url, options) => ({ ok: true, status: 200, headers: new Headers({ 'content-type': 'application/json' }), json: async () => ({ data: options?.method === 'PATCH' ? { ...donor, avatar: 'https://example.com/new.png' } : String(url).includes('/admin/users') ? { users: [donor], pagination: { page: 1, totalPages: 2 } } : {} }) })));
 });
 afterEach(() => vi.unstubAllGlobals());
 const openEditor = async user => {
@@ -19,6 +19,28 @@ const openEditor = async user => {
   return within(screen.getByRole('dialog'));
 };
 describe('Admin profile image management', () => {
+  it.each([
+    [404, 'The server does not support profile image updates yet'],
+    [413, 'The server rejected the image size'],
+    [502, 'The upload service is temporarily unavailable'],
+  ])('explains non-JSON HTTP %s upload failures instead of showing a browser parsing error', async (status, expected) => {
+    const user = userEvent.setup();
+    const modal = await openEditor(user);
+    fetch.mockImplementationOnce(async () => ({ ok: false, status, headers: new Headers({ 'content-type': 'text/html' }), json: async () => { throw new SyntaxError('The string did not match the expected pattern.'); } }));
+    await user.upload(modal.getByLabelText('New profile image'), new File(['image'], 'photo.jpeg', { type: 'image/jpeg' }));
+    await user.click(modal.getByRole('button', { name: 'Save Profile Image' }));
+    expect(await modal.findByRole('alert')).toHaveTextContent(expected);
+    expect(screen.getByAltText('Test Donor')).toHaveAttribute('src', donor.avatar);
+  });
+  it('handles malformed JSON without exposing the browser parsing error', async () => {
+    const user = userEvent.setup();
+    const modal = await openEditor(user);
+    fetch.mockImplementationOnce(async () => ({ ok: true, status: 200, headers: new Headers({ 'content-type': 'application/json' }), json: async () => { throw new SyntaxError('The string did not match the expected pattern.'); } }));
+    await user.upload(modal.getByLabelText('New profile image'), new File(['image'], 'photo.jpeg', { type: 'image/jpeg' }));
+    await user.click(modal.getByRole('button', { name: 'Save Profile Image' }));
+    expect(await modal.findByRole('alert')).toHaveTextContent('The server returned an invalid upload response');
+  });
+
   it('rejects unsupported uploads without calling the avatar API', async () => {
     const user = userEvent.setup({ applyAccept: false });
     const modal = await openEditor(user);
@@ -48,7 +70,7 @@ describe('Admin profile image management', () => {
   it('shows upload failures without replacing the existing image', async () => {
     const user = userEvent.setup();
     const modal = await openEditor(user);
-    fetch.mockImplementationOnce(async () => ({ ok: false, json: async () => ({ message: 'Storage unavailable' }) }));
+    fetch.mockImplementationOnce(async () => ({ ok: false, status: 500, headers: new Headers({ 'content-type': 'application/json' }), json: async () => ({ message: 'Storage unavailable' }) }));
     await user.upload(modal.getByLabelText('New profile image'), new File(['image'], 'photo.png', { type: 'image/png' }));
     await user.click(modal.getByRole('button', { name: 'Save Profile Image' }));
     expect(await modal.findByRole('alert')).toHaveTextContent('Storage unavailable');

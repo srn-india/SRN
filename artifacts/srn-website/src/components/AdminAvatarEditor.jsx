@@ -30,8 +30,16 @@ export default function AdminAvatarEditor({ target, onUpdated, onClose }) {
         method: 'PATCH', credentials: 'include', body,
         headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` },
       });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.message || 'Failed to update profile image');
+      if (!response.headers.get('content-type')?.includes('application/json')) {
+        if (response.status === 404) throw new Error('The server does not support profile image updates yet. The backend needs to be deployed with the latest changes.');
+        if (response.status === 413) throw new Error('The server rejected the image size. Please choose a smaller image and try again.');
+        throw new Error(`The upload service is temporarily unavailable (HTTP ${response.status}). Please try again shortly.`);
+      }
+      let result;
+      try { result = await response.json(); }
+      catch { throw new Error('The server returned an invalid upload response. Please try again shortly.'); }
+      if (!response.ok) throw new Error(result?.message || 'Failed to update profile image');
+      if (!result?.data?.avatar) throw new Error('The server returned an invalid upload response. Please try again shortly.');
       onUpdated(result.data);
       setFile(null);
       setMessage(result.data.idCardWarning || 'Profile image updated successfully.');
