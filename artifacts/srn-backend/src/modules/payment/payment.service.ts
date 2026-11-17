@@ -2,6 +2,7 @@ import { prisma } from '../../lib/prisma';
 import * as membershipService from '../membership/membership.service';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
+import { referrerSchema } from '../../utils/referrer';
 import { PaymentType } from '@prisma/client';
 import * as XLSX from 'xlsx';
 import { sendEmail } from '../../utils/email.service';
@@ -180,7 +181,8 @@ async function notifyUserOfPayment(payment: any) {
   }
 }
 
-export const createOrder = async (userId: string, amount: number, type: PaymentType) => {
+export const createOrder = async (userId: string, amount: number, type: PaymentType, referral?: string | null) => {
+  const referrerName = referrerSchema.parse(referral);
   const orderOptions = {
     amount: amount * 100, // amount in the smallest currency unit (paise)
     currency: "INR",
@@ -195,6 +197,7 @@ export const createOrder = async (userId: string, amount: number, type: PaymentT
       type,
       status: 'PENDING',
       provider: 'RAZORPAY',
+      referrerName: type === 'DONATION' ? referrerName : null,
       razorpayOrderId: razorpayOrder.id,
     },
   });
@@ -247,6 +250,7 @@ export const verifyPayment = async (paymentData: { razorpay_order_id: string, ra
       await tx.manualPayment.create({
         data: {
           id: `razorpay:${payment.id}`,
+          referrerName: payment.referrerName,
           userId: effectiveUserId,
           amount: Number(payment.amount),
           type: 'DONATION',

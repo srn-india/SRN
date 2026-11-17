@@ -93,6 +93,7 @@ export default function Donate() {
     email: user?.email || "",
     phone: user?.phone || "",
     panNumber: "",
+    referrerName: "",
     address: "",
     state: user?.state || "",
     city: user?.district || "",
@@ -180,6 +181,7 @@ export default function Donate() {
           currency: "INR", 
           type: "DONATION", 
           purpose: detailedPurpose,
+          referrerName: formData.referrerName.trim(),
           email: formData.email,
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -328,6 +330,7 @@ export default function Donate() {
           utrNumber: utrNumber.trim(),
           screenshot: screenshotUrl,
           purpose: detailedPurpose,
+          referrerName: formData.referrerName.trim(),
           email: formData.email ? formData.email.trim().toLowerCase() : undefined,
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -573,6 +576,21 @@ export default function Donate() {
                         className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none text-sm text-[#1E0F05]"
                       />
                     </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="donation-referrer" className="block text-xs font-bold text-[#7A5C45] mb-1.5 uppercase">
+                      {en ? "Referred by (optional)" : "संदर्भ देने वाले का नाम (वैकल्पिक)"}
+                    </label>
+                    <input
+                      id="donation-referrer"
+                      type="text"
+                      maxLength={150}
+                      placeholder={en ? "Name of the person who referred you" : "जिस व्यक्ति ने आपको प्रेरित किया, उनका नाम"}
+                      value={formData.referrerName}
+                      onChange={e => setFormData({ ...formData, referrerName: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8622A]/30 focus:border-[#E8622A] outline-none text-sm text-[#1E0F05]"
+                    />
                   </div>
 
                   {/* PAN & Address */}

@@ -3,6 +3,7 @@ import * as paymentService from './payment.service';
 import { prisma } from '../../lib/prisma';
 import { catchAsync } from '../../utils/catchAsync';
 import { sendSuccess } from '../../utils/response';
+import { referrerSchema } from '../../utils/referrer';
 
 export const getRazorpayKey = catchAsync(async (req: Request, res: Response) => {
   sendSuccess(res, { keyId: process.env.RAZORPAY_KEY_ID }, 'Razorpay Key ID');
@@ -10,6 +11,8 @@ export const getRazorpayKey = catchAsync(async (req: Request, res: Response) => 
 
 export const createOrder = catchAsync(async (req: Request, res: Response) => {
   const { amount, type, email, firstName, lastName, phone, panNumber, state, city, address } = req.body;
+  const referral = referrerSchema.safeParse(req.body.referrerName);
+  if (!referral.success) return res.status(400).json({ status: 'error', message: 'Referrer name must be text of at most 150 characters' });
   let userId = (req as any).user?.id;
 
   if (!userId) {
@@ -46,7 +49,7 @@ export const createOrder = catchAsync(async (req: Request, res: Response) => {
     userId = user.id;
   }
 
-  const order = await paymentService.createOrder(userId, amount, type);
+  const order = await paymentService.createOrder(userId, amount, type, referral.data);
   sendSuccess(res, order, 'Payment order created', 201);
 });
 

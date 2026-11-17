@@ -1,6 +1,8 @@
 import { prisma } from '../../lib/prisma';
 import { PaymentType } from '@prisma/client';
 import { z } from 'zod';
+import * as XLSX from 'xlsx';
+import { referrerSchema } from '../../utils/referrer';
 import { generateReceiptPdf, ReceiptData } from '../../utils/receipt.service';
 import * as membershipService from '../membership/membership.service';
 import * as idcardService from '../membership/idcard.service';
@@ -18,8 +20,10 @@ export const submitPayment = async (
     screenshot?: string;
     purpose?: string;
     email?: string;
+    referrerName?: string | null;
   }
 ) => {
+  const referrerName = referrerSchema.parse(data.referrerName);
   const initialStatus = 'PENDING';
 
   const payment = await prisma.manualPayment.create({
@@ -30,6 +34,7 @@ export const submitPayment = async (
       utrNumber: data.utrNumber,
       screenshot: data.screenshot,
       purpose: data.purpose,
+      referrerName: data.type === 'DONATION' ? referrerName : null,
       status: initialStatus
     },
     include: { user: true },
@@ -362,7 +367,8 @@ export const deletePayment = async (id: string) => {
 
 // ── Admin: Bulk cleanup approved / rejected / old manual payment records ────
 export const cleanupPayments = async (filter: { status?: string; olderThanDays?: number }) => {
-  const whereClause: any = {};
+  // Donations form the downloadable register and must survive routine cleanup.
+  const whereClause: any = { type: { not: 'DONATION' } };
   if (filter.status && filter.status !== 'ALL') {
     whereClause.status = filter.status;
   } else {
@@ -383,3 +389,26 @@ export const cleanupPayments = async (filter: { status?: string; olderThanDays?:
   return { success: true, count: result.count };
 };
 
+
+// Read the whole donation register independently of the dashboard's current filters.
+export const exportDonations = async () => {
+  const [manual, online] = await Promise.all([
+    prisma.manualPayment.findMany({ where: { type: 'DONATION' }, include: { user: true }, orderBy: { createdAt: 'desc' } }),
+    prisma.payment.findMany({ where: { type: 'DONATION', status: 'SUCCESS' }, include: { user: true, donation: true }, orderBy: { createdAt: 'desc' } }),
+  ]);
+  const reviewedIds = new Set(manual.map(p => p.id));
+  const records = [
+    ...manual.map(p => ({ id: p.id, date: p.createdAt, user: p.user, amount: Number(p.amount), referrer: p.referrerName, status: p.status, reference: p.utrNumber, purpose: p.purpose, note: p.adminNote, method: p.id.startsWith('razorpay:') ? 'Razorpay' : p.purpose?.includes('[BANK TRANSFER]') ? 'Bank Transfer' : 'UPI' })),
+    // Include historical online donations, but never count their review entries twice.
+    ...online.filter(p => !reviewedIds.has(`razorpay:${p.id}`)).map(p => ({ id: p.id, date: p.createdAt, user: p.user, amount: Number(p.amount), referrer: p.referrerName, status: 'REVIEW RECORD UNAVAILABLE', reference: p.razorpayPaymentId, purpose: p.donation?.purpose, note: '', method: 'Razorpay' })),
+  ].sort((a, b) => b.date.getTime() - a.date.getTime());
+  const headers = ['Donation ID', 'Date (UTC)', 'Donor Name', 'Email', 'Phone', 'Referrer Name', 'Amount (INR)', 'Payment Method', 'Transaction Reference', 'Review Status', 'Purpose', 'Admin Note'];
+  const rows = records.map(p => [p.id, p.date.toISOString(), `${p.user.firstName} ${p.user.lastName}`.trim(), p.user.email || '', p.user.phone || '', p.referrer || '', p.amount, p.method, p.reference || '', p.status, p.purpose || '', p.note || '']);
+  // aoa_to_sheet writes user text as literal string cells, never formulas.
+  const sheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  sheet['!cols'] = headers.map((_, i) => ({ wch: i === 10 || i === 11 ? 60 : 25 }));
+  sheet['!autofilter'] = { ref: sheet['!ref']! };
+  const book = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(book, sheet, 'Donations');
+  return XLSX.write(book, { type: 'buffer', bookType: 'xlsx' }) as Buffer;
+};

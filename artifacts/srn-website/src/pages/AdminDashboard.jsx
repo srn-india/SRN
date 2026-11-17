@@ -47,6 +47,7 @@ export default function AdminDashboard() {
   // Manual payments state
   const [manualPayments, setManualPayments] = useState([]);
   const [manualLoading, setManualLoading] = useState(false);
+  const [donationsExporting, setDonationsExporting] = useState(false);
   const [reviewPayment, setReviewPayment] = useState(null);
   const [reviewDetails, setReviewDetails] = useState({ amount: '', utrNumber: '', purpose: '', adminNote: '' });
   const [reviewBusy, setReviewBusy] = useState(false);
@@ -561,7 +562,7 @@ export default function AdminDashboard() {
   };
 
   const handleCleanupApprovedPayments = async () => {
-    if (!window.confirm("Remove all APPROVED manual payment records from the dashboard? This cleans up processed submissions while keeping member profiles and memberships intact.")) return;
+    if (!window.confirm("Remove all APPROVED membership payment records from the dashboard? Donation records are retained for the donation register.")) return;
     try {
       setManualLoading(true);
       const res = await fetch(`${API_BASE}/api/manual-payments/admin/cleanup?status=APPROVED`, {
@@ -642,6 +643,30 @@ export default function AdminDashboard() {
     document.body.appendChild(link);
     link.click();
     link.remove();
+  };
+
+  const handleExportDonations = async () => {
+    setDonationsExporting(true);
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch(`${API_BASE}/api/manual-payments/admin/donations/export`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Could not download donations. Please try again.");
+      const url = URL.createObjectURL(await res.blob());
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `SRN_Donations_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (err) {
+      alert(err.message || "Could not download donations. Please try again.");
+    } finally {
+      setDonationsExporting(false);
+    }
   };
 
   const handleExportMemberships = async () => {
@@ -1836,9 +1861,17 @@ export default function AdminDashboard() {
                         onClick={handleCleanupApprovedPayments} 
                         disabled={manualLoading}
                         className="flex items-center gap-2 px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl font-semibold text-sm transition-all shadow-xs cursor-pointer"
-                        title="Remove all approved & processed payment records from the dashboard"
+                        title="Remove approved membership payment records; keep donations in the register"
                       >
-                        <Trash2 className="w-4 h-4 text-rose-500" /> Clear Approved Records
+                        <Trash2 className="w-4 h-4 text-rose-500" /> Clear Approved Memberships
+                      </button>
+                      <button
+                        onClick={handleExportDonations}
+                        disabled={donationsExporting}
+                        className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold text-sm transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
+                        title="Download all donation records with referrer names (.xlsx)"
+                      >
+                        <Download className="w-4 h-4" /> {donationsExporting ? "Downloading…" : "Download Donations Excel"}
                       </button>
                       <button 
                         onClick={handleExportManualPayments} 
@@ -1846,7 +1879,7 @@ export default function AdminDashboard() {
                         className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold text-sm transition-all shadow-sm disabled:opacity-50 cursor-pointer"
                         title="Export Manual Payments Report (.csv)"
                       >
-                        <Download className="w-4 h-4" /> Export Excel / CSV
+                        <Download className="w-4 h-4" /> Export Payments CSV
                       </button>
                       <button onClick={() => fetchManualPayments()} className="flex items-center gap-2 px-4 py-2 bg-[#E8622A]/10 hover:bg-[#E8622A]/20 text-[#E8622A] rounded-xl font-semibold text-sm transition-colors cursor-pointer">
                         <RotateCw className="w-4 h-4" /> Refresh
@@ -2112,6 +2145,13 @@ export default function AdminDashboard() {
                                       </a>
                                     </div>
                                   </div>
+
+                                  {p.type === 'DONATION' && (
+                                    <div className="bg-gray-50/80 p-3.5 rounded-2xl border border-gray-100">
+                                      <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Referred by</p>
+                                      <p className="text-sm font-bold text-[#2C1810] break-words">{p.referrerName || "Not specified"}</p>
+                                    </div>
+                                  )}
 
                                   {/* State & District */}
                                   <div className="flex items-start gap-3 bg-gray-50/80 p-3.5 rounded-2xl border border-gray-100">

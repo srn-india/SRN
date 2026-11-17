@@ -1,20 +1,20 @@
 import crypto from 'crypto';
 import { prisma } from '../lib/prisma';
-import { verifyPayment } from '../modules/payment/payment.service';
+import { createOrder, verifyPayment } from '../modules/payment/payment.service';
 import { generateReceiptPdf } from '../utils/receipt.service';
 import { sendEmail } from '../utils/email.service';
 
 jest.mock('../lib/prisma', () => ({ prisma: {
-  payment: { findUnique: jest.fn(), findMany: jest.fn().mockResolvedValue([]) },
+  payment: { create: jest.fn(), findUnique: jest.fn(), findMany: jest.fn().mockResolvedValue([]) },
   user: { findUnique: jest.fn() }, $transaction: jest.fn(),
 } }));
-jest.mock('razorpay', () => jest.fn().mockImplementation(() => ({ orders: {} })));
+jest.mock('razorpay', () => jest.fn().mockImplementation(() => ({ orders: { create: jest.fn().mockResolvedValue({ id: 'order-1' }) } })));
 jest.mock('../utils/email.service', () => ({ sendEmail: jest.fn().mockResolvedValue({}) }));
 jest.mock('../utils/storage.service', () => ({ uploadPaymentReport: jest.fn().mockResolvedValue('https://example.com/report.xlsx') }));
 jest.mock('../utils/receipt.service', () => ({ generateReceiptPdf: jest.fn() }));
 jest.mock('../modules/membership/membership.service', () => ({ subscribeUser: jest.fn() }));
 
-const payment = { id: 'online-1', userId: 'donor-1', amount: 1500, type: 'DONATION', status: 'PENDING', razorpayOrderId: 'order-1', createdAt: new Date() };
+const payment = { id: 'online-1', userId: 'donor-1', amount: 1500, type: 'DONATION', status: 'PENDING', referrerName: 'Referral Person', razorpayOrderId: 'order-1', createdAt: new Date() };
 const tx = { payment: { update: jest.fn() }, user: { findUnique: jest.fn() }, donation: { create: jest.fn() }, manualPayment: { create: jest.fn() } };
 const user = { id: 'donor-1', firstName: 'Test', lastName: 'Donor', email: 'donor@example.com' };
 const data = () => ({ razorpay_order_id: 'order-1', razorpay_payment_id: 'pay-1', razorpay_signature: crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET!).update('order-1|pay-1').digest('hex') });
@@ -29,7 +29,7 @@ beforeEach(() => {
 test('online donation creates a pending admin review and sends no receipt', async () => {
   const result = await verifyPayment({ ...data(), purpose: 'Education' }, user.id);
   expect(result.reviewStatus).toBe('ADMIN_REVIEW');
-  expect(tx.manualPayment.create).toHaveBeenCalledWith({ data: expect.objectContaining({ id: 'razorpay:online-1', status: 'PENDING', amount: 1500, utrNumber: 'pay-1' }) });
+  expect(tx.manualPayment.create).toHaveBeenCalledWith({ data: expect.objectContaining({ id: 'razorpay:online-1', status: 'PENDING', amount: 1500, utrNumber: 'pay-1', referrerName: 'Referral Person' }) });
   expect(generateReceiptPdf).not.toHaveBeenCalled();
   const donorEmail = (sendEmail as jest.Mock).mock.calls.find(call => call[0] === user.email);
   expect(donorEmail?.[2]).toContain('after approval');
@@ -50,4 +50,13 @@ test('admin is still notified when the donor acknowledgment fails', async () => 
   (sendEmail as jest.Mock).mockRejectedValueOnce(new Error('Donor email failed'));
   await verifyPayment(data(), user.id);
   expect((sendEmail as jest.Mock).mock.calls.some(call => call[0] !== user.email && call[2].includes('Admin approval is required'))).toBe(true);
+});
+
+test('online referral is stored at order creation before checkout', async () => {
+  await createOrder(user.id, 1500, 'DONATION', '  Referral Person  ');
+  expect(prisma.payment.create).toHaveBeenCalledWith({ data: expect.objectContaining({ referrerName: 'Referral Person', status: 'PENDING' }) });
+});
+test('invalid online referral fails before payment creation', async () => {
+  await expect(createOrder(user.id, 1500, 'DONATION', 'a'.repeat(151))).rejects.toThrow();
+  expect(prisma.payment.create).not.toHaveBeenCalled();
 });

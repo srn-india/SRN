@@ -6,6 +6,11 @@ import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import { generateAccessToken } from '../utils/jwt';
 
+// Keep payment/database integration real while isolating external delivery services.
+jest.mock('../modules/membership/idcard.service', () => ({ generateAndUploadIdCard: jest.fn().mockResolvedValue('https://example.com/id-card.png') }));
+jest.mock('../utils/email.service', () => ({ sendEmail: jest.fn().mockResolvedValue({}) }));
+jest.mock('../utils/storage.service', () => ({ uploadPaymentReport: jest.fn().mockResolvedValue('https://example.com/report.xlsx') }));
+
 jest.mock('razorpay', () => {
   let counter = 0;
   return jest.fn().mockImplementation(() => {
@@ -23,6 +28,11 @@ jest.mock('razorpay', () => {
 describe('Payment & Membership Module', () => {
   let userToken: string;
   let userId: string;
+
+  beforeEach(() => {
+    // Receipt attachment downloads are external I/O, outside payment verification.
+    jest.spyOn(global, 'fetch').mockResolvedValue({ ok: false } as Response);
+  });
 
   beforeAll(async () => {
     await setupTestDB();

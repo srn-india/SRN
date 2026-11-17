@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import * as service from './manual-payment.service';
 import { upload, uploadToSupabase } from '../../utils/upload';
 import { prisma } from '../../lib/prisma';
+import { referrerSchema } from '../../utils/referrer';
 
 export const submit = async (req: Request, res: Response) => {
   try {
@@ -29,6 +30,9 @@ export const submit = async (req: Request, res: Response) => {
     if (typeof amount !== 'number' || !Number.isFinite(amount) || amount <= 0 || !['DONATION', 'MEMBERSHIP'].includes(type) || typeof utrNumber !== 'string' || !utrNumber.trim()) {
       return res.status(400).json({ success: false, message: 'amount, type and utrNumber are required' });
     }
+
+    const referral = referrerSchema.safeParse(req.body.referrerName);
+    if (!referral.success) return res.status(400).json({ success: false, message: 'Referrer name must be text of at most 150 characters' });
 
     const cleanPhone = phone ? String(phone).trim() : null;
     const idNum = govIdNumber ? String(govIdNumber).trim() : (panNumber ? String(panNumber).trim() : null);
@@ -202,7 +206,7 @@ export const submit = async (req: Request, res: Response) => {
       }).catch(console.error);
     }
 
-    const payment = await service.submitPayment(userId, { amount, type, utrNumber, screenshot, purpose, email });
+    const payment = await service.submitPayment(userId, { amount, type, utrNumber, screenshot, purpose, email, referrerName: referral.data });
     res.json({ success: true, message: 'Payment submitted for verification', data: payment });
   } catch (err: any) {
     res.status(500).json({ success: false, message: err.message });
@@ -304,5 +308,17 @@ export const resendDonationReceipt = async (req: Request, res: Response) => {
     res.json({ success: true, message: 'Donation receipt email sent' });
   } catch (err: any) {
     res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+export const exportDonations = async (_req: Request, res: Response) => {
+  try {
+    const buffer = await service.exportDonations();
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="SRN_Donations_${new Date().toISOString().slice(0, 10)}.xlsx"`);
+    res.setHeader('Cache-Control', 'no-store');
+    res.send(buffer);
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: 'Could not export donations. Please try again.' });
   }
 };

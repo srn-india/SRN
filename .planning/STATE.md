@@ -8,6 +8,7 @@
 ## Quick Tasks Completed
 | Task | Date | Status | Description |
 |------|------|--------|-------------|
+| `013-donation-referrals-excel` | 2026-11-18 | IMPLEMENTED ✓ (deployment pending) | Optional per-donation referrer name, admin-only full-register XLSX download, and donation preservation during bulk cleanup |
 | `012-idcard-test-portability` | 2026-10-26 | COMPLETE ✓ | Removed macOS-only preview file export from the ID-card regression test; layout assertions retained |
 | `011-idcard-long-name` | 2026-10-26 | COMPLETE ✓ | Fit full member names before the portrait, preserving other field sizes; regenerated the reported card |
 | `010-avatar-save-state` | 2026-10-26 | COMPLETE ✓ | Fixed stale file picker after saving, enabled actionable Save validation, and clarified ID-card copy |
@@ -90,3 +91,39 @@
 ## ID-card CI Portability — 2026-10-26
 - GitHub Actions reported 77 passing tests and one failure: the ID-card test tried writing a visual preview to macOS-only /private/tmp on Ubuntu. Removed the unused fs import and preview export; all rendering and layout assertions remain intact.
 - Local verification: all three ID-card cases and the backend build pass. No production code changed. Full Linux CI verification follows the push.
+
+
+## Donation Referrals & Excel Register — 2026-11-18
+- Added optional bilingual “Referred by” input to the shared donation details form. UPI and bank submissions pass the trimmed name; the existing Razorpay order flow also stores the referrer before checkout and copies it to the review queue on verified payment. The existing disabled Online tab is unchanged.
+- Added nullable referrerName columns (150 characters) to Payment and ManualPayment, with additive SQL migration at artifacts/srn-backend/prisma/migrations/20261118000000_donation_referrer/migration.sql. Missing/blank names remain null, preserving compatibility with existing callers and historical records; invalid types/oversized values are rejected before creating users or payment orders.
+- Admin Payment Reviews displays the referrer and provides Download Donations Excel. GET /api/manual-payments/admin/donations/export uses existing database-backed authentication and ADMIN authorization. Generates a real .xlsx workbook from all donation review statuses independently of dashboard filters, including historical successful online donations without duplicate review rows. Historical online records without a review row are explicitly marked REVIEW RECORD UNAVAILABLE.
+- Excel columns: donation ID, date (UTC), donor name/email/phone, referrer name, numeric INR amount, method, transaction reference, review status, purpose and admin note. Headers are retained for empty registers; Unicode, leading-zero references, and formula-like names are preserved as literal text. Downloads use no-store caching.
+- Routine bulk cleanup now excludes donations so the register survives clearing processed memberships; UI label/confirmation reflect this. Existing explicit individual record deletion remains available.
+- Verification: backend and frontend npm run build pass; all 32 frontend tests pass across 7 files; 32 focused backend donation/review/export tests pass across 3 suites. Tests cover UPI/bank form payloads, online order persistence and verification propagation, old submissions without referrals, input validation before writes, admin-only downloads, workbook contents/deduplication, export failures, and cleanup retention. Tests mock database/email; no live donation, user record, or donor email was created.
+- React Doctor changed-file scan: no findings; project score 59/100. git diff --check passes.
+- Deployment pending: no database schema changes have been applied to a running database and no production deployment was triggered. Apply the additive schema change before serving the new backend; the existing backend Docker startup uses prisma db push. The migration is also provided for migration-managed environments. Existing frontend bundle-size warning remains.
+- Memory work-state tools are not exposed in this session; project state is recorded here. The memory observer authentication outage was reported to the user at session start.
+
+- Local development servers started 2026-11-18: frontend http://localhost:8080 (session 3431), backend http://localhost:4000 (session 8724). Frontend /donate returns HTTP 200; backend root returns success; Redis connected. Frontend already targets localhost:4000. Database schema update remains pending.
+
+- Local frontend moved to http://localhost:8083 (session 22910) after the user reported a port 8080 conflict. Stopped only the SRN Vite process launched in session 3431. Backend remains at http://localhost:4000; existing backend CORS allows localhost:8083.
+
+- At the user’s request, moved frontend back to http://localhost:8080 (session 12384). Port 8080 was already free when checked; stopped SRN frontend on 8083 and started Vite with --port 8080 --strictPort. Frontend /donate returns HTTP 200 and backend root on 4000 returns success.
+
+
+## Donation Download Runtime Fix — 2026-11-18
+- User reported the generic donation download error and could not locate the form input. Read-only database inspection reproduced PostgreSQL 42703: referrerName did not exist in either Payment or ManualPayment. The earlier feature verification used mocked persistence and left the runtime schema update pending.
+- Applied exactly the two additive ALTER TABLE statements from migration 20261118000000_donation_referrer to the backend's configured remote database in one transaction, with a 5-second lock timeout. Verified both nullable VARCHAR(150) columns exist. No donor/payment rows were inserted, updated, or deleted. This was direct SQL application; migration-history metadata was not changed. Docker continues to use prisma db push.
+- Invoked the actual donation export service against the connected database: valid XLSX, 17157 bytes, Referrer Name header present, zero donation rows currently available. Backend npm run build passes; frontend /donate HTTP 200 and backend root returns success.
+- Browser verification at http://localhost:8080/donate confirms REFERRED BY (OPTIONAL), input id donation-referrer, immediately below email and above PAN. No frontend field change was needed. Local feature is available; production frontend/backend source deployment remains separate and was not triggered.
+- This supersedes the earlier pending database schema notes above; both referrer columns are now present in the configured database.
+
+
+## Donation Referral Main-Branch Verification — 2026-11-18
+- User requested rerunning all tests and pushing to main only after successful completion. Full initial backend run reproduced the previously documented ESM loader limitation (seven suites could not load htmlparser2), plus unavailable local Redis.
+- Fixed Jest dependency JavaScript transformation for the sanitizer dependency chain, including pnpm's nested node_modules layout and domelementtype. Confined JavaScript transformation to dependencies. Production runtime dependencies and application behavior are unchanged by this test configuration fix.
+- Payment integration tests now mock external ID-card generation, email/report delivery, and attachment downloads, while retaining real PostgreSQL payment/membership persistence and assertions. This removes external-storage timeouts inside test payment transactions and avoids contacting production services.
+- Final full-suite verification: 91/91 backend tests pass across all 15 suites, 32/32 frontend tests pass across all 7 files. Backend and frontend production builds pass. React Doctor changed-file scan has no findings (overall project score 59/100); git diff --check passes. Existing frontend bundle-size warning remains.
+- Backend integration tests ran against a dedicated temporary PostgreSQL database srn_referral_tests on 127.0.0.1:55432 and temporary Redis on 127.0.0.1:56379, with fake storage configuration and email delivery disabled/mocked. Production database and user records were not used for this test run. PostgreSQL schema was pushed only to this isolated test database. Installed local Redis via Homebrew for the test environment.
+- Made the donation SQL migration repeatable with ADD COLUMN IF NOT EXISTS, matching the prior direct application to the configured database. Validated the migration against the isolated schema with both columns already present.
+- Reviewed the final source diff. Commit scope includes referral input/storage, admin XLSX export, schema migration, tests, Jest configuration and this state record. Existing backend runtime-log changes are excluded. Main was synchronized with origin/main before changes were committed; push follows verification.

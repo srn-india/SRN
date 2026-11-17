@@ -9,5 +9,13 @@ module.exports = {
   resetModules: true,
   restoreMocks: true,
   setupFiles: ['<rootDir>/jest.setup.js'],
-  transformIgnorePatterns: ['node_modules/(?!(sanitize-html|htmlparser2|domhandler|domutils|dom-serializer|entities)/)'],
+  transform: {
+    '^.+\\.tsx?$': 'ts-jest',
+    '^.+/node_modules/.+\\.js$': ['ts-jest', { tsconfig: { allowJs: true } }],
+  },
+  // pnpm nests dependencies under .pnpm before their own node_modules directory.
+  transformIgnorePatterns: [
+    '/node_modules/(?!\\.pnpm/|sanitize-html/|htmlparser2/|domhandler/|domelementtype/|domutils/|dom-serializer/|entities/)',
+    '/node_modules/\\.pnpm/(?!(sanitize-html|htmlparser2|domhandler|domelementtype|domutils|dom-serializer|entities)@)',
+  ],
 };

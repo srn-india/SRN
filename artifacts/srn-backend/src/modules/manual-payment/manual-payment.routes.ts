@@ -12,6 +12,7 @@ router.get('/my', protect, ctrl.getMyPayments);
 router.post('/upload-screenshot', optionalAuth, upload.single('file'), ctrl.uploadScreenshot);
 
 // ── Admin routes ─────────────────────────────────────────────────────────────
+router.get('/admin/donations/export', protect, restrictTo('ADMIN'), ctrl.exportDonations);
 router.get('/admin/all', protect, restrictTo('ADMIN'), ctrl.getAllPayments);
 router.delete('/admin/cleanup', protect, restrictTo('ADMIN'), ctrl.cleanupPayments);
 router.delete('/admin/:id', protect, restrictTo('ADMIN'), ctrl.deletePayment);

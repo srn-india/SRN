@@ -141,6 +141,7 @@ model Payment {
   type              PaymentType
   razorpayOrderId   String?       @unique
   razorpayPaymentId String?       @unique
+  referrerName      String?       @db.VarChar(150)
   provider          String        @default("RAZORPAY")
   status            PaymentStatus @default(PENDING)
   createdAt         DateTime      @default(now())
@@ -319,6 +320,7 @@ model ManualPayment {
   type         PaymentType
   utrNumber    String
   screenshot   String?
+  referrerName String?             @db.VarChar(150)
   purpose      String?
   status       ManualPaymentStatus @default(PENDING)
   adminNote    String?
