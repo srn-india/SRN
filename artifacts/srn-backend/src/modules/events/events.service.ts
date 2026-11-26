@@ -53,6 +53,9 @@ export const getEventById = async (id: string) => {
 };
 
 export const deleteEvent = async (id: string) => {
+  const existing = await prisma.event.findUnique({ where: { id }, select: { id: true } });
+  if (!existing) throw new AppError('Record not found', 404);
+
   const event = await prisma.event.delete({
     where: { id },
   });
