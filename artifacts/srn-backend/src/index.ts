@@ -6,6 +6,9 @@ import { nodeProfilingIntegration } from '@sentry/profiling-node';
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN || '',
+  // Never report from automated test runs, and tag every event with the real environment
+  enabled: process.env.NODE_ENV !== 'test',
+  environment: process.env.SENTRY_ENVIRONMENT || process.env.NODE_ENV || 'development',
   integrations: [
     nodeProfilingIntegration(),
   ],
@@ -188,7 +191,14 @@ app.use('/api/articles', articleRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/manual-payments', manualPaymentRoutes);
 
-Sentry.setupExpressErrorHandler(app);
+Sentry.setupExpressErrorHandler(app, {
+  // "Record not found" (Prisma P2025) is a normal 404 for the client, not a server bug
+  shouldHandleError: (err: any) => {
+    if (err?.code === 'P2025') return false;
+    const status = Number(err?.statusCode ?? err?.status ?? 500);
+    return status >= 500;
+  },
+});
 
 // Error Handling Middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

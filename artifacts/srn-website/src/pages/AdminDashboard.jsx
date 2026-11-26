@@ -1606,8 +1606,8 @@ export default function AdminDashboard() {
 
               {/* MANAGE MEMBERSHIPS TAB */}
               {activeTab === "memberships" && (
-                <motion.div key="memberships" variants={fadeVariants} initial="hidden" animate="visible" exit="exit" className="bg-white/70 backdrop-blur-xl p-8 rounded-[2rem] border border-white/80 shadow-sm text-left">
-                  <div className="mb-8 pb-4 border-b border-gray-100 flex justify-between items-center">
+                <motion.div key="memberships" variants={fadeVariants} initial="hidden" animate="visible" exit="exit" className="bg-white/70 backdrop-blur-xl p-4 sm:p-6 lg:p-8 rounded-[2rem] border border-white/80 shadow-sm text-left">
+                  <div className="mb-8 pb-4 border-b border-gray-100 flex flex-wrap justify-between items-center gap-4">
                     <div>
                       <h2 className="text-2xl font-bold text-[#2C1810] font-serif flex items-center gap-2">
                         Manage Memberships
@@ -1629,6 +1629,8 @@ export default function AdminDashboard() {
                         disabled={loadingMemberships}
                         className="flex items-center justify-center p-2.5 bg-white text-[#7A5C45] hover:text-[#E8622A] rounded-xl border border-gray-200 hover:border-orange-200 transition-all shadow-sm disabled:opacity-50 cursor-pointer"
                         title="Reload Memberships"
+                        aria-label="Reload memberships"
+                        type="button"
                       >
                         <RotateCw className={`w-4 h-4 ${loadingMemberships ? "animate-spin" : ""}`} />
                       </button>
@@ -1642,7 +1644,7 @@ export default function AdminDashboard() {
                   ) : (
                     <div className="space-y-6">
                       {/* Revenue & Member Metrics Cards */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
                         <div className="bg-white/60 backdrop-blur-md rounded-[1.5rem] p-5 border border-white/80 shadow-sm">
                           <span className="text-xs text-[#7A5C45] font-semibold uppercase tracking-wider block mb-1">Active Subscriptions</span>
                           <span className="text-2xl font-bold text-emerald-600">{analytics?.totalMembers || 0}</span>
@@ -1661,137 +1663,159 @@ export default function AdminDashboard() {
                         </div>
                       </div>
 
-                      <div className="overflow-x-auto rounded-2xl border border-white/80 shadow-sm bg-white/30">
-                        <table className="w-full text-left border-collapse">
-                          <thead>
-                            <tr className="bg-gradient-to-r from-orange-50 to-orange-100/50 text-[#7A5C45] font-bold text-xs uppercase tracking-wider border-b border-gray-100">
-                              <th className="px-6 py-4">Member Name & Gender</th>
-                              <th className="px-6 py-4">Contact (Phone / Email)</th>
-                              <th className="px-6 py-4">Location & Occupation</th>
-                              <th className="px-6 py-4">Plan & Duration</th>
-                              <th className="px-6 py-4">Status</th>
-                              <th className="px-6 py-4 text-right">Action</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-gray-100 text-sm">
-                            {memberships.map((m) => (
-                              <tr key={m.id} className="hover:bg-white/50 transition-colors">
-                                <td className="px-6 py-4 font-semibold text-[#2C1810]">
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                    <span>{m.user ? `${m.user.firstName || ''} ${m.user.lastName || ''}`.trim() : "Unknown User"}</span>
+                      {/* Member list — responsive cards so every field and action stays visible at any width */}
+                      <div className="rounded-2xl border border-white/80 shadow-sm bg-white/30 overflow-hidden">
+                        {/* Column labels (large screens only) */}
+                        <div className="hidden lg:grid lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1.6fr)_minmax(0,1.3fr)_minmax(0,1.2fr)_auto] gap-6 px-6 py-3 bg-gradient-to-r from-orange-50 to-orange-100/50 text-[#7A5C45] font-bold text-xs uppercase tracking-wider border-b border-gray-100" aria-hidden="true">
+                          <span>Member</span>
+                          <span>Contact</span>
+                          <span>Location &amp; Occupation</span>
+                          <span>Plan &amp; Duration</span>
+                          <span className="text-right">Status</span>
+                        </div>
+
+                        <ul className="divide-y divide-gray-100 text-sm" aria-label="Membership records">
+                          {memberships.map((m) => {
+                            const memberName = m.user ? `${m.user.firstName || ''} ${m.user.lastName || ''}`.trim() || "Unnamed Member" : "Unknown User";
+                            const memberKey = m.id || m.userId;
+                            const isSending = sendingIdCardId === memberKey;
+                            const openRename = () => {
+                              setRenamingUser({ id: m.userId || m.user.id, firstName: m.user.firstName || '', lastName: m.user.lastName || '', email: m.user.email, avatar: m.user.avatar });
+                              setEditFirstName(m.user.firstName || '');
+                              setEditLastName(m.user.lastName || '');
+                              setRenameError('');
+                              setRenameModalOpen(true);
+                            };
+                            const location = [m.user?.district, m.user?.state].map(v => v && String(v).trim()).filter(Boolean).join(", ");
+                            const occupation = m.user?.occupation && m.user.occupation !== 'N/A' ? m.user.occupation : null;
+                            const statusClass =
+                              m.status === "ACTIVE" ? "bg-emerald-100 text-emerald-700" :
+                              m.status === "EXPIRED" ? "bg-gray-100 text-gray-600" : "bg-red-100 text-red-700";
+                            const btnBase = "inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1";
+
+                            return (
+                              <li key={m.id} className="px-5 sm:px-6 py-5 hover:bg-white/50 transition-colors">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1.6fr)_minmax(0,1.3fr)_minmax(0,1.2fr)_auto] gap-x-6 gap-y-4 items-start">
+                                  {/* Name & gender */}
+                                  <div className="min-w-0">
+                                    <span className="lg:hidden block text-[10px] font-bold uppercase tracking-wider text-[#7A5C45] mb-1">Member</span>
+                                    <p className="font-semibold text-[#2C1810] text-base leading-snug break-words">{memberName}</p>
                                     {m.user?.gender && (
-                                      <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-bold uppercase tracking-wider">
+                                      <span className="inline-block mt-1.5 px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-bold uppercase tracking-wider">
                                         {m.user.gender}
                                       </span>
                                     )}
-                                    {m.user && (
-                                      <button
-                                        onClick={() => {
-                                          setRenamingUser({ id: m.userId || m.user.id, firstName: m.user.firstName || '', lastName: m.user.lastName || '', email: m.user.email, avatar: m.user.avatar });
-                                          setEditFirstName(m.user.firstName || '');
-                                          setEditLastName(m.user.lastName || '');
-                                          setRenameError('');
-                                          setRenameModalOpen(true);
-                                        }}
-                                        className="p-1 hover:bg-orange-50 text-gray-400 hover:text-[#E8622A] rounded-lg transition-colors cursor-pointer"
-                                        title="Rename Member"
-                                      >
-                                        <Pencil className="w-3.5 h-3.5" />
-                                      </button>
+                                  </div>
+
+                                  {/* Contact */}
+                                  <div className="min-w-0">
+                                    <span className="lg:hidden block text-[10px] font-bold uppercase tracking-wider text-[#7A5C45] mb-1">Contact</span>
+                                    {m.user?.phone ? (
+                                      <a href={`tel:${m.user.phone}`} className="block font-medium text-[#2C1810] hover:text-[#E8622A]">{m.user.phone}</a>
+                                    ) : (
+                                      <span className="block text-gray-400">No phone</span>
+                                    )}
+                                    {m.user?.email ? (
+                                      <a href={`mailto:${m.user.email}`} className="block text-xs text-gray-500 hover:text-[#E8622A] break-all mt-0.5" title={m.user.email}>{m.user.email}</a>
+                                    ) : (
+                                      <span className="block text-xs text-gray-400 mt-0.5">No email</span>
                                     )}
                                   </div>
-                                </td>
-                                <td className="px-6 py-4 text-gray-600">
-                                  <div className="font-medium text-sm text-[#2C1810]">{m.user?.phone || "No phone"}</div>
-                                  <div className="text-xs text-gray-500">{m.user?.email || "N/A"}</div>
-                                </td>
-                                <td className="px-6 py-4 text-xs font-medium text-gray-600">
-                                  <div className="text-gray-800 font-semibold">{[m.user?.district, m.user?.state].filter(Boolean).join(", ") || "N/A"}</div>
-                                  <div className="text-[#7A5C45]">{m.user?.occupation && m.user.occupation !== 'N/A' ? m.user.occupation : "No occupation listed"}</div>
-                                </td>
-                                <td className="px-6 py-4">
-                                  <span className="px-2.5 py-1 bg-orange-50 text-[#E8622A] rounded-lg text-xs font-bold border border-orange-100">
-                                    {m.plan}
-                                  </span>
-                                  <div className="text-[11px] text-gray-400 mt-1">
-                                    {new Date(m.startDate).toLocaleDateString("en-IN")} - {new Date(m.endDate).toLocaleDateString("en-IN")}
+
+                                  {/* Location & occupation */}
+                                  <div className="min-w-0 text-xs">
+                                    <span className="lg:hidden block text-[10px] font-bold uppercase tracking-wider text-[#7A5C45] mb-1">Location &amp; Occupation</span>
+                                    <p className="text-gray-800 font-semibold break-words">{location || "N/A"}</p>
+                                    <p className={occupation ? "text-[#7A5C45] mt-0.5 break-words" : "text-gray-400 italic mt-0.5"}>{occupation || "No occupation listed"}</p>
                                   </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                                    m.status === "ACTIVE" ? "bg-emerald-100 text-emerald-700" :
-                                    m.status === "EXPIRED" ? "bg-gray-100 text-gray-600" : "bg-red-100 text-red-700"
-                                  }`}>
-                                    {m.status}
-                                  </span>
-                                </td>
-                                <td className="px-6 py-4 text-right">
-                                  <div className="flex items-center justify-end gap-2 flex-wrap">
-                                    {m.status === "ACTIVE" && (
-                                      <>
-                                        <button
-                                          onClick={() => handleSendMemberIdCard(m.id || m.userId, m.user ? `${m.user.firstName || ''} ${m.user.lastName || ''}`.trim() : 'Member')}
-                                          disabled={sendingIdCardId === (m.id || m.userId)}
-                                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100/80 border border-indigo-200 text-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
-                                          title="Send official ID card and receipt to member email (can be sent multiple times)"
-                                        >
-                                          {sendingIdCardId === (m.id || m.userId) ? (
-                                            <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-600" />
-                                          ) : (
-                                            <Send className="w-3.5 h-3.5" />
-                                          )}
-                                          <span>{sendingIdCardId === (m.id || m.userId) ? "Sending..." : "Send ID Card"}</span>
-                                        </button>
 
-                                        <a
-                                          href={`https://cgmlrhewmemptyklkbrq.supabase.co/storage/v1/object/public/id-cards/${m.id}.png?download=SRN_ID_Card_${m.user?.firstName || 'Member'}.png&t=${Date.now()}`}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-50 hover:bg-orange-100/80 border border-orange-200 text-[#E8622A] rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
-                                          title="Download ID Card PNG directly"
-                                        >
-                                          <Download className="w-3.5 h-3.5" />
-                                          <span>Download</span>
-                                        </a>
-                                      </>
-                                    )}
+                                  {/* Plan & duration */}
+                                  <div className="min-w-0">
+                                    <span className="lg:hidden block text-[10px] font-bold uppercase tracking-wider text-[#7A5C45] mb-1">Plan &amp; Duration</span>
+                                    <span className="inline-block px-2.5 py-1 bg-orange-50 text-[#E8622A] rounded-lg text-xs font-bold border border-orange-100">
+                                      {m.plan}
+                                    </span>
+                                    <p className="text-[11px] text-gray-500 mt-1.5 whitespace-nowrap">
+                                      {new Date(m.startDate).toLocaleDateString("en-IN")} – {new Date(m.endDate).toLocaleDateString("en-IN")}
+                                    </p>
+                                  </div>
 
-                                    {m.user && (
+                                  {/* Status */}
+                                  <div className="sm:col-span-2 lg:col-span-1 lg:text-right">
+                                    <span className="lg:hidden text-[10px] font-bold uppercase tracking-wider text-[#7A5C45] mr-2">Status</span>
+                                    <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold ${statusClass}`}>
+                                      {m.status}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Actions — always on their own row so nothing gets clipped */}
+                                <div className="mt-4 pt-4 border-t border-dashed border-gray-200 flex flex-wrap items-center justify-end gap-2" role="group" aria-label={`Actions for ${memberName}`}>
+                                  {m.status === "ACTIVE" && (
+                                    <>
                                       <button
-                                        onClick={() => {
-                                          setRenamingUser({ id: m.userId || m.user.id, firstName: m.user.firstName || '', lastName: m.user.lastName || '', email: m.user.email, avatar: m.user.avatar });
-                                          setEditFirstName(m.user.firstName || '');
-                                          setEditLastName(m.user.lastName || '');
-                                          setRenameError('');
-                                          setRenameModalOpen(true);
-                                        }}
-                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 hover:border-orange-300 hover:bg-orange-50/50 text-[#7A5C45] hover:text-[#E8622A] rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
-                                        title="Rename Member"
+                                        type="button"
+                                        onClick={() => handleSendMemberIdCard(memberKey, memberName)}
+                                        disabled={isSending}
+                                        aria-label={`Send ID card to ${memberName}`}
+                                        className={`${btnBase} bg-indigo-50 hover:bg-indigo-100/80 border border-indigo-200 text-indigo-700 focus-visible:ring-indigo-400 disabled:opacity-60 disabled:cursor-not-allowed`}
+                                        title="Send official ID card and receipt to member email (can be sent multiple times)"
                                       >
-                                        <Pencil className="w-3.5 h-3.5" /> Rename
+                                        {isSending ? (
+                                          <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-600" aria-hidden="true" />
+                                        ) : (
+                                          <Send className="w-3.5 h-3.5" aria-hidden="true" />
+                                        )}
+                                        <span>{isSending ? "Sending..." : "Send ID Card"}</span>
                                       </button>
-                                    )}
 
+                                      <a
+                                        href={`https://cgmlrhewmemptyklkbrq.supabase.co/storage/v1/object/public/id-cards/${m.id}.png?download=SRN_ID_Card_${m.user?.firstName || 'Member'}.png&t=${Date.now()}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        aria-label={`Download ID card for ${memberName}`}
+                                        className={`${btnBase} bg-orange-50 hover:bg-orange-100/80 border border-orange-200 text-[#E8622A] focus-visible:ring-orange-400`}
+                                        title="Download ID Card PNG directly"
+                                      >
+                                        <Download className="w-3.5 h-3.5" aria-hidden="true" />
+                                        <span>Download ID</span>
+                                      </a>
+                                    </>
+                                  )}
+
+                                  {m.user && (
                                     <button
-                                      onClick={() => handleDeleteMembership(m.id, m.user ? `${m.user.firstName || ''} ${m.user.lastName || ''}`.trim() : 'this member')}
-                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-red-200 hover:border-red-400 hover:bg-red-50 text-red-600 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
-                                      title="Permanently Delete Membership Record"
+                                      type="button"
+                                      onClick={openRename}
+                                      aria-label={`Rename ${memberName}`}
+                                      className={`${btnBase} bg-white border border-gray-200 hover:border-orange-300 hover:bg-orange-50/50 text-[#7A5C45] hover:text-[#E8622A] focus-visible:ring-orange-400`}
+                                      title="Rename Member"
                                     >
-                                      <Trash2 className="w-3.5 h-3.5 text-red-500" /> Delete
+                                      <Pencil className="w-3.5 h-3.5" aria-hidden="true" />
+                                      <span>Rename</span>
                                     </button>
-                                  </div>
-                                </td>
-                              </tr>
-                            ))}
-                            {memberships.length === 0 && (
-                              <tr>
-                                <td colSpan={6} className="text-center py-10 text-[#7A5C45] bg-white/10">
-                                  No membership records found.
-                                </td>
-                              </tr>
-                            )}
-                          </tbody>
-                        </table>
+                                  )}
+
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteMembership(m.id, m.user ? memberName : 'this member')}
+                                    aria-label={`Delete membership of ${memberName}`}
+                                    className={`${btnBase} bg-white border border-red-200 hover:border-red-400 hover:bg-red-50 text-red-600 focus-visible:ring-red-400`}
+                                    title="Permanently Delete Membership Record"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5 text-red-500" aria-hidden="true" />
+                                    <span>Delete</span>
+                                  </button>
+                                </div>
+                              </li>
+                            );
+                          })}
+                          {memberships.length === 0 && (
+                            <li className="text-center py-10 text-[#7A5C45] bg-white/10">
+                              No membership records found.
+                            </li>
+                          )}
+                        </ul>
                       </div>
 
                       {/* Pagination Controls */}
