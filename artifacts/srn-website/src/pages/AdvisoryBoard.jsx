@@ -14,6 +14,17 @@ const boardMembers = [
     ]
   },
   {
+    name: "डॉ. अनिल कुमार गुप्ता",
+    highlight: "आई.ए.एस. 1979 (उत्तर प्रदेश)",
+    image: "/national_bearers/anil-kumar-gupta.jpeg",
+    details: [
+      "पी.एच.डी., एम.एससी. (यॉर्क, इंग्लैंड)",
+      "पूर्व अध्यक्ष, उत्तर प्रदेश आई.ए.एस. एसोसिएशन",
+      "पूर्व अध्यक्ष, राजस्व परिषद, उत्तर प्रदेश",
+      "पूर्व प्रमुख सचिव, गृह विभाग, उत्तर प्रदेश"
+    ]
+  },
+  {
     name: (
       <span>
         <span className="font-bold">पद्मश्री</span> डॉ. पी. एल. गौतम जी
@@ -69,6 +80,7 @@ const boardMembers = [
     name: "श्री विनोद कोहली",
     highlight: "बी.टेक (इलेक्ट्रिकल-आईआईटी दिल्ली) 1972",
     image: "/national_bearers/vinod-kohali.jpeg",
+    isDegreeHighlight: true,
     details: [
       "सदस्य, कार्यकारी परिषद, उत्तराखण्ड प्रौद्योगिकी विश्वविद्यालय",
       "प्रबंध निदेशक, क्यूजीनस इन्फोटेक प्राइवेट लिमिटेड"
@@ -121,11 +133,11 @@ function AdvisoryMemberCard({ member, idx, lang }) {
         {member.name}
       </h3>
       
-      {/* Highlight/Designation - Bold text (except for idx === 5 where it is a degree) */}
+      {/* Highlight/Designation - Bold text (except for degree-style highlights) */}
       <p className={`text-base leading-snug ${
         member.isCustomStyled
           ? ""
-          : (idx === 5 ? "text-sm md:text-base text-[#7A5C45] font-medium" : "font-bold text-[#5C1010]")
+          : (member.isDegreeHighlight ? "text-sm md:text-base text-[#7A5C45] font-medium" : "font-bold text-[#5C1010]")
       }`}>
         {member.highlight}
       </p>

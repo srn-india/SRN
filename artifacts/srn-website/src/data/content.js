@@ -107,6 +107,14 @@ export const content = {
           role: "Former Chief Secretary, Government of Telangana",
         },
         {
+          initials: "AG",
+          nameHindi: "डॉ. अनिल कुमार गुप्ता",
+          name: "Dr. Anil Kumar Gupta",
+          batch: "IAS 1979 (UP)",
+          qualification: "PhD, MSc (York, England); Ex Chairman, Board of Revenue, Uttar Pradesh",
+          role: "Ex Principal Secretary, Department of Home, UP; Ex President, UP IAS Association",
+        },
+        {
           initials: "VP",
           nameHindi: "श्री विभूति भूषण प्रधान",
           name: "Shri Vibhuti Bhushan Pradhan",
@@ -427,6 +435,14 @@ export const content = {
           batch: "IAS 1984",
           qualification: "B.Tech IIT Roorkee, M.Tech IIT Delhi, Ph.D TERI",
           role: "Former Chief Secretary, Government of Telangana",
+        },
+        {
+          initials: "AG",
+          nameHindi: "डॉ. अनिल कुमार गुप्ता",
+          name: "Dr. Anil Kumar Gupta",
+          batch: "IAS 1979 (UP)",
+          qualification: "PhD, MSc (York, England); Ex Chairman, Board of Revenue, Uttar Pradesh",
+          role: "Ex Principal Secretary, Department of Home, UP; Ex President, UP IAS Association",
         },
         {
           initials: "VP",
